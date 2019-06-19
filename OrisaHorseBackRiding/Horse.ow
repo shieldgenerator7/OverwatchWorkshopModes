@@ -1,5 +1,14 @@
 
 
+/*
+
+Horse Player Vars:
+A - Type ID: 1 for Horse
+R - Rider: the player that is riding this horse player
+N - "Next To": true if a player is riding this horse player
+S - Speed: the movement speed of the player
+
+*/
 
 
 rule("player spawn (horse) (orisa)")
@@ -19,12 +28,17 @@ rule("player spawn (horse) (orisa)")
 
 	actions
 	{
+        //Add this player to the global horse array
 		Skip If(Compare(Global Variable(H), !=, 0), 1);
 		Set Global Variable(H, Event Player);
 		Skip If(Array Contains(Global Variable(H), Event Player), 1);
 		Modify Global Variable(H, Append To Array, Event Player);
+
+        //Remove this player from the global rider array
 		Modify Global Variable(R, Remove From Array By Value, Event Player);
-		Set Player Variable(Event Player, A, False);
+
+        //Set player horse vars
+		Set Player Variable(Event Player, A, 1);
 		Set Player Variable(Player Variable(Event Player, R), H, Null);
 		Set Player Variable(Player Variable(Event Player, H), R, Null);
 		Set Player Variable(Event Player, H, Null);
@@ -50,7 +64,7 @@ rule("horse injured")
 
 	conditions
 	{
-		Player Variable(Event Player, A) == False;
+		Player Variable(Event Player, A) == 1;
 		Player Variable(Event Player, N) == True;
 		Normalized Health(Event Player) < 0.500;
 	}
@@ -77,7 +91,7 @@ rule("horse dies")
 
 	conditions
 	{
-		Player Variable(Event Player, A) == False;
+		Player Variable(Event Player, A) == 1;
 	}
 
 	actions
@@ -101,7 +115,7 @@ rule("horse's rider dies")
 
 	conditions
 	{
-		Player Variable(Event Player, A) == False;
+		Player Variable(Event Player, A) == 1;
 		Is Alive(Player Variable(Event Player, R)) == False;
 	}
 
@@ -122,7 +136,7 @@ rule("horse gallop (speed up)")
 
 	conditions
 	{
-		Player Variable(Event Player, A) == False;
+		Player Variable(Event Player, A) == 1;
 		Is Button Held(Event Player, Ability 1) == True;
 	}
 
@@ -148,7 +162,7 @@ rule("horse gallop (initial speed burst)")
 
 	conditions
 	{
-		Player Variable(Event Player, A) == False;
+		Player Variable(Event Player, A) == 1;
 		Is Button Held(Event Player, Ability 1) == True;
 	}
 
@@ -172,7 +186,7 @@ rule("horse gallop (slow down)")
 
 	conditions
 	{
-		Player Variable(Event Player, A) == False;
+		Player Variable(Event Player, A) == 1;
 		Is Button Held(Event Player, Ability 1) == False;
 		Player Variable(Event Player, S) > 50;
 	}
@@ -199,7 +213,7 @@ rule("horse gallop (initial slow down)")
 
 	conditions
 	{
-		Player Variable(Event Player, A) == False;
+		Player Variable(Event Player, A) == 1;
 		Is Button Held(Event Player, Ability 1) == False;
 		Player Variable(Event Player, S) > 50;
 	}
@@ -247,7 +261,7 @@ rule("horse reset speed")
 
 	conditions
 	{
-		Player Variable(Event Player, A) == False;
+		Player Variable(Event Player, A) == 1;
 		Speed Of(Event Player) < 1;
 	}
 
@@ -272,7 +286,7 @@ rule("antibug attempt #1 (horse)")
 
 	conditions
 	{
-		Player Variable(Event Player, A) == False;
+		Player Variable(Event Player, A) == 1;
 		Player Variable(Event Player, N) == True;
 		Player Variable(Event Player, R) == Null;
 	}
@@ -294,7 +308,7 @@ rule("antibug attempt #2 (horse)")
 
 	conditions
 	{
-		Player Variable(Event Player, A) == False;
+		Player Variable(Event Player, A) == 1;
 		Player Variable(Event Player, R) != Null;
 		Player Variable(Player Variable(Event Player, R), H) != Event Player;
 	}
