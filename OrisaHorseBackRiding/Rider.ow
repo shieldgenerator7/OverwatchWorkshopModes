@@ -5,6 +5,7 @@ RIDER
 Rider Player Vars:
 A - Type ID: 2 for Rider
 H - Horse: the horse player that this player is riding
+M - Mount Cooldown: How long after dismounting before the rider can remount
 N - "Next To": true if this player is riding a horse player
 
 */
@@ -107,7 +108,7 @@ rule("rider mounts horse")
 	}
 }
 
-rule("rider rides horse (copied from \"stacks\" by Squ1dward)")
+rule("rider rides horse (copied from \"Stacks\" by Squ1dward)")
 {
 	event
 	{

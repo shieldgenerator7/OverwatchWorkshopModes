@@ -4,6 +4,7 @@ HORSE
 
 Horse Player Vars:
 A - Type ID: 1 for Horse
+D - Damage: how much damage the last run-up punch did
 R - Rider: the player that is riding this horse player
 N - "Next To": true if a player is riding this horse player
 S - Speed: the movement speed of the player
@@ -227,7 +228,7 @@ rule("horse gallop (initial slow down)")
 	}
 }
 
-rule("horse punches deal damage the faster she went (suggested by XDnetwork)")
+rule("horse punches deal damage the faster she went (suggested by XDNetwork)")
 {
 	event
 	{
