@@ -12,7 +12,7 @@ Made by ShieldGnrtr7
 */
 
 
-rule("Game Setup - Made by ShieldGnrtr7")
+rule("Game Setup - Made by ShieldGnrtr7 @ShieldGnrtr7 ===last updated 2019-06-19 @19:33==="")
 {
 	event
 	{
@@ -21,6 +21,8 @@ rule("Game Setup - Made by ShieldGnrtr7")
 
 	actions
 	{
+        Set Global Variable(A, null);//new player that needs a hero assignment
+        Set Global Variable(B, null);//new player currently being processed
 		Set Global Variable(O, Vector(0, 1, 0));//offset from horse to rider
 	}
 }
@@ -61,10 +63,92 @@ rule("Skip Setup")
 	}
 }
 
-rule("Made by ShieldGnrtr7 @ShieldGnrtr7 ===last updated 2019-05-26 @00:00===")
+rule("Player Spawn (init)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+    {
+        Player Variable(Event Player, A) == 0;
+    }
+
+    actions{
+        //Add player to global role assignment queue
+        Skip If(Compare(Global Variable(A), !=, 0), 1);
+		Set Global Variable(A, Event Player);
+		Skip If(Array Contains(Global Variable(A), Event Player), 1);
+		Modify Global Variable(A, Append To Array, Event Player);
+    }
+}
+
+rule("Player Spawn (Assign Rider)")
 {
 	event
 	{
 		Ongoing - Global;
 	}
+
+	conditions
+    {
+        Value In Array(Global Variable(A), 0) != Null;
+		Global Variable(B) == null;
+        // Or(
+        //     Compare(Count Of(Global Variable(H)), >, Count Of(Global Variable(R))),
+        //     Compare(Global Variable(R), ==, 0)
+        //     ) == True;
+        Count Of(Global Variable(H)) > Count Of(Global Variable(R));
+    }
+
+	actions
+	{
+        Set Global Variable(B, Value In Array(Global Variable(A), 0));
+		Set Player Variable(Global Variable(B), A, 2);
+        Start Forcing Player To Be Hero(Global Variable(B), Hero(McCree));
+        //Add to rider array
+		Skip If(Compare(Global Variable(R), !=, 0), 1);
+		Set Global Variable(R, Global Variable(B));
+		Skip If(Array Contains(Global Variable(R), Global Variable(B)), 1);
+		Modify Global Variable(R, Append To Array, Global Variable(B));
+	    Modify Global Variable(A, Remove From Array By Index, 0);
+        Set Global Variable(B, null);
+	    Wait(0.016, Ignore Condition);
+	    Loop If Condition Is True;
+    }
+}
+
+rule("Player Spawn (Assign Horse)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Value In Array(Global Variable(A), 0) != Null;
+		Global Variable(B) == null;
+		//Global Variable(R) != 0;
+        Count Of(Global Variable(H)) <= Count Of(Global Variable(R));
+	}
+
+	actions
+	{
+        Set Global Variable(B, Value In Array(Global Variable(A), 0));
+		Set Player Variable(Global Variable(B), A, 1);
+        Start Forcing Player To Be Hero(Global Variable(B), Hero(Orisa));
+        //Add to horse array
+        Skip If(Compare(Global Variable(H), !=, 0), 1);
+		Set Global Variable(H, Global Variable(B));
+		Skip If(Array Contains(Global Variable(H), Global Variable(B)), 1);
+		Modify Global Variable(H, Append To Array, Global Variable(B));
+	    Modify Global Variable(A, Remove From Array By Index, 0);
+        Set Global Variable(B, null);
+	    Wait(0.016, Ignore Condition);
+	    Loop If Condition Is True;
+    }
 }

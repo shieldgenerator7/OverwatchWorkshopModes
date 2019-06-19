@@ -228,7 +228,7 @@ rule("horse gallop (initial slow down)")
 	}
 }
 
-rule("horse punches deal damage the faster she went (suggested by XDNetwork)")
+rule("horse punches deal damage the faster she went (suggested by XDNETWORK)")
 {
 	event
 	{
