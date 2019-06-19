@@ -33,3 +33,237 @@ rule("Player Spawn (rider) (mccree)")
 		Clear Status(Event Player, Phased Out);
 	}
 }
+
+rule("rider chooses horse")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, A) == True;
+		Player Variable(Event Player, H) == Null;
+		Is True For Any(Global Variable(H), And(Compare(Player Variable(Current Array Element, R), ==, Null), Compare(Distance Between(
+			Position Of(Event Player), Position Of(Current Array Element)), <=, 2))) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, H, Value In Array(Filtered Array(Global Variable(H), And(Compare(Player Variable(
+			Current Array Element, R), ==, Null), Compare(Distance Between(Position Of(Event Player), Position Of(Current Array Element)),
+			<=, 2))), 0));
+		Set Player Variable(Player Variable(Event Player, H), R, Event Player);
+	}
+}
+
+rule("rider mounts horse")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, A) == True;
+		Player Variable(Event Player, H) != Null;
+		Player Variable(Event Player, N) == False;
+		Distance Between(Position Of(Event Player), Position Of(Player Variable(Event Player, H))) <= 2;
+		Player Variable(Event Player, M) == 0;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, N, True);
+		Set Player Variable(Player Variable(Event Player, H), N, True);
+		Set Status(Event Player, Player Variable(Event Player, H), Phased Out, 9999);
+		Set Status(Player Variable(Event Player, H), Event Player, Unkillable, 9999);
+		Clear Status(Event Player, Knocked Down);
+		Heal(Event Player, Player Variable(Event Player, H), 100);
+		Heal(Player Variable(Event Player, H), Event Player, 100);
+	}
+}
+
+rule("rider rides horse (copied from \"stacks\" by Squ1dward)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, A) == True;
+		Player Variable(Event Player, N) == True;
+		Is Alive(Event Player) == True;
+		Player Variable(Event Player, H) != Null;
+		Is Alive(Player Variable(Event Player, H)) == True;
+	}
+
+	actions
+	{
+		Abort If Condition Is False;
+		Apply Impulse(Event Player, Direction Towards(Position Of(Event Player), Add(Position Of(Event Player), Vector(
+			Speed Of In Direction(Event Player, Left), Vertical Speed Of(Event Player), Speed Of In Direction(Event Player, Forward)))),
+			Multiply(Speed Of(Event Player), -0.800), To World, Incorporate Contrary Motion);
+		Apply Impulse(Event Player, Direction Towards(Event Player, Add(Position Of(Player Variable(Event Player, H)), Global Variable(
+			O))), Multiply(Distance Between(Position Of(Event Player), Add(Position Of(Player Variable(Event Player, H)), Global Variable(
+			O))), 10), To World, Cancel Contrary Motion);
+		Skip If(Or(Compare(Distance Between(Position Of(Event Player), Position Of(Player Variable(Event Player, H))), <, 2), Compare(
+			Is Alive(Player Variable(Event Player, H)), !=, True)), 3);
+		Set Player Variable(Event Player, C, Vertical Facing Angle Of(Event Player));
+		Teleport(Event Player, Add(Position Of(Player Variable(Event Player, H)), Global Variable(O)));
+		Set Facing(Event Player, Direction From Angles(Horizontal Facing Angle Of(Event Player), Player Variable(Event Player, C)),
+			To World);
+		Wait(0.016, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("rider injured")
+{
+	event
+	{
+		Player took damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, A) == True;
+		Player Variable(Event Player, N) == True;
+		Normalized Health(Event Player) < 0.250;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, N, False);
+		Set Player Variable(Event Player, M, 2);
+	}
+}
+
+rule("rider thrown off horse")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, A) == True;
+		Player Variable(Event Player, M) > 0;
+	}
+
+	actions
+	{
+		Set Player Variable(Player Variable(Event Player, H), N, False);
+		Set Player Variable(Event Player, M, 2);
+		Chase Player Variable Over Time(Event Player, M, 0, 2, Destination and Duration);
+		Clear Status(Event Player, Phased Out);
+		Clear Status(Player Variable(Event Player, H), Unkillable);
+		Set Status(Event Player, Null, Knocked Down, 5);
+		Apply Impulse(Event Player, Add(Multiply(Facing Direction Of(Player Variable(Event Player, H)), -1.000), Vector(0, 1, 0)), 10,
+			To World, Cancel Contrary Motion);
+	}
+}
+
+rule("rider dies")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, A) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Player Variable(Event Player, H), R, Null);
+		Set Player Variable(Event Player, H, Null);
+		Modify Global Variable(R, Remove From Array By Value, Event Player);
+	}
+}
+
+rule("rider's horse dies")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, A) == True;
+		Is Alive(Player Variable(Event Player, H)) == False;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, H, Null);
+	}
+}
+
+rule("antibug attempt #1 (rider)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, A) == True;
+		Player Variable(Event Player, N) == True;
+		Player Variable(Event Player, H) == Null;
+	}
+
+	actions
+	{
+		Kill(Event Player, Null);
+	}
+}
+
+rule("antibug attempt #2 (rider)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, A) == True;
+		Player Variable(Event Player, H) != Null;
+		Player Variable(Player Variable(Event Player, H), R) != Event Player;
+	}
+
+	actions
+	{
+		Kill(Event Player, Null);
+		Clear Status(Event Player, Unkillable);
+		Clear Status(Event Player, Phased Out);
+	}
+}

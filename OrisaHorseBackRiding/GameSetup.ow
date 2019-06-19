@@ -46,3 +46,11 @@ rule("Skip Setup")
 		Set Match Time(0);
 	}
 }
+
+rule("Made by ShieldGnrtr7 @ShieldGnrtr7 ===last updated 2019-05-26 @00:00===")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
