@@ -1,3 +1,17 @@
+/*
+
+Welcome to Camp Efi, the place where all the guys and gals come to ride the best Orisas in town.
+Saddle up and ride!
+===
+McCree is rider, Orisa is horse. Walk up to mount.
+Shoot Orisa to knock McCree off.
+Orisa presses SHIFT to run.
+===
+Made by ShieldGnrtr7
+
+*/
+
+
 rule("Game Setup - Made by ShieldGnrtr7")
 {
 	event
