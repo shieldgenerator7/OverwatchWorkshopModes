@@ -1,0 +1,48 @@
+rule("Game Setup - Made by ShieldGnrtr7")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Set Global Variable(O, Vector(0, 1, 0));//offset from horse to rider
+	}
+}
+
+rule("Skip Assembly")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Assembling Heroes == True;
+	}
+
+	actions
+	{
+		Set Match Time(0);
+	}
+}
+
+rule("Skip Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is In Setup == True;
+	}
+
+	actions
+	{
+		Set Match Time(0);
+	}
+}
