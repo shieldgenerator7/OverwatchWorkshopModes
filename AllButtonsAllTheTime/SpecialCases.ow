@@ -1,0 +1,27 @@
+//
+// Brigitte
+//
+rule("Player Setup (Brigitte)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Brigitte;
+	}
+
+    conditions
+    {
+        Hero Of(Event Player) == Hero(Brigitte);
+        Player Variable (Event Player, F) == True;
+    }
+
+	actions
+	{
+        //Secondary Fire
+	    Set Player Variable At Index(Event Player, B, 0, 5);
+	    Set Player Variable At Index(Event Player, B, 1, False);
+        Wait(0.5, Ignore Condition);
+	    Set Player Variable At Index(Event Player, B, 1, True);
+	}
+}

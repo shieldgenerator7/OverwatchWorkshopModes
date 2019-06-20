@@ -1,0 +1,216 @@
+rule("Game Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Skip Assembly")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Assembling Heroes == True;
+	}
+
+	actions
+	{
+		Set Match Time(0);
+	}
+}
+
+rule("Skip Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is In Setup == True;
+	}
+
+	actions
+	{
+		Set Match Time(0);
+	}
+}
+
+rule("Player Setup")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+    conditions
+    {
+        Is Alive(Event Player) == True;
+    }
+
+	actions
+	{
+        //Holding controls: 9999 = hold forever, 1 and more = time to hold / tap
+        //True = Hold, False = Tap Repeatedly
+        //Primary Fire
+		Set Player Variable At Index(Event Player, A, 0, 9999);
+	    Set Player Variable At Index(Event Player, A, 1, True);
+        //Secondary Fire
+		Set Player Variable At Index(Event Player, B, 0, 9999);
+	    Set Player Variable At Index(Event Player, B, 1, True);
+        //Abilty 1
+		Set Player Variable At Index(Event Player, C, 0, 9999);
+	    Set Player Variable At Index(Event Player, C, 1, True);
+        //Abilty 2
+		Set Player Variable At Index(Event Player, D, 0, 9999);
+	    Set Player Variable At Index(Event Player, D, 1, True);
+        //Ultimate
+		Set Player Variable At Index(Event Player, E, 0, 9999);
+	    Set Player Variable At Index(Event Player, E, 1, True);
+
+        //Declare setup finished        
+        Set Player Variable (Event Player, F, True);
+	}
+}
+
+
+rule("Hold Primary Fire")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Value In Array(Player Variable(Event Player, A), 1) == True;
+	}
+
+	actions
+	{
+		Start Holding Button(Event Player, Primary Fire);
+		Wait(Value In Array(Player Variable(Event Player, A), 0), Restart When True);
+		Stop Holding Button(Event Player, Primary Fire);
+		Wait(Value In Array(Player Variable(Event Player, A), 0), Restart When True);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Stop Infini-Hold Primary Fire")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Value In Array(Player Variable(Event Player, A), 1) != True;
+	}
+
+	actions
+	{
+		Stop Holding Button(Event Player, Primary Fire);
+	}
+}
+
+rule("Tap Primary Fire")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Value In Array(Player Variable(Event Player, A), 1) == False;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Primary Fire);
+		Wait(Value In Array(Player Variable(Event Player, A), 0), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Hold Secondary Fire")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Value In Array(Player Variable(Event Player, B), 1) == True;
+	}
+
+	actions
+	{
+		Start Holding Button(Event Player, Secondary Fire);
+		Wait(Value In Array(Player Variable(Event Player, B), 0), Restart When True);
+		Stop Holding Button(Event Player, Secondary Fire);
+		Wait(Value In Array(Player Variable(Event Player, B), 0), Restart When True);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Stop Infini-Hold Secondary Fire")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Value In Array(Player Variable(Event Player, B), 1) != True;
+	}
+
+	actions
+	{
+		Stop Holding Button(Event Player, Secondary Fire);
+	}
+}
+
+rule("Tap Secondary Fire")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Value In Array(Player Variable(Event Player, B), 1) == False;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Secondary Fire);
+		Wait(Value In Array(Player Variable(Event Player, B), 0), Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
