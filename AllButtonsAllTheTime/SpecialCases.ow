@@ -25,3 +25,31 @@ rule("Player Setup (Brigitte)")
 	    Set Player Variable At Index(Event Player, B, 1, True);
 	}
 }
+
+//
+// Tracer
+//
+rule("Player Setup (Tracer)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Tracer;
+	}
+
+    conditions
+    {
+        Hero Of(Event Player) == Hero(Tracer);
+        Player Variable (Event Player, F) == True;
+    }
+
+	actions
+	{
+        //Secondary Fire
+	    Set Player Variable At Index(Event Player, A, 0, 9999);
+	    Set Player Variable At Index(Event Player, A, 1, False);
+        Wait(0.5, Ignore Condition);
+	    Set Player Variable At Index(Event Player, A, 1, True);
+	}
+}

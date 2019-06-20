@@ -97,6 +97,10 @@ rule("Player Setup")
 }
 
 
+//
+// Primary Fire
+//
+
 rule("Hold Primary Fire")
 {
 	event
