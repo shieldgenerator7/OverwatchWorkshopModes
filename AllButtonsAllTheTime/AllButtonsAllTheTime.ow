@@ -64,23 +64,23 @@ rule("Player Setup")
 		//[2] Holding Cycle: True = Currently Holding, False = Not Currently Holding
 
         //Primary Fire
-		Set Player Variable At Index(Event Player, A, 0, 9999);
-	    Set Player Variable At Index(Event Player, A, 1, True);
+		Set Player Variable At Index(Event Player, A, 0, 0.016);
+	    Set Player Variable At Index(Event Player, A, 1, False);
 	    Set Player Variable At Index(Event Player, A, 2, False);
         //Secondary Fire
-		Set Player Variable At Index(Event Player, B, 0, 9999);
-	    Set Player Variable At Index(Event Player, B, 1, True);
+		Set Player Variable At Index(Event Player, B, 0, 0.016);
+	    Set Player Variable At Index(Event Player, B, 1, False);
 	    Set Player Variable At Index(Event Player, B, 2, False);
         //Abilty 1
-		Set Player Variable At Index(Event Player, C, 0, 1);
+		Set Player Variable At Index(Event Player, C, 0, 0.016);
 	    Set Player Variable At Index(Event Player, C, 1, False);
 	    Set Player Variable At Index(Event Player, C, 2, False);
         //Abilty 2
-		Set Player Variable At Index(Event Player, D, 0, 1);
+		Set Player Variable At Index(Event Player, D, 0, 0.016);
 	    Set Player Variable At Index(Event Player, D, 1, False);
 	    Set Player Variable At Index(Event Player, D, 2, False);
         //Ultimate
-		Set Player Variable At Index(Event Player, E, 0, 1);
+		Set Player Variable At Index(Event Player, E, 0, 0.016);
 	    Set Player Variable At Index(Event Player, E, 1, False);
 	    Set Player Variable At Index(Event Player, E, 2, False);
 
