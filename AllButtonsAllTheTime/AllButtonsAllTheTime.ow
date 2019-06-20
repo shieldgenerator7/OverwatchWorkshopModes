@@ -58,23 +58,38 @@ rule("Player Setup")
 
 	actions
 	{
-        //Holding controls: 9999 = hold forever, 1 and more = time to hold / tap
-        //True = Hold, False = Tap Repeatedly
+        //Holding controls: 
+		//[0] Time: 9999 = hold forever, 1 and more = time to hold / tap
+        //[1] Hold/Tap: True = Hold, False = Tap Repeatedly
+		//[2] Holding Cycle: True = Currently Holding, False = Not Currently Holding
+
         //Primary Fire
 		Set Player Variable At Index(Event Player, A, 0, 9999);
 	    Set Player Variable At Index(Event Player, A, 1, True);
+	    Set Player Variable At Index(Event Player, A, 2, False);
         //Secondary Fire
 		Set Player Variable At Index(Event Player, B, 0, 9999);
 	    Set Player Variable At Index(Event Player, B, 1, True);
+	    Set Player Variable At Index(Event Player, B, 2, False);
         //Abilty 1
 		Set Player Variable At Index(Event Player, C, 0, 9999);
 	    Set Player Variable At Index(Event Player, C, 1, True);
+	    Set Player Variable At Index(Event Player, C, 2, False);
         //Abilty 2
 		Set Player Variable At Index(Event Player, D, 0, 9999);
 	    Set Player Variable At Index(Event Player, D, 1, True);
+	    Set Player Variable At Index(Event Player, D, 2, False);
         //Ultimate
 		Set Player Variable At Index(Event Player, E, 0, 9999);
 	    Set Player Variable At Index(Event Player, E, 1, True);
+	    Set Player Variable At Index(Event Player, E, 2, False);
+
+        //Disallow regular buttons
+        Disallow Button(Event Player, Primary Fire);
+        Disallow Button(Event Player, Secondary Fire);
+        Disallow Button(Event Player, Ability 1);
+        Disallow Button(Event Player, Ability 2);
+        Disallow Button(Event Player, Ultimate);
 
         //Declare setup finished        
         Set Player Variable (Event Player, F, True);
@@ -98,11 +113,38 @@ rule("Hold Primary Fire")
 
 	actions
 	{
+        Allow Button(Event Player, Primary Fire);
 		Start Holding Button(Event Player, Primary Fire);
+		Set Player Variable At Index(Event Player, A, 2, True);
 		Wait(Value In Array(Player Variable(Event Player, A), 0), Restart When True);
+		Set Player Variable At Index(Event Player, A, 2, False);
 		Stop Holding Button(Event Player, Primary Fire);
+        Disallow Button(Event Player, Primary Fire);
 		Wait(Value In Array(Player Variable(Event Player, A), 0), Restart When True);
 		Loop If Condition Is True;
+	}
+}
+
+disabled rule("Continue Infini-Hold Primary Fire If Broken Out Of")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Value In Array(Player Variable(Event Player, A), 1) == True;
+		Value In Array(Player Variable(Event Player, A), 2) == True;
+		Is Button Held(Event Player, Primary Fire) == False;
+	}
+
+	actions
+	{
+		Wait(0.1, Ignore Condition);
+		Start Holding Button(Event Player, Primary Fire);
 	}
 }
 
@@ -122,7 +164,9 @@ rule("Stop Infini-Hold Primary Fire")
 
 	actions
 	{
+		Set Player Variable At Index(Event Player, A, 2, False);
 		Stop Holding Button(Event Player, Primary Fire);
+        Disallow Button(Event Player, Primary Fire);
 	}
 }
 
@@ -142,11 +186,17 @@ rule("Tap Primary Fire")
 
 	actions
 	{
+        Allow Button(Event Player, Primary Fire);
 		Press Button(Event Player, Primary Fire);
+        Disallow Button(Event Player, Primary Fire);
 		Wait(Value In Array(Player Variable(Event Player, A), 0), Ignore Condition);
 		Loop If Condition Is True;
 	}
 }
+
+//
+// Secondary Fire
+//
 
 rule("Hold Secondary Fire")
 {
@@ -164,11 +214,38 @@ rule("Hold Secondary Fire")
 
 	actions
 	{
+        Allow Button(Event Player, Secondary Fire);
 		Start Holding Button(Event Player, Secondary Fire);
+		Set Player Variable At Index(Event Player, B, 2, True);
 		Wait(Value In Array(Player Variable(Event Player, B), 0), Restart When True);
+		Set Player Variable At Index(Event Player, B, 2, False);
 		Stop Holding Button(Event Player, Secondary Fire);
+        Disallow Button(Event Player, Secondary Fire);
 		Wait(Value In Array(Player Variable(Event Player, B), 0), Restart When True);
 		Loop If Condition Is True;
+	}
+}
+
+disabled rule("Continue Infini-Hold Secondary Fire If Broken Out Of")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Value In Array(Player Variable(Event Player, B), 1) == True;
+		Value In Array(Player Variable(Event Player, B), 2) == True;
+		Is Button Held(Event Player, Secondary Fire) == False;
+	}
+
+	actions
+	{
+		Wait(0.1, Ignore Condition);
+		Start Holding Button(Event Player, Secondary Fire);
 	}
 }
 
@@ -188,7 +265,9 @@ rule("Stop Infini-Hold Secondary Fire")
 
 	actions
 	{
+		Set Player Variable At Index(Event Player, B, 2, False);
 		Stop Holding Button(Event Player, Secondary Fire);
+        Disallow Button(Event Player, Secondary Fire);
 	}
 }
 
@@ -208,7 +287,9 @@ rule("Tap Secondary Fire")
 
 	actions
 	{
+        Allow Button(Event Player, Secondary Fire);
 		Press Button(Event Player, Secondary Fire);
+        Disallow Button(Event Player, Secondary Fire);
 		Wait(Value In Array(Player Variable(Event Player, B), 0), Ignore Condition);
 		Loop If Condition Is True;
 	}
