@@ -614,3 +614,32 @@ rule("Tap Ultimate")
 		Loop If Condition Is True;
 	}
 }
+
+//
+// Crouch to stop Sticky Keys
+//
+disabled rule("Crouch to stop Sticky Keys")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Crouch) == True;
+	}
+
+	actions
+	{
+        Disallow Button(Event Player, Primary Fire);
+        Disallow Button(Event Player, Secondary Fire);
+        Disallow Button(Event Player, Ability 1);
+        Disallow Button(Event Player, Ability 2);
+        Disallow Button(Event Player, Ultimate);
+		Wait(0.016, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
