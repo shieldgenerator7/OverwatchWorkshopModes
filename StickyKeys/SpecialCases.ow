@@ -1,4 +1,40 @@
 //
+// Bastion
+//
+rule("Player Setup (Bastion)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Bastion;
+	}
+
+    conditions
+    {
+        Hero Of(Event Player) == Hero(Bastion);
+        Player Variable (Event Player, F) == True;
+    }
+
+	actions
+	{		
+        //Primary Fire
+	    Set Player Variable At Index(Event Player, A, 0, 9999);
+	    Set Player Variable At Index(Event Player, A, 1, False);
+        Wait(0.5, Ignore Condition);
+	    Set Player Variable At Index(Event Player, A, 1, True);
+        //Secondary Fire
+	    Set Player Variable At Index(Event Player, B, 0, 2);
+	    Set Player Variable At Index(Event Player, B, 1, False);
+        //Ability 1
+	    Set Player Variable At Index(Event Player, C, 0, 5);
+	    Set Player Variable At Index(Event Player, C, 1, False);
+		//
+		Allow Button (Event Player, Primary Fire);
+	}
+}
+
+//
 // Brigitte
 //
 rule("Player Setup (Brigitte)")
