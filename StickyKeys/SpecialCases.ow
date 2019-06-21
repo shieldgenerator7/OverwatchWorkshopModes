@@ -119,6 +119,34 @@ rule("Player Setup (Brigitte)")
 }
 
 //
+// Doomfist
+//
+rule("Player Setup (Doomfist)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Doomfist;
+	}
+
+    conditions
+    {
+        Hero Of(Event Player) == Hero(Doomfist);
+        Player Variable (Event Player, F) == True;
+    }
+
+	actions
+	{
+        //Secondary Fire
+	    Set Player Variable At Index(Event Player, B, 0, 2);
+	    Set Player Variable At Index(Event Player, B, 1, False);
+        Wait(0.5, Ignore Condition);
+	    Set Player Variable At Index(Event Player, B, 1, True);
+	}
+}
+
+//
 // Reinhardt
 //
 rule("Player Setup (Reinhardt)")
