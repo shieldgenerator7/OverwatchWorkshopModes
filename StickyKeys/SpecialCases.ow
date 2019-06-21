@@ -307,3 +307,41 @@ rule("Wrecking Ball: Disable Primary Fire while rolling")
 		Loop If Condition Is True;
 	}
 }
+
+//
+// Zenyatta
+//
+
+rule("Player Setup (Zenyatta)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Zenyatta;
+	}
+
+    conditions
+    {
+        Hero Of(Event Player) == Hero(Zenyatta);
+        Player Variable (Event Player, F) == True;
+    }
+
+	actions
+	{		
+        //Primary Fire
+	    Set Player Variable At Index(Event Player, A, 0, 0.5);
+	    Set Player Variable At Index(Event Player, A, 1, False);
+        //Secondary Fire
+	    Set Player Variable At Index(Event Player, B, 0, 2);
+	    Set Player Variable At Index(Event Player, B, 1, False);
+        Wait(0.5, Ignore Condition);
+	    Set Player Variable At Index(Event Player, B, 1, True);
+        //Ability 1
+	    Set Player Variable At Index(Event Player, C, 0, 2);
+	    Set Player Variable At Index(Event Player, C, 1, False);
+        //Ability 2
+	    Set Player Variable At Index(Event Player, D, 0, 2);
+	    Set Player Variable At Index(Event Player, D, 1, False);
+	}
+}
