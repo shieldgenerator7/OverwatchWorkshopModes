@@ -27,6 +27,56 @@ rule("Player Setup (Brigitte)")
 }
 
 //
+// Reinhardt
+//
+rule("Player Setup (Reinhardt)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+    conditions
+    {
+        Hero Of(Event Player) == Hero(Reinhardt);
+        Player Variable (Event Player, F) == True;
+    }
+
+	actions
+	{
+        //Secondary Fire
+	    Set Player Variable At Index(Event Player, B, 0, 5);
+	    Set Player Variable At Index(Event Player, B, 1, False);
+        Wait(0.5, Ignore Condition);
+	    Set Player Variable At Index(Event Player, B, 1, True);
+	}
+}
+rule("Reinhardt: Disable Primary Fire while Shield is up")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+    conditions
+    {
+        Hero Of(Event Player) == Hero(Reinhardt);
+        Is Button Held(Event Player, Secondary Fire) == True;
+    }
+
+	actions
+	{
+        Disallow Button(Event Player, Primary Fire);
+		Wait(0.016, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+//
 // Tracer
 //
 rule("Player Setup (Tracer)")
