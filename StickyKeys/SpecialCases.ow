@@ -1,4 +1,60 @@
 //
+// Ana
+//
+rule("Player Setup (Ana)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Ana;
+	}
+
+    conditions
+    {
+        Hero Of(Event Player) == Hero(Ana);
+        Player Variable (Event Player, F) == True;
+    }
+
+	actions
+	{
+        //Secondary Fire
+	    Set Player Variable At Index(Event Player, B, 0, 5);
+	    Set Player Variable At Index(Event Player, B, 1, False);
+        Wait(0.5, Ignore Condition);
+	    Set Player Variable At Index(Event Player, B, 1, True);
+	}
+}
+
+//
+// Ashe
+//
+rule("Player Setup (Ashe)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Ashe;
+	}
+
+    conditions
+    {
+        Hero Of(Event Player) == Hero(Ashe);
+        Player Variable (Event Player, F) == True;
+    }
+
+	actions
+	{
+        //Secondary Fire
+	    Set Player Variable At Index(Event Player, B, 0, 5);
+	    Set Player Variable At Index(Event Player, B, 1, False);
+        Wait(0.5, Ignore Condition);
+	    Set Player Variable At Index(Event Player, B, 1, True);
+	}
+}
+
+//
 // Bastion
 //
 rule("Player Setup (Bastion)")
@@ -137,6 +193,34 @@ rule("Player Setup (Tracer)")
 	    Set Player Variable At Index(Event Player, A, 1, False);
         Wait(0.5, Ignore Condition);
 	    Set Player Variable At Index(Event Player, A, 1, True);
+	}
+}
+
+//
+// Widowmaker
+//
+rule("Player Setup (Widowmaker)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Widowmaker;
+	}
+
+    conditions
+    {
+        Hero Of(Event Player) == Hero(Widowmaker);
+        Player Variable (Event Player, F) == True;
+    }
+
+	actions
+	{
+        //Secondary Fire
+	    Set Player Variable At Index(Event Player, B, 0, 5);
+	    Set Player Variable At Index(Event Player, B, 1, False);
+        Wait(0.5, Ignore Condition);
+	    Set Player Variable At Index(Event Player, B, 1, True);
 	}
 }
 
