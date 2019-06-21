@@ -1,3 +1,9 @@
+/*
+
+STICKY KEYS === All your buttons are being pressed, all the time. Make sure sure you're in position when your ult goes off by itself!
+
+*/
+
 rule("Game Setup")
 {
 	event
