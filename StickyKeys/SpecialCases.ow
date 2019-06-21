@@ -161,7 +161,9 @@ rule("Player Setup (Wrecking Ball)")
 	actions
 	{		
         //Secondary Fire
-	    Set Player Variable At Index(Event Player, B, 0, 5);
+	    Set Player Variable At Index(Event Player, B, 0, 2);
+	    Set Player Variable At Index(Event Player, B, 1, False);
+        Wait(0.5, Ignore Condition);
 	    Set Player Variable At Index(Event Player, B, 1, True);
         //Ability 1
 	    Set Player Variable At Index(Event Player, C, 0, 5);
