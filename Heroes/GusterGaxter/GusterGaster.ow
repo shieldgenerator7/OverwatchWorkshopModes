@@ -1,0 +1,203 @@
+/*
+
+"The strongest man doesn't need to hurt to win."
+Guster Gaxter is a strong silent type who refuses to use violence against his opponents. Instead, he uses his vortex manipulator to move them out of his way.
+
+Primary Fire: CO2 Bubble. Guster surrounds an enemy with a CO2 Bubble that blocks their shots and suffocates them.
+If an enemy remains in a CO2 Bubble for 5 seconds straight, they pass out for 5 seconds.
+
+Secondary Fire: O2 Bubble. Guster surrounds himself with an O2 Bubble that heals him for the amount of damage he would have received.
+
+Ability 1: Twister Alley. Guster surrounds himself with a tornado that increases his movement speed and knocks nearby enemies up into the air.
+
+Ability 2: Blustery Summons. Guster makes a huge gust of wind that summons an ally to his side.
+
+Ultimate: Maelstrom! Guster makes gale force winds at his location that block all damage but makes melee punches more powerful.
+
+*/
+
+/*
+
+Player Vars:
+B - Base Cooldowns: the array of base cooldowns for the abilities.
+C - Cooldowns: the array of current cooldowns for the abilities.
+E - Enemy Effect IDs: the array of IDs of the enemy sphere effects.
+F - Effect IDs: the array of IDs of the friendly sphere effects.
+H - HUD Text IDs: the array of IDs of the HUD texts used to show the ability cooldowns.
+P - Prev Target: used to identify when the target switched.
+T - Target: the player being targetted by Primary Fire
+
+Target Player Vars:
+K - CO2 Level: How much excessive CO2 this target player has. If it reaches 5, they pass out.
+L - CO2 Recovery Delay: how long after being exposed to CO2 Bubble before the target starts recovering.
+
+*/
+
+rule("Player Spawn (Guster)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Zenyatta;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Hero Of(Event Player) == Hero(Zenyatta);
+	}
+
+	actions
+	{
+    }
+}
+
+rule("Guster Primary Fire: CO2 Bubble")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Zenyatta;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Hero Of(Event Player) == Hero(Zenyatta);
+        Is Button Held(Event Player, Primary Fire) == True;	   
+	    Is True For Any(
+            Players in View Angle(Event Player, Opposite Team Of(Team Of(Event Player)), 45),
+            Is In Line of Sight(
+		        Eye Position(Event Player),
+                Eye Position(Current Array Element),
+                Enemy Barriers Block LOS
+            )
+        ) == True;
+	}
+
+	actions
+    {
+        Set Player Variable(Event Player, T, Player Closest To Reticle(Event Player, Opposite Team Of(Team Of(Event Player))));
+        Wait(0.100, Ignore Condition);
+        Loop If Condition Is True;
+	    Set Player Variable(Event Player, T, Null);
+    }
+}
+
+rule("Guster's Primary Fire has a Target")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Zenyatta;
+	}
+
+	conditions
+	{
+        Is Alive(Event Player) == True;
+		Hero Of(Event Player) == Hero(Zenyatta);
+		Player Variable(Event Player, T) != Null;
+	}
+
+	actions
+	{
+		Modify Player Variable(Player Variable(Event Player, T), K, Add, Multiply(1, 0.100));
+	    Set Player Variable(Player Variable(Event Player, T), L, 1);
+	    Set Player Variable(Player Variable(Event Player, T), M, Event Player);
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Guster's Primary Fire Changes Target")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Zenyatta;
+	}
+
+	conditions
+	{
+        Is Alive(Event Player) == True;
+		Hero Of(Event Player) == Hero(Zenyatta);
+		Player Variable(Event Player, T) != Player Variable(Event Player, P);
+	}
+
+	actions
+	{
+		Set Damage Dealt(Player Variable(Event Player, P), 100);
+		Set Player Variable(Event Player, P, Player Variable(Event Player, T));
+		Set Damage Dealt(Player Variable(Event Player, T), 0);
+	}
+}
+
+rule("Target Heal from CO2 Bubble")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, K) > 0;
+		Player Variable(Event Player, L) <= 0;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, K, Subtract, 0.100);
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Target Heal From CO2 Bubble Delay")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, L) > 0;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, L, Subtract, 0.100);
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Target PassOut from CO2")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, K) >= 5;
+	}
+
+	actions
+	{
+		Set Status(Event Player, Player Variable(Event Player, M), Knocked Down, 5);
+		Set Player Variable(Event Player, K, 0);
+	}
+}
