@@ -290,7 +290,7 @@ rule("Guster's Secondary Fire: O2 Bubble (Active)")
 	}
 }
 
-rule("Guster'S Secondary Fire Timer")
+rule("Guster's Secondary Fire Timer")
 {
 	event
 	{
@@ -311,6 +311,42 @@ rule("Guster'S Secondary Fire Timer")
 		Modify Player Variable At Index(Event Player, A, 1, Subtract, 0.100);
 		Wait(0.100, Ignore Condition);
 		Loop If Condition Is True;
+	}
+}
+
+rule("Guster's Ability 1: Twister Alley")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Zenyatta;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Hero Of(Event Player) == Hero(Zenyatta);
+		Is Button Held(Event Player, Ability 1) == True;
+	}
+
+	actions
+	{
+		Apply Impulse(Players Within Radius(Position Of(Event Player), 10, Opposite Team Of(Team Of(Event Player)),
+			Surfaces And Enemy Barriers), Vector(0, 1, 0), 10, To World, Cancel Contrary Motion);
+		Skip If(Compare(Value In Array(Player Variable(Event Player, E), 2), !=, Null), 6);
+		Destroy Effect(Value In Array(Player Variable(Event Player, E), 2));
+		Destroy Effect(Value In Array(Player Variable(Event Player, F), 2));
+		Create Effect(All Players(Opposite Team Of(Team Of(Event Player))), Sphere, Red, Position Of(Event Player), 10,
+			Visible To Position and Radius);
+		Set Player Variable At Index(Event Player, E, 2, Last Created Entity);
+		Create Effect(All Players(Team Of(Event Player)), Sphere, White, Position Of(Event Player), 10, Visible To Position and Radius);
+		Set Player Variable At Index(Event Player, F, 2, Last Created Entity);
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+		Destroy Effect(Value In Array(Player Variable(Event Player, E), 2));
+		Destroy Effect(Value In Array(Player Variable(Event Player, F), 2));
+		Set Player Variable At Index(Event Player, E, 2, Null);
 	}
 }
 
