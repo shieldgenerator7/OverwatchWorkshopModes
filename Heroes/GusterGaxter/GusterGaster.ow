@@ -129,11 +129,21 @@ rule("Guster's Primary Fire Changes Target")
 	}
 
 	actions
-	{
-		Set Damage Dealt(Player Variable(Event Player, P), 100);
-		Set Player Variable(Event Player, P, Player Variable(Event Player, T));
-		Set Damage Dealt(Player Variable(Event Player, T), 0);
-	}
+    {
+        Set Damage Dealt(Player Variable(Event Player, P), 100);
+        Set Player Variable(Event Player, P, Player Variable(Event Player, T));
+        Set Damage Dealt(Player Variable(Event Player, T), 0);
+        //Create Visual Effects
+        Destroy Effect(Value In Array(Player Variable(Event Player, E), 0));
+        Destroy Effect(Value In Array(Player Variable(Event Player, F), 0));
+        Skip If(Compare(Player Variable(Event Player, T), ==, Null), 4);
+        Create Effect(All Players(Opposite Team Of(Team Of(Event Player))), Sphere, Red, Position Of(Player Variable(Event Player, T)), 2,
+            Visible To Position and Radius);
+        Set Player Variable At Index(Event Player, E, 0, Last Created Entity);
+        Create Effect(All Players(Team Of(Event Player)), Sphere, White, Position Of(Player Variable(Event Player, T)), 2,
+            Visible To Position and Radius);
+        Set Player Variable At Index(Event Player, F, 0, Last Created Entity);
+    }
 }
 
 rule("Target Heal from CO2 Bubble")
