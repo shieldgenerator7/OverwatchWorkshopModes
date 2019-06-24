@@ -24,6 +24,10 @@ rule("Game Setup - Made by ShieldGnrtr7 @ShieldGnrtr7 ===last updated 2019-06-19
         Set Global Variable(A, null);//new player that needs a hero assignment
         Set Global Variable(B, null);//new player currently being processed
 		Set Global Variable(O, Vector(0, 1, 0));//offset from horse to rider
+        //Generate rider hero array
+        Set Global Variable(Q, Hero(Ashe));
+        Modify Global Variable(Q, Append To Array, Hero(D.Va));
+        Modify Global Variable(Q, Append To Array, Hero(McCree));
 	}
 }
 
