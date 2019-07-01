@@ -36,6 +36,12 @@ rule("Game Setup")
 	actions
 	{
 		Set Global Variable(R, Null);
+		Set Global Variable(T, 3);
+		Set Global Variable(S, Team 1);
+		Create HUD Text(All Players(All Teams), String("{0}: {1}", String("Time", Null, Null, Null), Global Variable(T), Null), Null, Null,
+			Top, 0, White, White, White, Visible To and String);
+		Create HUD Text(All Players(All Teams), String("{0}: {1}", String("Current Players", Null, Null, Null), Global Variable(S), Null),
+			Null, Null, Top, 0, White, White, White, Visible To and String);
 	}
 }
 
@@ -166,6 +172,88 @@ rule("Global Queue Role Assignment (Team 2)")
 		Set Global Variable(R, Null);            
         Wait(0.100, Ignore Condition);
         Loop If Condition Is True;
+	}
+}
+
+rule("Teams change every 3 seconds (Count down)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(T) > 0;
+	}
+
+	actions
+	{
+		Modify Global Variable(T, Subtract, 0.100);
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Teams change every 3 seconds (Switch)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(T) <= 0;
+	}
+
+	actions
+	{
+		Set Global Variable(T, 3);
+		Skip If(Compare(Global Variable(S), ==, Team 2), 2);
+		Set Global Variable(S, Team 2);
+		Abort;
+		Set Global Variable(S, Team 1);
+	}
+}
+
+rule("Switch to Team 1")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(S) == Team 1;
+	}
+
+	actions
+	{
+		Set Global Variable(C, Global Variable(B));
+		Set Status(Global Variable(C), Null, Hacked, 3);
+		Set Status(Global Variable(C), Null, Rooted, 3);
+	}
+}
+
+rule("Switch to Team 2")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(S) == Team 2;
+	}
+
+	actions
+	{
+		Set Global Variable(C, Global Variable(A));
+		Set Status(Global Variable(C), Null, Hacked, 3);
+		Set Status(Global Variable(C), Null, Rooted, 3);
 	}
 }
 
