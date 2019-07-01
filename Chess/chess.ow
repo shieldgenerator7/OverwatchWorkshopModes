@@ -231,9 +231,8 @@ rule("Switch to Team 1")
 
 	actions
 	{
-	    Set Global Variable(C, Filtered Array(Global Variable(B), Compare(Player Variable(Current Array Element, A), !=, 1)));
-		Set Status(Global Variable(C), Null, Hacked, 3);
-		Set Status(Global Variable(C), Null, Rooted, 3);
+		Set Global Variable(C, Filtered Array(Global Variable(B), Compare(Player Variable(Current Array Element, A), !=, 1)));
+		Set Status(Global Variable(C), Null, Frozen, 3);
 	}
 }
 
@@ -251,9 +250,8 @@ rule("Switch to Team 2")
 
 	actions
 	{
-	    Set Global Variable(C, Filtered Array(Global Variable(A), Compare(Player Variable(Current Array Element, A), !=, 1)));
-		Set Status(Global Variable(C), Null, Hacked, 3);
-		Set Status(Global Variable(C), Null, Rooted, 3);
+		Set Global Variable(C, Filtered Array(Global Variable(A), Compare(Player Variable(Current Array Element, A), !=, 1)));
+		Set Status(Global Variable(C), Null, Frozen, 3);
 	}
 }
 
