@@ -1,0 +1,213 @@
+/*
+
+Chess
+
+All players have infinite lives, except for the King. When the enemy King dies, your team wins.
+(1) Player: Pharah
+(2) King: Reinhardt
+(3) Queen: Orisa
+(4) Rook: Bastion
+(5) Knight: Brigitte
+(6) Bishop: Genji
+
+There are no pawns, because the 6th player controls the action.
+
+Every 3 seconds, control switches teams. The selected player for that team then gets 3 seconds to do whatever they want.
+
+===GLOBAL VARS===
+A - Team A: list of players in team A
+B - Team B: list of players in team B
+Q - Queue: queue of players waiting to be assigned a role
+R - Currently Processed Player: player currently getting processed by the role assignment queue
+
+===PLAYER VARS===
+A - Role: role of player, 0 for no role, 1-6 for role
+
+*/
+
+
+rule("Game Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Set Global Variable(R, Null);
+	}
+}
+
+rule("Skip Assembly")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Assembling Heroes == True;
+	}
+
+	actions
+	{
+		Set Match Time(0);
+	}
+}
+
+rule("Skip Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is In Setup == True;
+	}
+
+	actions
+	{
+		Set Match Time(0);
+	}
+}
+
+rule("Players spawn and join role queue")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, A) == 0;
+	}
+
+	actions
+	{
+		Modify Global Variable(Q, Append To Array, Event Player);
+	}
+}
+
+rule("Global Queue Role Assignment (Team 1)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Value In Array(Global Variable(Q), 1) != Null;
+		Team Of(Value In Array(Global Variable(Q), 1)) == Team 1;
+		Global Variable(R) == Null;
+	}
+
+	actions
+	{
+		Set Global Variable(R, Value In Array(Global Variable(Q), 1));
+		Modify Global Variable(A, Append To Array, Global Variable(R));
+		Skip If(Is True For Any(Global Variable(A), Compare(Player Variable(Current Array Element, A), ==, 6)), 1);
+		Set Player Variable(Global Variable(R), A, 6);
+		Skip If(Is True For Any(Global Variable(A), Compare(Player Variable(Current Array Element, A), ==, 5)), 1);
+		Set Player Variable(Global Variable(R), A, 5);
+		Skip If(Is True For Any(Global Variable(A), Compare(Player Variable(Current Array Element, A), ==, 4)), 1);
+		Set Player Variable(Global Variable(R), A, 4);
+		Skip If(Is True For Any(Global Variable(A), Compare(Player Variable(Current Array Element, A), ==, 3)), 1);
+		Set Player Variable(Global Variable(R), A, 3);
+		Skip If(Is True For Any(Global Variable(A), Compare(Player Variable(Current Array Element, A), ==, 2)), 1);
+		Set Player Variable(Global Variable(R), A, 2);
+		Skip If(Is True For Any(Global Variable(A), Compare(Player Variable(Current Array Element, A), ==, 1)), 1);
+		Set Player Variable(Global Variable(R), A, 1);
+	    Modify Global Variable(Q, Remove From Array By Index, 1);
+		Set Global Variable(R, Null);
+        Wait(0.100, Ignore Condition);
+        Loop If Condition Is True;
+	}
+}
+
+rule("Global Queue Role Assignment (Team 2)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Value In Array(Global Variable(Q), 1) != Null;
+		Team Of(Value In Array(Global Variable(Q), 1)) == Team 2;
+		Global Variable(R) == Null;
+	}
+
+	actions
+	{
+		Set Global Variable(R, Value In Array(Global Variable(Q), 1));
+		Modify Global Variable(B, Append To Array, Global Variable(R));
+		Skip If(Is True For Any(Global Variable(B), Compare(Player Variable(Current Array Element, A), ==, 6)), 1);
+		Set Player Variable(Global Variable(R), A, 6);
+		Skip If(Is True For Any(Global Variable(B), Compare(Player Variable(Current Array Element, A), ==, 5)), 1);
+		Set Player Variable(Global Variable(R), A, 5);
+		Skip If(Is True For Any(Global Variable(B), Compare(Player Variable(Current Array Element, A), ==, 4)), 1);
+		Set Player Variable(Global Variable(R), A, 4);
+		Skip If(Is True For Any(Global Variable(B), Compare(Player Variable(Current Array Element, A), ==, 3)), 1);
+		Set Player Variable(Global Variable(R), A, 3);
+		Skip If(Is True For Any(Global Variable(B), Compare(Player Variable(Current Array Element, A), ==, 2)), 1);
+		Set Player Variable(Global Variable(R), A, 2);
+		Skip If(Is True For Any(Global Variable(B), Compare(Player Variable(Current Array Element, A), ==, 1)), 1);
+		Set Player Variable(Global Variable(R), A, 1);
+	    Modify Global Variable(Q, Remove From Array By Index, 1);
+		Set Global Variable(R, Null);            
+        Wait(0.100, Ignore Condition);
+        Loop If Condition Is True;
+	}
+}
+
+rule("Player Player Assignment")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, A) == 1;
+	}
+
+	actions
+	{
+		Start Forcing Player To Be Hero(Event Player, Hero(Pharah));
+	}
+}
+
+rule("Player Player Assignment (Post-Spawn)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, A) == 1;
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Status(Event Player, Event Player, Phased Out, 9999);
+		Set Invisible(Event Player, All);
+		Set Damage Dealt(Event Player, 0);
+	}
+}
