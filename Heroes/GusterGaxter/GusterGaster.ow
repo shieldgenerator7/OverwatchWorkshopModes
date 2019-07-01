@@ -27,6 +27,7 @@ F - Effect IDs: the array of IDs of the friendly sphere effects.
 H - HUD Text IDs: the array of IDs of the HUD texts used to show the ability cooldowns.
 P - Prev Target: used to identify when the target switched.
 T - Target: the player being targetted by Primary Fire
+V - Vortex Radius: the radius of the twister
 
 Target Player Vars:
 K - CO2 Level: How much excessive CO2 this target player has. If it reaches 5, they pass out.
@@ -350,4 +351,26 @@ rule("Guster's Ability 1: Twister Alley")
 	}
 }
 
+/*
+=== TEST ====
+*/
+rule("INTERACT + CROUCH to bring everyone to the point")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Slot 0;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Interact) == True;
+		Is Button Held(Event Player, Crouch) == True;
+	}
+
+	actions
+	{
+		Teleport(All Living Players(All Teams), Objective Position(0));
+	}
 }
