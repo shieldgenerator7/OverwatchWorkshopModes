@@ -211,3 +211,34 @@ rule("Player Player Assignment (Post-Spawn)")
 		Set Damage Dealt(Event Player, 0);
 	}
 }
+
+rule("Player show guide points to teammates")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, A) == 1;
+		Is Button Held(Event Player, Primary Fire) == True;
+	}
+
+	actions
+	{
+		Destroy Effect(Player Variable(Event Player, E));
+		Destroy Icon(Player Variable(Event Player, F));
+		Set Player Variable(Event Player, P, Ray Cast Hit Position(Eye Position(Event Player), Add(Eye Position(Event Player), Multiply(
+			Facing Direction Of(Event Player), 100)), All Players(All Teams), Event Player, True));
+		Create Effect(All Players(Team Of(Event Player)), Ring, Green, Player Variable(Event Player, P), 2,
+			Visible To Position and Radius);
+		Set Player Variable(Event Player, E, Last Created Entity);
+		Create Icon(All Players(Team Of(Event Player)), Player Variable(Event Player, P), Flag, Visible To and Position, Green, True);
+		Set Player Variable(Event Player, F, Last Created Entity);
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
