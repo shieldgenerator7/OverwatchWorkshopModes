@@ -1,0 +1,115 @@
+disabled rule("Set up P array")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Set Global Variable(P, Empty Array);
+		Modify Global Variable(P, Append To Array, Vector(35.204, 8.896, -76.117));
+		Modify Global Variable(P, Append To Array, Vector(29.143, 9.092, -75.990));
+		Modify Global Variable(P, Append To Array, Vector(23.281, 8.087, -76.717));
+		Modify Global Variable(P, Append To Array, Vector(17.413, 6.968, -78.030));
+		Modify Global Variable(P, Append To Array, Vector(12.653, 6.832, -76.822));
+		Modify Global Variable(P, Append To Array, Vector(10.625, 7.001, -69.716));
+		Modify Global Variable(P, Append To Array, Vector(8.163, 6.826, -62.652));
+		Modify Global Variable(P, Append To Array, Vector(8.479, 6.877, -63.727));
+		Modify Global Variable(P, Append To Array, Vector(4.011, 6.719, -52.151));
+		Modify Global Variable(P, Append To Array, Vector(0.146, 6.706, -47.463));
+		Modify Global Variable(P, Append To Array, Vector(-4.467, 6.429, -43.868));
+		Modify Global Variable(P, Append To Array, Vector(-10.307, 5.005, -39.634));
+		Modify Global Variable(P, Append To Array, Vector(-16.189, 4.501, -41.168));
+		Modify Global Variable(P, Append To Array, Vector(-22.572, 4.463, -43.187));
+		Modify Global Variable(P, Append To Array, Vector(-28.172, 4.463, -46.171));
+		Modify Global Variable(P, Append To Array, Vector(-32.810, 4.428, -49.897));
+		Modify Global Variable(P, Append To Array, Vector(-40.144, 4.487, -48.365));
+		Modify Global Variable(P, Append To Array, Vector(-40.293, 4.480, -86.504));
+		Modify Global Variable(P, Append To Array, Vector(-38.651, 4.350, -73.341));
+		Modify Global Variable(P, Append To Array, Vector(-25.782, 11.928, -97.993));
+		Modify Global Variable(P, Append To Array, Vector(-25.079, 12.889, -97.337));
+		Modify Global Variable(P, Append To Array, Vector(-33.710, 6.300, -106.011));
+	}
+}
+
+rule("Spawn Hammonds")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(A) < Count Of(Global Variable(P));
+	}
+
+	actions
+	{
+		Create Dummy Bot(Hero(Wrecking Ball), Team 1, 0, Value In Array(Global Variable(P), Global Variable(A)), Vector(0, 1, 0));
+		Modify Global Variable(A, Add, 1);
+		Wait(2, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+disabled rule("Rule 2")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Crouch) == True;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Hero(Wrecking Ball), Team Of(Event Player), 1, Position Of(Event Player), Facing Direction Of(Event Player));
+	}
+}
+
+rule("Crouch to save checkpoint")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Crouch) == True;
+	}
+
+	actions
+	{
+		Modify Global Variable(P, Append To Array, Position Of(Event Player));
+	}
+}
+
+rule("Hammond Ults")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Wrecking Ball;
+	}
+
+	conditions
+	{
+		Ultimate Charge Percent(Event Player) == 100;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Ultimate);
+	}
+}
