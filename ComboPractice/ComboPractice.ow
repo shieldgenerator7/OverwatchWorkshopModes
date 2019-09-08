@@ -18,11 +18,11 @@ rule("TEAM 2 Limitations")
 		Set Healing Dealt(Event Player, 0);
 		Set Healing Received(Event Player, 0);
 		Set Damage Dealt(Event Player, 0);
-		Disallow Button(Event Player, Primary Fire);
-		Disallow Button(Event Player, Secondary Fire);
-		Disallow Button(Event Player, Ability 1);
-		Disallow Button(Event Player, Ability 2);
-		Disallow Button(Event Player, Ultimate);
+		Set Primary Fire Enabled(Event Player, False);
+		Set Secondary Fire Enabled(Event Player, False);
+		Set Ability 1 Enabled(Event Player, False);
+		Set Ability 2 Enabled(Event Player, False);
+		Set Ultimate Ability Enabled(Event Player, False);
 	}
 }
 
