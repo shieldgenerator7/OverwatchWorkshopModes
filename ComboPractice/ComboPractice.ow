@@ -63,3 +63,50 @@ rule("TEAM 2 Unfreeze when no one's looking")
 		Clear Status(Event Player, Frozen);
 	}
 }
+
+rule("Player takes damage")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, A, 5);
+		Chase Player Variable At Rate(Event Player, A, 0, 1, Destination and Rate);
+		Destroy In-World Text(Player Variable(Event Player, T));
+		Create In-World Text(All Players(All Teams), Player Variable(Event Player, A), Add(Vector(0, 1, 0), Position Of(Event Player)), 1,
+			Clip Against Surfaces, Visible To Position and String);
+		Set Player Variable(Event Player, T, Last Text ID);
+	}
+}
+
+rule("Player Var A reaches 0")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, A) == 0;
+	}
+
+	actions
+	{
+		Destroy In-World Text(Player Variable(Event Player, T));
+		Heal(Event Player, Null, 10000);
+	}
+}
+}
