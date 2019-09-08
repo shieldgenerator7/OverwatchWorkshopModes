@@ -1,0 +1,69 @@
+rule("TEAM 2 Limitations")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Healing Dealt(Event Player, 0);
+		Set Healing Received(Event Player, 0);
+		Set Damage Dealt(Event Player, 0);
+		Disallow Button(Event Player, Primary Fire);
+		Disallow Button(Event Player, Secondary Fire);
+		Disallow Button(Event Player, Ability 1);
+		Disallow Button(Event Player, Ability 2);
+		Disallow Button(Event Player, Ultimate);
+	}
+}
+
+rule("TEAM 2 Freeze when Team 1 sees them")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		All;
+	}
+
+	conditions
+	{
+		Is True For Any(All Living Players(Team 1), And(Is In View Angle(Current Array Element, Position Of(Event Player), 45),
+			Is In Line of Sight(Position Of(Current Array Element), Position Of(Event Player), Barriers Do Not Block LOS))) == True;
+	}
+
+	actions
+	{
+		Set Status(Event Player, Null, Frozen, 9999);
+	}
+}
+
+rule("TEAM 2 Unfreeze when no one's looking")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		All;
+	}
+
+	conditions
+	{
+		Is True For Any(All Living Players(Team 1), And(Is In View Angle(Current Array Element, Position Of(Event Player), 45),
+			Is In Line of Sight(Position Of(Current Array Element), Position Of(Event Player), Barriers Do Not Block LOS))) == False;
+	}
+
+	actions
+	{
+		Clear Status(Event Player, Frozen);
+	}
+}
