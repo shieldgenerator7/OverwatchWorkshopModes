@@ -109,4 +109,26 @@ rule("Player Var A reaches 0")
 		Heal(Event Player, Null, 10000);
 	}
 }
+
+rule("Team 2 respawns randomly")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, P, Random Value In Array(All Living Players(Team 1)));
+		Set Player Variable(Event Player, Q, Vector(Random Integer(-20.000, 20), 0, Random Integer(-20.000, 20)));
+		Teleport(Event Player, Nearest Walkable Position(Add(Position Of(Player Variable(Event Player, P)), Player Variable(Event Player,
+			Q))));
+	}
 }
