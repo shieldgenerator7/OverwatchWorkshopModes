@@ -1,0 +1,1721 @@
+rule("made by scrooged#2849")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("disable default scoring/music/announcer, create \"x players alive\" text, pick random hero from hero list")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is In Setup == True;
+	}
+
+	actions
+	{
+		Disable Built-In Game Mode Announcer;
+		Disable Built-In Game Mode Scoring;
+		Disable Built-In Game Mode Music;
+		Create HUD Text(All Players(All Teams), String("{0} {1}", String("Participants", Null, Null, Null), String("{0}: {1}", String(
+			"Alive", Null, Null, Null), Count Of(All Living Players(All Teams)), Null), Null), Null, Null, Left, 0, Red, Red, Red,
+			Visible To and String);
+		Set Match Time(10);
+		Set Global Variable(D, Random Value In Array(Global Variable(C)));
+	}
+}
+
+rule("choose random map section (global var f), create sphere(s)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is In Setup == True;
+	}
+
+	actions
+	{
+		Wait(0.016, Ignore Condition);
+		Set Global Variable(F, Random Integer(0, Subtract(Count Of(Global Variable(A)), 1)));
+		Set Global Variable(L, Value In Array(Value In Array(Global Variable(A), Global Variable(F)), 1));
+		Create Effect(All Players(All Teams), Sphere, Red, Vector(X Component Of(Value In Array(Value In Array(Global Variable(A),
+			Global Variable(F)), 2)), Global Variable(L), Z Component Of(Value In Array(Value In Array(Global Variable(A), Global Variable(
+			F)), 2))), 200, Visible To Position and Radius);
+		Skip If(Compare(Count Of(Value In Array(Global Variable(A), Global Variable(F))), !=, 4), 1);
+		Create Effect(All Players(All Teams), Sphere, Red, Vector(X Component Of(Value In Array(Value In Array(Global Variable(A),
+			Global Variable(F)), 3)), Global Variable(L), Z Component Of(Value In Array(Value In Array(Global Variable(A), Global Variable(
+			F)), 3))), 200, Visible To Position and Radius);
+	}
+}
+
+rule("init players (teleport to a random position within 0.1m of start position, set player var a when initialized)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Or(Is In Setup, Is Game In Progress) == True;
+		Has Spawned(Event Player) == True;
+		Distance Between(Event Player, Value In Array(Value In Array(Global Variable(A), Global Variable(F)), 0)) > 4;
+		Player Variable(Event Player, A) == 0;
+	}
+
+	actions
+	{
+		Wait(0.064, Ignore Condition);
+		Teleport(Event Player, Vector(Random Real(Subtract(X Component Of(Value In Array(Value In Array(Global Variable(A),
+			Global Variable(F)), 0)), 0.100), Add(X Component Of(Value In Array(Value In Array(Global Variable(A), Global Variable(F)),
+			0)), 0.100)), Y Component Of(Value In Array(Value In Array(Global Variable(A), Global Variable(F)), 0)), Random Real(Subtract(
+			Z Component Of(Value In Array(Value In Array(Global Variable(A), Global Variable(F)), 0)), 0.100), Add(Z Component Of(
+			Value In Array(Value In Array(Global Variable(A), Global Variable(F)), 0)), 0.100))));
+		Loop If Condition Is True;
+		Start Forcing Player To Be Hero(Event Player, Randomized Array(Global Variable(C)));
+		Wait(1, Ignore Condition);
+		Enable Death Spectate All Players(Event Player);
+		Disable Built-In Game Mode Respawning(Event Player);
+		Set Damage Dealt(Event Player, 0.001);
+		Set Player Variable(Event Player, A, 1);
+	}
+}
+
+rule("lava rises (global var h = current speed, global var L = lava y position)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is In Setup == True;
+	}
+
+	actions
+	{
+		Wait(0.016, Ignore Condition);
+		Modify Global Variable(L, Add, Global Variable(H));
+		Loop;
+	}
+}
+
+rule("accelerate lava from 0:00 to 0:35")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is In Setup == True;
+	}
+
+	actions
+	{
+		Chase Global Variable At Rate(H, 1, Multiply(0.001, 0.010), Destination and Rate);
+	}
+}
+
+rule("accelerate lava quickly from 0:35 to 0:58")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Match Time <= 865;
+	}
+
+	actions
+	{
+		Stop Chasing Global Variable(H);
+		Chase Global Variable At Rate(H, 1, Multiply(0.001, 0.100), Destination and Rate);
+	}
+}
+
+rule("deccelerate lava from 0:58 to 2:10")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Match Time <= 842;
+	}
+
+	actions
+	{
+		Stop Chasing Global Variable(H);
+		Chase Global Variable At Rate(H, 0.001, Multiply(0.001, 0.050), Destination and Rate);
+	}
+}
+
+rule("accelerate lava from 2:10 onwards")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Match Time <= 770;
+	}
+
+	actions
+	{
+		Stop Chasing Global Variable(H);
+		Chase Global Variable At Rate(H, 1, Multiply(0.001, 0.020), Destination and Rate);
+	}
+}
+
+rule("save latest attacker in player var b, save current health of victim in player var C when attacked")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Damage <= 1;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, B, Attacker);
+		Set Player Variable(Event Player, C, Health(Event Player));
+		Wait(7, Restart When True);
+		Set Player Variable(Event Player, B, Null);
+	}
+}
+
+rule("player inside lava sphere(s): burn, damage over time")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Count Of(Filtered Array(Array Slice(Value In Array(Global Variable(A), Global Variable(F)), 2, 99), Compare(Distance Between(
+			Event Player, Vector(X Component Of(Current Array Element), Global Variable(L), Z Component Of(Current Array Element))), <,
+			199.270))) > Null;
+	}
+
+	actions
+	{
+		Stop All Heal Over Time(Event Player);
+		Set Status(Event Player, Null, Burning, 10000);
+		Start Damage Over Time(Event Player, Null, 9999, 100);
+		Wait(0.016, Abort When False);
+		Skip If(Compare(Health(Event Player), >, 0), 1);
+	}
+}
+
+rule("player outside lava spheres: heal over time")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Count Of(Filtered Array(Array Slice(Value In Array(Global Variable(A), Global Variable(F)), 2, 99), Compare(Distance Between(
+			Event Player, Vector(X Component Of(Current Array Element), Global Variable(L), Z Component Of(Current Array Element))), <,
+			199.270))) == Null;
+	}
+
+	actions
+	{
+		Clear Status(Event Player, Burning);
+		Stop All Damage Over Time(Event Player);
+		Wait(1, Abort When False);
+		Start Heal Over Time(Event Player, Null, 9999, 20);
+	}
+}
+
+rule("check extra spheres (horizon + king's row), player inside")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Count Of(Global Variable(B)) > 0;
+		Count Of(Filtered Array(Global Variable(B), Compare(Distance Between(Event Player, Vector(X Component Of(Current Array Element),
+			Y Component Of(Current Array Element), Z Component Of(Current Array Element))), <, 197.270))) > Null;
+	}
+
+	actions
+	{
+		Stop All Heal Over Time(Event Player);
+		Set Status(Event Player, Null, Burning, 10000);
+		Start Damage Over Time(Event Player, Null, 9999, 66);
+		Wait(3.200, Abort When False);
+		Kill(Event Player, Null);
+	}
+}
+
+rule("check extra spheres (horizon + king's row), player outside")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Count Of(Global Variable(B)) > 0;
+		Count Of(Filtered Array(Global Variable(B), Compare(Distance Between(Event Player, Vector(X Component Of(Current Array Element),
+			Y Component Of(Current Array Element), Z Component Of(Current Array Element))), <, 197.270))) == Null;
+	}
+
+	actions
+	{
+		Clear Status(Event Player, Burning);
+		Stop All Damage Over Time(Event Player);
+		Wait(1, Abort When False);
+		Start Heal Over Time(Event Player, Null, 9999, 20);
+	}
+}
+
+rule("grant all living players a point when a player dies")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Modify Player Score(All Living Players(All Teams), 1);
+	}
+}
+
+rule("player victory")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Count Of(All Living Players(All Teams)) == 1;
+	}
+
+	actions
+	{
+		Stop All Damage Over Time(All Living Players(All Teams));
+		Declare Player Victory(All Living Players(All Teams));
+	}
+}
+
+rule("debug: coords and current lava speed * 100")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		False == True;
+	}
+
+	actions
+	{
+		Create HUD Text(All Players(All Teams), String("{0} : {1} : {2}", X Component Of(Position Of(Event Player)), Y Component Of(
+			Position Of(Event Player)), Z Component Of(Position Of(Event Player))), Null, Null, Left, 0, White, White, White,
+			Visible To and String);
+		Create HUD Text(All Players(All Teams), String("{0} {1}", Multiply(Global Variable(H), 100), String("", Null, Null, Null), Null),
+			Null, Null, Left, 0, White, White, White, Visible To and String);
+	}
+}
+
+rule("Map detector: create array a (map section data at each index: player start pos, lava start y pos, lava sphere x&z pos)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Set Global Variable(X, Nearest Walkable Position(Vector(100, 100, 100)));
+		Set Global Variable(Y, Round To Integer(X Component Of(Global Variable(X)), Up));
+	}
+}
+
+rule("king's row (3 sections) (1 extra sphere, global var b)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(Y) == 17;
+	}
+
+	actions
+	{
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(-50.000, 0, 1));
+		Modify Global Variable(E, Append To Array, -200.000);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-69.500, -49.500), 0, Random Real(-55.000, -35.000)));
+		Set Global Variable At Index(A, 0, Global Variable(E));
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(-122.000, -1.220, 19));
+		Modify Global Variable(E, Append To Array, -201.500);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-126.600, -106.600), 0, Random Real(8.200, 28.200)));
+		Set Global Variable At Index(A, 1, Global Variable(E));
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(13, 6, -4.000));
+		Modify Global Variable(E, Append To Array, -197.000);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-14.200, 5.800), 0, Random Real(-1.850, 18.150)));
+		Set Global Variable At Index(A, 2, Global Variable(E));
+		Set Global Variable(B, Empty Array);
+		Modify Global Variable(B, Append To Array, Vector(-359.500, 0, 64));
+		Create Effect(All Players(All Teams), Sphere, Red, Value In Array(Global Variable(B), 0), 200, Visible To Position and Radius);
+	}
+}
+
+rule("necropolis (1 section)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(Y) == 30;
+	}
+
+	actions
+	{
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(-23.000, 3, 0));
+		Modify Global Variable(E, Append To Array, -199.000);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-20.000, 20), 0, Random Real(-20.000, 20)));
+		Set Global Variable At Index(A, 0, Global Variable(E));
+	}
+}
+
+rule("dorado (1 section)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(Y) == 144;
+	}
+
+	actions
+	{
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(79, 13, 24.500));
+		Modify Global Variable(E, Append To Array, -189.000);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(57, 97), 0, Random Real(11, 51)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(127, 167), 0, Random Real(-9.000, 31)));
+		Set Global Variable At Index(A, 0, Global Variable(E));
+	}
+}
+
+rule("chateau (1 section)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(Y) == 168;
+	}
+
+	actions
+	{
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(185, 6, 87));
+		Modify Global Variable(E, Append To Array, -194.000);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(186, 226), 0, Random Real(68, 108)));
+		Set Global Variable At Index(A, 0, Global Variable(E));
+	}
+}
+
+rule("petra (1 section)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(Y) == 41;
+	}
+
+	actions
+	{
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(-3.000, 1, -8.000));
+		Modify Global Variable(E, Append To Array, -203.000);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(21, 41), 0, Random Real(21, 41)));
+		Set Global Variable At Index(A, 0, Global Variable(E));
+	}
+}
+
+rule("paris (1 section)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(Y) == -3.000;
+	}
+
+	actions
+	{
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(-11.000, 14, -38.000));
+		Modify Global Variable(E, Append To Array, -190.000);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-63.550, -43.550), 0, Random Real(-0.100, 19.900)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-4.140, 15.860), 0, Random Real(-70.500, -50.500)));
+		Set Global Variable At Index(A, 0, Global Variable(E));
+	}
+}
+
+rule("temple of anubis (1 section)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(Y) == 21;
+	}
+
+	actions
+	{
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(-4.000, 5.500, 57));
+		Modify Global Variable(E, Append To Array, -198.700);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-62.000, -22.000), 0, Random Real(7, 47)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-28.000, 12), 0, Random Real(91, 131)));
+		Set Global Variable At Index(A, 0, Global Variable(E));
+	}
+}
+
+rule("hollywood (3 sections)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(Y) == 25;
+	}
+
+	actions
+	{
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(5, 6, -67.000));
+		Modify Global Variable(E, Append To Array, -196.000);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-11.600, 8.400), 0, Random Real(-15.500, 4.500)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(21.650, 41.650), 0, Random Real(-83.900, -63.900)));
+		Set Global Variable At Index(A, 0, Global Variable(E));
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(-20.000, 9.750, -112.000));
+		Modify Global Variable(E, Append To Array, -194.000);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-39.400, -19.400), 0, Random Real(-153.200, -133.200)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-10.350, 9.650), 0, Random Real(-121.500, -101.500)));
+		Set Global Variable At Index(A, 1, Global Variable(E));
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(18, 6, 40));
+		Modify Global Variable(E, Append To Array, -197.500);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-34.400, -14.400), 0, Random Real(53.400, 73.400)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-47.450, -27.450), 0, Random Real(-15.250, 4.750)));
+		Set Global Variable At Index(A, 2, Global Variable(E));
+	}
+}
+
+rule("eichenwalde (3 sections)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(Y) == 124;
+	}
+
+	actions
+	{
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(100, 12.720, -108.000));
+		Modify Global Variable(E, Append To Array, -187.000);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(45.750, 65.750), 0, Random Real(-91.500, -71.500)));
+		Set Global Variable At Index(A, 0, Global Variable(E));
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(-1.000, 6.520, -72.000));
+		Modify Global Variable(E, Append To Array, -195.000);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-18.650, 1.350), 0, Random Real(-31.900, -11.900)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(8.700, 28.700), 0, Random Real(-86.500, -66.500)));
+		Set Global Variable At Index(A, 1, Global Variable(E));
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(122.504, 12.056, -62.386));
+		Modify Global Variable(E, Append To Array, -190.500);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(100, 120), 0, Random Real(-30.000, -50.000)));
+		Set Global Variable At Index(A, 2, Global Variable(E));
+		Set Global Variable(B, Empty Array);
+		Modify Global Variable(B, Append To Array, Vector(132.776, 12.524, 191));
+		Create Effect(All Players(All Teams), Sphere, Purple, Value In Array(Global Variable(B), 0), 200, Visible To Position and Radius);
+	}
+}
+
+rule("black forest (1 section)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(Y) == 37;
+	}
+
+	actions
+	{
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(11, 17, 5));
+		Modify Global Variable(E, Append To Array, -187.000);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-4.250, 15.750), 0, Random Real(-5.000, 15)));
+		Set Global Variable At Index(A, 0, Global Variable(E));
+	}
+}
+
+rule("ecopoint: antarctica (1 section)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(Y) == 18;
+	}
+
+	actions
+	{
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(-19.000, 7, 0));
+		Modify Global Variable(E, Append To Array, -191.000);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-12.000, 28), 0, Random Real(22, 62)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-12.000, 28), 0, Random Real(-62.000, -22.000)));
+		Set Global Variable At Index(A, 0, Global Variable(E));
+	}
+}
+
+rule("blizzworld (3 sections)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(Y) == 54;
+	}
+
+	actions
+	{
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(-78.000, 4.880, 66));
+		Modify Global Variable(E, Append To Array, -200.000);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-79.400, -59.400), 0, Random Real(135.600, 155.600)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-35.800, -15.800), 0, Random Real(64.850, 84.850)));
+		Set Global Variable At Index(A, 0, Global Variable(E));
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(-8.000, 6.070, 52));
+		Modify Global Variable(E, Append To Array, -198.500);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-10.500, 9.500), 0, Random Real(47.800, 67.800)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-21.700, -1.700), 0, Random Real(-60.900, -40.900)));
+		Set Global Variable At Index(A, 1, Global Variable(E));
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(-121.932, 1.208, 109.821));
+		Modify Global Variable(E, Append To Array, -204.000);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-145.000, -125.000), 0, Random Real(125, 105)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-80.000, -100.000), 0, Random Real(140, 160)));
+		Set Global Variable At Index(A, 2, Global Variable(E));
+	}
+}
+
+rule("hanamura (1 section)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(Y) == 78;
+	}
+
+	actions
+	{
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(14, -0.980, -11.000));
+		Modify Global Variable(E, Append To Array, -201.500);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-0.750, 19.250), 0, Random Real(2.500, 22.500)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(5.750, 25.750), 0, Random Real(-83.750, -63.750)));
+		Set Global Variable At Index(A, 0, Global Variable(E));
+	}
+}
+
+rule("volskaya (1 section)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(Y) == 34;
+	}
+
+	actions
+	{
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(-47.000, -2.980, 52));
+		Modify Global Variable(E, Append To Array, -202.000);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-24.050, -4.050), 0, Random Real(84.300, 104.300)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-88.450, -68.450), 0, Random Real(37.700, 57.700)));
+		Set Global Variable At Index(A, 0, Global Variable(E));
+	}
+}
+
+rule("ilios: well (1 section)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(Y) == -167.000;
+	}
+
+	actions
+	{
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(-220.000, 0, -28.000));
+		Modify Global Variable(E, Append To Array, -198.000);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-238.500, -218.500), 0, Random Real(-3.500, 16.500)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-189.000, -169.000), 0, Random Real(-40.900, -20.900)));
+		Set Global Variable At Index(A, 0, Global Variable(E));
+	}
+}
+
+rule("horizon lunar colony (1 section) (2 extra spheres, global var b)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(Y) == 56;
+	}
+
+	actions
+	{
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(2, 9, -114.000));
+		Modify Global Variable(E, Append To Array, -194.000);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(33, 73), 0, Random Real(-87.000, -47.000)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-45.000, -5.000), 0, Random Real(-142.000, -102.000)));
+		Set Global Variable At Index(A, 0, Global Variable(E));
+		Set Global Variable(B, Empty Array);
+		Modify Global Variable(B, Append To Array, Vector(278, 12, -62.000));
+		Modify Global Variable(B, Append To Array, Vector(240, 9, 63));
+		Create Effect(All Players(All Teams), Sphere, Red, Vector(X Component Of(Value In Array(Global Variable(B), 0)), Y Component Of(
+			Value In Array(Global Variable(B), 0)), Z Component Of(Value In Array(Global Variable(B), 0))), 200, Visible To);
+		Create Effect(All Players(All Teams), Sphere, Red, Vector(X Component Of(Value In Array(Global Variable(B), 1)), Y Component Of(
+			Value In Array(Global Variable(B), 1)), Z Component Of(Value In Array(Global Variable(B), 1))), 200, Visible To);
+	}
+}
+
+rule("havana (2 sections) (•)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(Y) == 88;
+	}
+
+	actions
+	{
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(31.756, 5.361, -96.830));
+		Modify Global Variable(E, Append To Array, -196.000);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(4.250, 72.400), 0, Random Real(-97.990, -61.910)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(4.250, 72.400), 0, Random Real(-97.990, -61.910)));
+		Set Global Variable At Index(A, 0, Global Variable(E));
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(-12.854, 7.198, -79.050));
+		Modify Global Variable(E, Append To Array, -196.000);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-45.000, -65.000), 0, Random Real(-40.000, -60.000)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-15.000, -35.000), 0, Random Real(-70.000, -90.000)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(30, 50), 0, Random Real(-40.000, -60.000)));
+		Set Global Variable At Index(A, 1, Global Variable(E));
+	}
+}
+
+rule("ilios: lighthouse (3 spheres) (.•)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(Y) == 300;
+	}
+
+	actions
+	{
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(358.330, -25.640, -51.720));
+		Modify Global Variable(E, Append To Array, -226.000);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(249.688, 269.688), 0, Random Real(-105.771, -85.771)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(310.283, 330.283), 0, Random Real(36.171, 56.171)));
+		Modify Global Variable(E, Append To Array, Vector(358.330, 0, -51.720));
+		Set Global Variable At Index(A, 0, Global Variable(E));
+	}
+}
+
+rule("ilios: ruins (2 spheres) (•)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(Y) == 66;
+	}
+
+	actions
+	{
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(28.500, 57.370, -156.990));
+		Modify Global Variable(E, Append To Array, -141.000);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-51.930, -21.930), 0, Random Real(-171.560, -141.560)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(81.110, 101.110), 0, Random Real(-166.860, -146.860)));
+		Set Global Variable At Index(A, 0, Global Variable(E));
+	}
+}
+
+rule("castilio (1 sphere) (•)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(Y) == -71.000;
+	}
+
+	actions
+	{
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(-128.000, 34.400, 63.120));
+		Modify Global Variable(E, Append To Array, -167.800);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-115.510, -95.610), 33.417, Random Real(31.230, 83.150)));
+		Set Global Variable At Index(A, 0, Global Variable(E));
+	}
+}
+
+rule("lijiang: tower (3 spheres) (•)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(Y) == 13;
+	}
+
+	actions
+	{
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(0, 272.500, 280));
+		Modify Global Variable(E, Append To Array, 67);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-15.000, 15), 0, Random Real(265, 295)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(58.400, 88.400), 0, Random Real(334.890, 364.890)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-78.140, -48.140), 0, Random Real(335, 365)));
+		Set Global Variable At Index(A, 0, Global Variable(E));
+	}
+}
+
+rule("lijiang: night market (2 spheres) (•)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(Y) == 69;
+	}
+
+	actions
+	{
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(0, -1.000, -62.000));
+		Modify Global Variable(E, Append To Array, -200.000);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(30, 60), 0, Random Real(-33.000, -3.000)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-60.000, -30.000), 0, Random Real(-33.000, -3.000)));
+		Set Global Variable At Index(A, 0, Global Variable(E));
+	}
+}
+
+rule("lijiang: garden (2 spheres) (•)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(Y) == 102;
+	}
+
+	actions
+	{
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(0, 94.150, 137));
+		Modify Global Variable(E, Append To Array, -106.000);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(26, 56), 0, Random Real(149, 179)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-56.000, -26.000), 0, Random Real(149, 179)));
+		Set Global Variable At Index(A, 0, Global Variable(E));
+	}
+}
+
+rule("nepal: shrine (3 spheres) (•)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(Y) == -13.000;
+	}
+
+	actions
+	{
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(-24.330, 13, 0));
+		Modify Global Variable(E, Append To Array, -188.000);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-55.000, -25.000), 0, Random Real(50, 80)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-60.000, -30.000), 0, Random Real(-15.000, 15)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-55.000, -25.000), 0, Random Real(-80.000, -50.000)));
+		Set Global Variable At Index(A, 0, Global Variable(E));
+	}
+}
+
+rule("nepal: village (2 spheres) (•)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(Y) == -130.000;
+	}
+
+	actions
+	{
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(-195.326, -92.122, 0));
+		Modify Global Variable(E, Append To Array, -293.500);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-225.000, -135.000), 0, Random Real(-95.000, -5.000)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-225.000, -135.000), 0, Random Real(5, 95)));
+		Set Global Variable At Index(A, 0, Global Variable(E));
+	}
+}
+
+rule("nepal: sanctum (3 spheres) (•)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(Y) == 101;
+	}
+
+	actions
+	{
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(98.870, 128, 0));
+		Modify Global Variable(E, Append To Array, -72.000);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(76, 116), 0, Random Real(37, 77)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(76, 116), 0, Random Real(-77.000, -37.000)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(25, 65), 0, Random Real(-20.000, 20)));
+		Set Global Variable At Index(A, 0, Global Variable(E));
+	}
+}
+
+rule("oasis: city center (2 spheres) (•)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(Y) == 186;
+	}
+
+	actions
+	{
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(143.664, 4.252, 247.721));
+		Modify Global Variable(E, Append To Array, -199.000);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(126, 146), 0, Random Real(276, 256)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(160, 180), 0, Random Real(210, 230)));
+		Set Global Variable At Index(A, 0, Global Variable(E));
+	}
+}
+
+rule("oasis: gardens (2 spheres) (•)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(Y) == 173;
+	}
+
+	actions
+	{
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(121, 11.500, -227.250));
+		Modify Global Variable(E, Append To Array, -196.000);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(90, 120), 0, Random Real(-275.000, -245.000)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(140, 170), 0, Random Real(-225.000, -195.000)));
+		Set Global Variable At Index(A, 0, Global Variable(E));
+	}
+}
+
+rule("oasis: university (2 spheres) (•)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(Y) == -163.000;
+	}
+
+	actions
+	{
+		Set Global Variable(E, Empty Array);
+		Modify Global Variable(E, Append To Array, Vector(-210.000, 19, 0));
+		Modify Global Variable(E, Append To Array, -185.000);
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-200.000, -170.000), 0, Random Real(-45.000, -15.000)));
+		Modify Global Variable(E, Append To Array, Vector(Random Real(-200.000, -170.000), 0, Random Real(15, 45)));
+		Set Global Variable At Index(A, 0, Global Variable(E));
+	}
+}
+
+rule("Moira Impulso")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Moira;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Is Using Ability 1(Event Player) == True;
+	}
+
+	actions
+	{
+		Apply Impulse(Event Player, Vector(0, 5, 0), 15, To Player, Cancel Contrary Motion);
+	}
+}
+
+rule("Hanzo Freeze")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		Hanzo;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+	}
+
+	actions
+	{
+		Set Status(Victim, Null, Frozen, 1.500);
+	}
+}
+
+rule("Genji Stun")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		Genji;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Is Using Ability 1(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Status(Victim, Null, Stunned, 1.200);
+	}
+}
+
+rule("Sym fagg")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		Symmetra;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Is Firing Primary(Event Player) == True;
+	}
+
+	actions
+	{
+		Apply Impulse(Victim, Down, 5, To World, Incorporate Contrary Motion);
+	}
+}
+
+rule("Sym Ult")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Symmetra;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Is Using Ultimate(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Damage Received(Event Player, 10);
+		Set Ability 1 Enabled(Event Player, True);
+		Wait(15, Ignore Condition);
+		Set Damage Received(Event Player, 100);
+		Set Ability 1 Enabled(Event Player, False);
+	}
+}
+
+rule("Widow Ult")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Widowmaker;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Is Using Ultimate(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Gravity(Event Player, 25);
+		Set Damage Received(Event Player, 10);
+		Set Secondary Fire Enabled(Event Player, True);
+		Wait(15, Ignore Condition);
+		Set Gravity(Event Player, 100);
+		Set Damage Received(Event Player, 100);
+		Set Secondary Fire Enabled(Event Player, False);
+	}
+}
+
+rule("Widow Stun")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		Widowmaker;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+	}
+
+	actions
+	{
+		Set Status(Victim, Null, Stunned, 1);
+		Apply Impulse(Victim, Forward, 10, To Player, Incorporate Contrary Motion);
+	}
+}
+
+rule("Reaper Impulso")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reaper;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Is Using Ability 1(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Gravity(Event Player, 0);
+		Apply Impulse(Event Player, Up, 10, To Player, Cancel Contrary Motion);
+		Wait(2, Ignore Condition);
+		Set Gravity(Event Player, 90);
+	}
+}
+
+rule("Reaper Ult Op")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		Reaper;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Is Using Ultimate(Event Player) == True;
+	}
+
+	actions
+	{
+		Apply Impulse(Victim, Backward, 25, To Player, Cancel Contrary Motion);
+	}
+}
+
+rule("Sombra Desliz")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Sombra;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Is Using Ability 2(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Gravity(Event Player, 20);
+		Wait(5, Ignore Condition);
+		Set Gravity(Event Player, 100);
+	}
+}
+
+rule("Sombra Ult Armor")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Sombra;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Is Using Ultimate(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Damage Received(Event Player, 10);
+		Wait(5, Ignore Condition);
+		Set Damage Received(Event Player, 100);
+	}
+}
+
+rule("Hammy Escudos/Salto")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Wrecking Ball;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Is Using Ability 2(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Gravity(Event Player, 25);
+		Apply Impulse(Event Player, Vector(0, 5, 0), 10, To World, Cancel Contrary Motion);
+		Set Damage Received(Event Player, 25);
+		Wait(7, Ignore Condition);
+		Set Gravity(Event Player, 100);
+		Set Damage Received(Event Player, 100);
+	}
+}
+
+rule("Ashe Desliz")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Ashe;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Is Using Ability 1(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Gravity(Event Player, 40);
+		Wait(4, Ignore Condition);
+		Set Gravity(Event Player, 70);
+	}
+}
+
+rule("76 Desliz")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Victim == True;
+	}
+
+	actions
+	{
+		Set Gravity(Event Player, 50);
+		Wait(3, Ignore Condition);
+		Set Gravity(Event Player, 100);
+	}
+}
+
+rule("76 Healing-Armor")
+{
+	event
+	{
+		Player Received Healing;
+		All;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+	}
+
+	actions
+	{
+		Set Damage Received(Event Player, 0);
+		Create Effect(All Players(All Teams), Good Aura, White, Event Player, 1, Visible To Position and Radius);
+		Wait(5, Ignore Condition);
+		Set Damage Received(Event Player, 100);
+		Destroy Effect(Last Created Entity);
+	}
+}
+
+rule("76 Ult Op")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Is Using Ultimate(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Damage Received(Event Player, 25);
+		Set Primary Fire Enabled(Event Player, True);
+		Wait(6, Ignore Condition);
+		Set Damage Received(Event Player, 100);
+		Set Primary Fire Enabled(Event Player, False);
+	}
+}
+
+rule("76 Ult Op fagg")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Is Firing Primary(Event Player) == True;
+	}
+
+	actions
+	{
+		Apply Impulse(Victim, Forward, 7, To Player, Cancel Contrary Motion);
+	}
+}
+
+rule("Doom Imba RU")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Doomfist;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Is Using Ability 1(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Gravity(Event Player, 25);
+		Wait(2, Ignore Condition);
+		Set Gravity(Event Player, 80);
+	}
+}
+
+rule("Doom SL Armor")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Doomfist;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Is Using Ability 2(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Damage Received(Event Player, 30);
+		Wait(2, Ignore Condition);
+		Set Damage Received(Event Player, 100);
+	}
+}
+
+rule("Sigma Impulso")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Sigma;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Is Using Ability 1(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Gravity(Event Player, 0);
+		Apply Impulse(Event Player, Vector(0, 5, 0), 5, To World, Cancel Contrary Motion);
+		Wait(2.500, Ignore Condition);
+		Set Gravity(Event Player, 80);
+	}
+}
+
+rule("MCree Op")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		McCree;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+	}
+
+	actions
+	{
+		Set Status(Victim, Null, Stunned, 2);
+	}
+}
+
+rule("MCree Impulso")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		McCree;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Is Using Ability 1(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Gravity(Event Player, 50);
+		Apply Impulse(Event Player, Vector(0, 30, 0), 20, To World, Cancel Contrary Motion);
+		Wait(3, Ignore Condition);
+		Set Gravity(Event Player, 70);
+	}
+}
+
+rule("MCree Ult Op")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		McCree;
+	}
+
+	conditions
+	{
+		Is Using Ultimate(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Gravity(Event Player, 0);
+		Apply Impulse(Event Player, Up, 5, To Player, Incorporate Contrary Motion);
+		Wait(3, Ignore Condition);
+		Set Gravity(Event Player, 70);
+	}
+}
+
+rule("Pharah Ult Armor")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Pharah;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Is Using Ultimate(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Damage Received(Event Player, 5);
+		Wait(4, Ignore Condition);
+		Set Damage Received(Event Player, 100);
+	}
+}
+
+rule("Rein Charge")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Is Using Ability 1(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Gravity(Event Player, 0);
+		Wait(1, Ignore Condition);
+		Apply Impulse(Event Player, Up, 5, To World, Cancel Contrary Motion);
+		Wait(3, Ignore Condition);
+		Set Gravity(Event Player, 100);
+	}
+}
+
+rule("Rein Fire")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Is Using Ability 2(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Status(Victim, Null, Knocked Down, 2);
+		Apply Impulse(Victim, Forward, 15, To Player, Cancel Contrary Motion);
+	}
+}
