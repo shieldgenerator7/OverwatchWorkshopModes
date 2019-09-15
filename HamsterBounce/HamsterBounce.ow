@@ -1,4 +1,4 @@
-disabled rule("Set up P array")
+rule("Set up P array")
 {
 	event
 	{
@@ -30,6 +30,7 @@ disabled rule("Set up P array")
 		Modify Global Variable(P, Append To Array, Vector(-25.782, 11.928, -97.993));
 		Modify Global Variable(P, Append To Array, Vector(-25.079, 12.889, -97.337));
 		Modify Global Variable(P, Append To Array, Vector(-33.710, 6.300, -106.011));
+		Set Global Variable(S, 0);
 	}
 }
 
@@ -47,8 +48,10 @@ rule("Spawn Hammonds")
 
 	actions
 	{
-		Create Dummy Bot(Hero(Wrecking Ball), Team 1, 0, Value In Array(Global Variable(P), Global Variable(A)), Vector(0, 1, 0));
+		Create Dummy Bot(Hero(Wrecking Ball), Team 1, Global Variable(S), Value In Array(Global Variable(P), Global Variable(A)), Vector(0,
+			1, 0));
 		Modify Global Variable(A, Add, 1);
+		Modify Global Variable(S, Add, 1);
 		Wait(2, Ignore Condition);
 		Loop If Condition Is True;
 	}
@@ -100,12 +103,14 @@ rule("Hammond Ults")
 	{
 		Ongoing - Each Player;
 		All;
-		Wrecking Ball;
+		All;
 	}
 
 	conditions
 	{
 		Ultimate Charge Percent(Event Player) == 100;
+		Hero Of(Event Player) == Hero(Wrecking Ball);
+		Is Dummy Bot(Event Player) == True;
 	}
 
 	actions
