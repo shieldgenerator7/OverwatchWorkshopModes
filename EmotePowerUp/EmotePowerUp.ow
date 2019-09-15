@@ -1,0 +1,60 @@
+rule("Player spawn in, set up")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, P, 100);
+	}
+}
+
+rule("Emote to Gain Power")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Communicating Any Emote(Event Player) == True;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, P, Add, 1);
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("If P != Q, adjust values for new power level")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, P) != Player Variable(Event Player, Q);
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, Q, Player Variable(Event Player, P));
+		Set Damage Dealt(Event Player, Player Variable(Event Player, P));
+		Set Max Health(Event Player, Player Variable(Event Player, P));
+		Set Move Speed(Event Player, Player Variable(Event Player, P));
+		Set Healing Received(Event Player, Player Variable(Event Player, P));
+	}
+}
