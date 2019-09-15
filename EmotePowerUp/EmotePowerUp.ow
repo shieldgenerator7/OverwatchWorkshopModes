@@ -10,6 +10,8 @@ rule("Player spawn in, set up")
 	actions
 	{
 		Set Player Variable(Event Player, P, 100);
+		Create HUD Text(Event Player, String("{0}: {1}", String("Power", Null, Null, Null), Player Variable(Event Player, P), Null), Null,
+			Null, Left, 0, White, White, White, Visible To and String);
 	}
 }
 
