@@ -55,7 +55,6 @@ rule("If P != Q, adjust values for new power level")
 	{
 		Set Player Variable(Event Player, Q, Player Variable(Event Player, P));
 		Set Damage Dealt(Event Player, Player Variable(Event Player, P));
-		Set Max Health(Event Player, Player Variable(Event Player, P));
 		Set Move Speed(Event Player, Player Variable(Event Player, P));
 		Set Healing Received(Event Player, Player Variable(Event Player, P));
 	}
@@ -96,5 +95,26 @@ rule("Reset Power when die")
 	actions
 	{
 		Set Player Variable(Event Player, P, 100);
+	}
+}
+
+rule("Update max health at certain values")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Modulo(Player Variable(Event Player, P), 50) == 0;
+	}
+
+	actions
+	{
+		Set Max Health(Event Player, Player Variable(Event Player, P));
+		Heal(Event Player, Event Player, 25);
 	}
 }
