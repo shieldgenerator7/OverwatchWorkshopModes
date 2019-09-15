@@ -58,3 +58,41 @@ rule("If P != Q, adjust values for new power level")
 		Set Healing Received(Event Player, Player Variable(Event Player, P));
 	}
 }
+
+rule("Slowly lose power")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, P) > 100;
+		Is Communicating Any Emote(Event Player) == False;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, P, Subtract, 1);
+		Wait(0.500, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Reset Power when die")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, P, 100);
+	}
+}
