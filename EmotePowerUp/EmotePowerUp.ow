@@ -55,7 +55,7 @@ rule("If P != Q, adjust values for new power level")
 	{
 		Set Player Variable(Event Player, Q, Player Variable(Event Player, P));
 		Set Damage Dealt(Event Player, Player Variable(Event Player, P));
-		Set Move Speed(Event Player, Player Variable(Event Player, P));
+		Set Move Speed(Event Player, Max(100, Divide(Player Variable(Event Player, P), 2)));
 		Set Healing Received(Event Player, Player Variable(Event Player, P));
 	}
 }
@@ -77,9 +77,31 @@ rule("Slowly lose power")
 
 	actions
 	{
-		Modify Player Variable(Event Player, P, Subtract, 1);
+		Modify Player Variable(Event Player, P, Subtract, Divide(Player Variable(Event Player, P), 100));
+		Skip If(Compare(Player Variable(Event Player, P), <, 500), 1);
+		Modify Player Variable(Event Player, P, Subtract, Divide(Player Variable(Event Player, P), 100));
 		Wait(0.500, Ignore Condition);
 		Loop If Condition Is True;
+	}
+}
+
+rule("Lose power with each hit")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, P) > 100;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, P, Subtract, Divide(Event Damage, 100));
 	}
 }
 
