@@ -1,0 +1,329 @@
+//You randomly get an element when you spawn.
+//Each element has a unique effect when you hit an enemy.
+//Fire = burn enemies.
+//Ice = freeze enemies. 
+// Lightning = damage nearby enemies. 
+// Wind = push back enemies. 
+// Water = make enemies immobile but also immortal.
+
+rule("game setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("player spawn, get element")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, E, Random Integer(1, 5));
+	}
+}
+
+rule("element setup (fire)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, E) == 1;
+	}
+
+	actions
+	{
+		Create HUD Text(Event Player, String("Burn", Null, Null, Null), Null, Null, Left, 0, Red, White, White, Visible To and String);
+		Set Player Variable(Event Player, A, Last Text ID);
+		Create In-World Text(All Players(All Teams), String("Burn", Null, Null, Null), Add(Eye Position(Event Player), Vector(0, 0.200,
+			0)), 1, Clip Against Surfaces, Visible To Position and String);
+		Set Player Variable(Event Player, B, Last Text ID);
+		Create Effect(Filtered Array(All Players(All Teams), Compare(Current Array Element, !=, Event Player)), Bad Aura, Red, Add(
+			Position Of(Event Player), Vector(0, 0.500, 0)), 1, Visible To Position and Radius);
+		Set Player Variable(Event Player, C, Last Created Entity);
+	}
+}
+
+rule("element setup (Ice)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, E) == 2;
+	}
+
+	actions
+	{
+		Create HUD Text(Event Player, String("Freeze", Null, Null, Null), Null, Null, Left, 0, White, White, Blue, Visible To and String);
+		Set Player Variable(Event Player, A, Last Text ID);
+		Create In-World Text(All Players(All Teams), String("Freeze", Null, Null, Null), Add(Eye Position(Event Player), Vector(0, 0.200,
+			0)), 1, Clip Against Surfaces, Visible To Position and String);
+		Set Player Variable(Event Player, B, Last Text ID);
+		Create Effect(Filtered Array(All Players(All Teams), Compare(Current Array Element, !=, Event Player)), Cloud, White, Add(
+			Position Of(Event Player), Vector(0, 0.500, 0)), 1, Visible To Position and Radius);
+		Set Player Variable(Event Player, C, Last Created Entity);
+	}
+}
+
+rule("element setup (lightning)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, E) == 3;
+	}
+
+	actions
+	{
+		Create HUD Text(Event Player, String("Current", Null, Null, Null), Null, Null, Left, 0, Yellow, White, White,
+			Visible To and String);
+		Set Player Variable(Event Player, A, Last Text ID);
+		Create In-World Text(All Players(All Teams), String("Current", Null, Null, Null), Add(Eye Position(Event Player), Vector(0, 0.200,
+			0)), 1, Clip Against Surfaces, Visible To Position and String);
+		Set Player Variable(Event Player, B, Last Text ID);
+		Create Effect(Filtered Array(All Players(All Teams), Compare(Current Array Element, !=, Event Player)), Sparkles, Yellow, Add(
+			Position Of(Event Player), Vector(0, 0.500, 0)), 1, Visible To Position and Radius);
+		Set Player Variable(Event Player, C, Last Created Entity);
+	}
+}
+
+rule("element setup (wind)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, E) == 4;
+	}
+
+	actions
+	{
+		Create HUD Text(Event Player, String("Vortex", Null, Null, Null), Null, Null, Left, 0, Green, White, White, Visible To and String);
+		Set Player Variable(Event Player, A, Last Text ID);
+		Create In-World Text(All Players(All Teams), String("Vortex", Null, Null, Null), Add(Eye Position(Event Player), Vector(0, 0.200,
+			0)), 1, Clip Against Surfaces, Visible To Position and String);
+		Set Player Variable(Event Player, B, Last Text ID);
+		Create Effect(Filtered Array(All Players(All Teams), Compare(Current Array Element, !=, Event Player)), Orb, Green, Add(
+			Position Of(Event Player), Vector(0, 0.500, 0)), 1, Visible To Position and Radius);
+		Set Player Variable(Event Player, C, Last Created Entity);
+	}
+}
+
+rule("element setup (water)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, E) == 5;
+	}
+
+	actions
+	{
+		Create HUD Text(Event Player, String("Life", Null, Null, Null), Null, Null, Left, 0, Blue, White, White, Visible To and String);
+		Set Player Variable(Event Player, A, Last Text ID);
+		Create In-World Text(All Players(All Teams), String("Life", Null, Null, Null), Add(Eye Position(Event Player), Vector(0, 0.200,
+			0)), 1, Clip Against Surfaces, Visible To Position and String);
+		Set Player Variable(Event Player, B, Last Text ID);
+		Create Effect(Filtered Array(All Players(All Teams), Compare(Current Array Element, !=, Event Player)), Good Aura, Blue, Add(
+			Position Of(Event Player), Vector(0, 0.500, 0)), 1, Visible To Position and Radius);
+		Set Player Variable(Event Player, C, Last Created Entity);
+	}
+}
+
+rule("element damage (fire)")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Attacker, E) == 1;
+	}
+
+	actions
+	{
+		Skip If(Compare(Player Variable(Event Player, H), !=, 0), 3);
+		Start Damage Over Time(Victim, Attacker, 5, 10);
+		Set Status(Victim, Attacker, Burning, 5);
+		Set Player Variable(Event Player, H, Last Damage Over Time ID);
+		Wait(5, Ignore Condition);
+		Set Player Variable(Event Player, H, 0);
+	}
+}
+
+rule("element damage (ice)")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Attacker, E) == 2;
+	}
+
+	actions
+	{
+		Set Status(Victim, Attacker, Frozen, 0.500);
+	}
+}
+
+rule("element damage (lightning)")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Attacker, E) == 3;
+	}
+
+	actions
+	{
+		Skip If(Compare(Event Damage, ==, 10.100), 1);
+		Damage(Filtered Array(All Players(Team Of(Victim)), And(Compare(Current Array Element, !=, Victim), Compare(Distance Between(
+			Position Of(Current Array Element), Position Of(Victim)), <=, 7))), Attacker, 10.100);
+	}
+}
+
+rule("element damage (wind)")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Attacker, E) == 4;
+	}
+
+	actions
+	{
+		Apply Impulse(Victim, Direction Towards(Position Of(Attacker), Position Of(Victim)), 20, To World, Cancel Contrary Motion);
+		Apply Impulse(Victim, Vector(0, 1, 0), 5, To World, Cancel Contrary Motion);
+	}
+}
+
+rule("element damage (water)")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Attacker, E) == 5;
+	}
+
+	actions
+	{
+		Heal(Attacker, Victim, Event Damage);
+		Set Damage Dealt(Victim, 0);
+		Wait(0.500, Ignore Condition);
+		Set Damage Dealt(Victim, 100);
+	}
+}
+
+rule("player died")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Destroy HUD Text(Player Variable(Event Player, A));
+		Destroy In-World Text(Player Variable(Event Player, B));
+		Destroy Effect(Player Variable(Event Player, C));
+		Set Player Variable(Event Player, E, 0);
+	}
+}
+
+rule("manual reset (interact + crouch)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Interact) == True;
+		Is Button Held(Event Player, Crouch) == True;
+	}
+
+	actions
+	{
+		Kill(Event Player, Event Player);
+	}
+}
+
+rule("=== made by ShieldGnrtr7 === last updated 2019-06-05 03:17 ===")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
