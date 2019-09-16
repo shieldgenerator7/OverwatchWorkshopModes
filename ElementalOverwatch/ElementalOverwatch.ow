@@ -207,6 +207,7 @@ rule("element damage (ice)")
 	conditions
 	{
 		Player Variable(Attacker, E) == 2;
+		Normalized Health(Victim) > 0.500;
 	}
 
 	actions
@@ -227,13 +228,36 @@ rule("element damage (lightning)")
 	conditions
 	{
 		Player Variable(Attacker, E) == 3;
+		Player Variable(Victim, H) != Attacker;
 	}
 
 	actions
 	{
-		Skip If(Compare(Event Damage, ==, 10.100), 1);
-		Damage(Filtered Array(All Players(Team Of(Victim)), And(Compare(Current Array Element, !=, Victim), Compare(Distance Between(
-			Position Of(Current Array Element), Position Of(Victim)), <=, 7))), Attacker, 10.100);
+		Set Player Variable(Attacker, L, Filtered Array(All Players(Team Of(Victim)), And(Compare(Current Array Element, !=, Victim),
+			Compare(Distance Between(Position Of(Current Array Element), Position Of(Victim)), <=, 7))));
+		Set Player Variable(Player Variable(Attacker, L), H, Attacker);
+		Damage(Player Variable(Attacker, L), Attacker, 10.100);
+	}
+}
+
+rule("element damage (lightning) (end)")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Attacker, E) == 3;
+		Player Variable(Victim, H) == Attacker;
+	}
+
+	actions
+	{
+		Set Player Variable(Victim, H, Null);
 	}
 }
 
@@ -275,7 +299,7 @@ rule("element damage (water)")
 	actions
 	{
 		Heal(Attacker, Victim, Event Damage);
-		Set Damage Dealt(Victim, 0);
+		Set Damage Dealt(Victim, 0.100);
 		Wait(0.500, Ignore Condition);
 		Set Damage Dealt(Victim, 100);
 	}
