@@ -122,3 +122,11 @@ rule("Update max health at certain values")
 		Set Player Variable(Event Player, H, Last Heal Over Time ID);
 	}
 }
+
+rule("== Made by ShieldGnrtr7 == Last updated 2019-09-15 20:13 ==")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
