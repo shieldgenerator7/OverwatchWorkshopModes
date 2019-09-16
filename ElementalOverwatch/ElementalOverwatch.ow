@@ -236,7 +236,7 @@ rule("element damage (lightning)")
 		Set Player Variable(Attacker, L, Filtered Array(All Players(Team Of(Victim)), And(Compare(Current Array Element, !=, Victim),
 			Compare(Distance Between(Position Of(Current Array Element), Position Of(Victim)), <=, 7))));
 		Set Player Variable(Player Variable(Attacker, L), H, Attacker);
-		Damage(Player Variable(Attacker, L), Attacker, 10.100);
+		Damage(Player Variable(Attacker, L), Attacker, Multiply(Event Damage, 0.500));
 	}
 }
 
