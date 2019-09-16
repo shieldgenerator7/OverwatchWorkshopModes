@@ -114,7 +114,11 @@ rule("Update max health at certain values")
 
 	actions
 	{
-		Set Max Health(Event Player, Player Variable(Event Player, P));
-		Heal(Event Player, Event Player, 25);
+		disabled Set Max Health(Event Player, Player Variable(Event Player, P));
+		disabled Wait(0.250, Ignore Condition);
+		disabled Heal(Event Player, Event Player, 25);
+		Stop Heal Over Time(Player Variable(Event Player, H));
+		Start Heal Over Time(Event Player, Event Player, 9999, Divide(Player Variable(Event Player, P), 100));
+		Set Player Variable(Event Player, H, Last Heal Over Time ID);
 	}
 }
