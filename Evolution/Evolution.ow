@@ -16,7 +16,10 @@
 // Jump Gravity
 //
 // == Player Variables Used ==
+// F - Egg Effect ID
 // H - Self Heals Per Second
+// M - Current Mate
+// P - Position of Egg
 // R - Ring Effect ID
 
 rule("Player spawn, give them random stats")
@@ -103,6 +106,35 @@ rule("Player emote next to another emoting player to mate")
 
 	actions
 	{
-		Create Effect(All Players(All Teams), Sphere, Yellow, Event Player, 2, Visible To Position and Radius);
+		Set Player Variable(Event Player, M, Index Of Array Value(Filtered Array(Players Within Radius(Position Of(Event Player), 5,
+			Team Of(Event Player), Surfaces And Enemy Barriers), And(Compare(Current Array Element, !=, Event Player), Compare(
+			Is Communicating Any Emote(Current Array Element), ==, True))), 0));
+		Set Player Variable(Event Player, P, Position Of(Event Player));
+		Destroy Effect(Player Variable(Event Player, F));
+		Create Effect(All Players(All Teams), Sphere, Yellow, Player Variable(Event Player, P), 0.500, Visible To Position and Radius);
+		Set Player Variable(Event Player, F, Last Created Entity);
+	}
+}
+
+rule("Player has egg, attach to player until player crouches")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, P) != Null;
+		Is Button Held(Event Player, Crouch) == False;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, P, Position Of(Event Player));
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
 	}
 }
