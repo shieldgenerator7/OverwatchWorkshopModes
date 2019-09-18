@@ -18,6 +18,7 @@
 // == Player Variables Used ==
 // F - Egg Effect ID
 // H - Self Heals Per Second
+// L - Laid? True if player dropped the egg
 // M - Current Mate
 // P - Position of Egg
 // R - Ring Effect ID
@@ -113,10 +114,11 @@ rule("Player emote next to another emoting player to mate")
 		Destroy Effect(Player Variable(Event Player, F));
 		Create Effect(All Players(All Teams), Sphere, Yellow, Player Variable(Event Player, P), 0.500, Visible To Position and Radius);
 		Set Player Variable(Event Player, F, Last Created Entity);
+		Set Player Variable(Event Player, L, False);
 	}
 }
 
-rule("Player has egg, attach to player until player crouches")
+rule("Player has egg, attach to player until L is true")
 {
 	event
 	{
@@ -128,7 +130,7 @@ rule("Player has egg, attach to player until player crouches")
 	conditions
 	{
 		Player Variable(Event Player, P) != Null;
-		Is Button Held(Event Player, Crouch) == False;
+		Player Variable(Event Player, L) == False;
 	}
 
 	actions
@@ -136,5 +138,26 @@ rule("Player has egg, attach to player until player crouches")
 		Set Player Variable(Event Player, P, Position Of(Event Player));
 		Wait(0.100, Ignore Condition);
 		Loop If Condition Is True;
+	}
+}
+
+rule("Set L = true if player crouches")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Crouch) == True;
+		Player Variable(Event Player, L) == False;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, L, True);
 	}
 }
