@@ -5,4 +5,13 @@
 // Players mate with other players and lay eggs that become respawn points.
 // Player stats change and evolve depending on who their parents were and random variations.
 //
-// 
+// == Stats that change ==
+// Max Health (50 - 200)
+// Damage Dealt
+// Damage Received
+// Healing Dealt
+// Healing Received
+// Heal Per Second (Regen)
+// Movement Speed
+// Jump Gravity
+//
