@@ -15,3 +15,26 @@
 // Movement Speed
 // Jump Gravity
 //
+
+rule("Player spawn, give them random stats")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Set Max Health(Event Player, Multiply(100, Multiply(Random Real(0.500, 1), Random Real(1, 2))));
+		Set Damage Dealt(Event Player, Multiply(100, Multiply(Random Real(0.500, 1), Random Real(1, 2))));
+		Set Damage Received(Event Player, Multiply(100, Multiply(Random Real(0.500, 1), Random Real(1, 2))));
+		Set Healing Dealt(Event Player, Multiply(100, Multiply(Random Real(0.500, 1), Random Real(1, 2))));
+		Set Healing Received(Event Player, Multiply(100, Multiply(Random Real(0.500, 1), Random Real(1, 2))));
+		Set Player Variable(Event Player, H, Random Integer(1, 10));
+		Set Move Speed(Event Player, Multiply(100, Multiply(Random Real(0.500, 1), Random Real(1, 2))));
+		Set Gravity(Event Player, Multiply(100, Multiply(Random Real(0.500, 1), Random Real(1, 2))));
+		Start Heal Over Time(Event Player, Event Player, 9999, Player Variable(Event Player, H));
+	}
+}
