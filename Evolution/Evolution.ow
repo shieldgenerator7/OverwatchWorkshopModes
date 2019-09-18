@@ -22,6 +22,21 @@
 // M - Current Mate
 // P - Position of Egg
 // R - Ring Effect ID
+// S - Spawn (where they will spawn at) (temp)
+// T - Parent (that laid their egg) (temp)
+
+rule("Game Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Disable Built-In Game Mode Respawning(All Players(All Teams));
+	}
+}
 
 rule("Player spawn, give them random stats")
 {
@@ -159,5 +174,31 @@ rule("Set L = true if player crouches")
 	actions
 	{
 		Set Player Variable(Event Player, L, True);
+	}
+}
+
+rule("Player dies, is egg available? Then spawn at that egg")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is True For Any(All Players(Team Of(Event Player)), Compare(Player Variable(Current Array Element, P), !=, Null)) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, T, Value In Array(Filtered Array(All Players(Team Of(Event Player)), Compare(Player Variable(
+			Current Array Element, P), !=, Null)), 0));
+		Set Player Variable(Event Player, S, Player Variable(Player Variable(Event Player, T), P));
+		Resurrect(Event Player);
+		Teleport(Event Player, Player Variable(Event Player, S));
+		Set Player Variable(Player Variable(Event Player, T), P, Null);
+		Destroy Effect(Player Variable(Player Variable(Event Player, T), F));
 	}
 }
