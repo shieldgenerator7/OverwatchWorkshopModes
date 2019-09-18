@@ -42,9 +42,14 @@ rule("Player spawn, give them random stats")
 {
 	event
 	{
-		Player Joined Match;
+		Ongoing - Each Player;
 		All;
 		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
 	}
 
 	actions
