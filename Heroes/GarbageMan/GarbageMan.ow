@@ -155,6 +155,8 @@ rule("Garbage Man Primary Fire (EFFECT)")
 			Global Variable(BEAM_TICK_RATE)));
 		Apply Impulse(Player Variable(Event Player, eBeamTargetList), Facing Direction Of(Event Player), 3, To World,
 			Incorporate Contrary Motion);
+		Wait(Divide(1, Global Variable(BEAM_TICK_RATE)), Abort When False);
+		Loop If Condition Is True;
 	}
 }
 
