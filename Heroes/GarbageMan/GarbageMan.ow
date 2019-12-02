@@ -27,6 +27,8 @@ variables
 		6: windTunnelPosition
 		7: fWindTunnelTargetList
 		8: eWindTunnelTargetList
+		9: windTunnelCooldown
+		10: windTunnelCooldownTextId
 		11: fWindTunnelEffectId
 		12: eWindTunnelEffectId
 		13: windTunnelTimeLeft
@@ -319,6 +321,7 @@ rule("Garbage Man Ability 1 \"Wind Tunnel\" (START)")
 		Hero Of(Event Player) == Hero(Junkrat);
 		Is Alive(Event Player) == True;
 		Is Button Held(Event Player, Ability 1) == True;
+		Player Variable(Event Player, windTunnelCooldown) <= 0;
 	}
 
 	actions
@@ -335,6 +338,13 @@ rule("Garbage Man Ability 1 \"Wind Tunnel\" (START)")
 		Stop Chasing Player Variable(Event Player, windTunnelTimeLeft);
 		Set Player Variable(Event Player, windTunnelTimeLeft, Global Variable(WIND_TUNNEL_DURATION));
 		Chase Player Variable At Rate(Event Player, windTunnelTimeLeft, 0, 1, None);
+		Destroy HUD Text(Player Variable(Event Player, windTunnelCooldownTextId));
+		Create HUD Text(Event Player, Custom String("Wind Tunnel: {0} sec", Player Variable(Event Player, windTunnelCooldown), Null, Null),
+			Null, Null, Left, 0, White, White, White, String, Default Visibility);
+		Set Player Variable(Event Player, windTunnelCooldownTextId, Last Text ID);
+		Stop Chasing Player Variable(Event Player, windTunnelCooldown);
+		Set Player Variable(Event Player, windTunnelCooldown, Global Variable(WIND_TUNNEL_COOLDOWN));
+		Chase Player Variable At Rate(Event Player, windTunnelCooldown, 0, 1, None);
 	}
 }
 
@@ -392,5 +402,29 @@ rule("Garbage Man Ability 1 \"Wind Tunnel\" (END)")
 		Destroy Effect(Player Variable(Event Player, fWindTunnelEffectId));
 		Destroy Effect(Player Variable(Event Player, eWindTunnelEffectId));
 		Set Player Variable(Event Player, windTunnelTimeLeft, 0);
+	}
+}
+
+rule("Garbage Man Ability 1 \"Wind Tunnel\" (READY)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Junkrat);
+		Player Variable(Event Player, windTunnelCooldown) <= 0;
+	}
+
+	actions
+	{
+		Destroy HUD Text(Player Variable(Event Player, windTunnelCooldownTextId));
+		Create HUD Text(Event Player, Custom String("Wind Tunnel: READY", Null, Null, Null), Null, Null, Left, 0, White, White, White,
+			String, Default Visibility);
+		Set Player Variable(Event Player, windTunnelCooldownTextId, Last Text ID);
 	}
 }
