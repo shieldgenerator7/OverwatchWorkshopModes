@@ -16,6 +16,9 @@ variables
 		12: WIND_TUNNEL_COOLDOWN
 		13: WIND_TUNNEL_TICK_RATE
 		14: WIND_TUNNEL_MAX_VELOCITY
+		17: TRASH_BAG_SPEED
+		19: TRASH_BAG_RADIUS
+		21: TRASH_BAG_GRAVITY
 
 	player:
 		0: fBeamEffectId
@@ -32,6 +35,11 @@ variables
 		11: fWindTunnelEffectId
 		12: eWindTunnelEffectId
 		13: windTunnelTimeLeft
+		14: trashBagCooldown
+		15: trashBagPosition
+		16: trashBagVelocity
+		18: fTrashBagEffectId
+		19: eTrashBagEffectId
 }
 
 rule("Game Setup")
@@ -58,6 +66,9 @@ rule("Game Setup")
 		Set Global Variable(WIND_TUNNEL_COOLDOWN, 5);
 		Set Global Variable(WIND_TUNNEL_TICK_RATE, 20);
 		Set Global Variable(WIND_TUNNEL_MAX_VELOCITY, 5);
+		Set Global Variable(TRASH_BAG_SPEED, 15);
+		Set Global Variable(TRASH_BAG_RADIUS, 0.500);
+		Set Global Variable(TRASH_BAG_GRAVITY, 20);
 	}
 }
 
@@ -432,5 +443,42 @@ rule("Garbage Man Ability 1 \"Wind Tunnel\" (READY)")
 		Create HUD Text(Event Player, Custom String("Wind Tunnel: READY", Null, Null, Null), Null, Null, Left, 0, White, White, White,
 			String, Default Visibility);
 		Set Player Variable(Event Player, windTunnelCooldownTextId, Last Text ID);
+	}
+}
+
+rule("Garbage Man Ability 2 \"Trash Bag\" (START)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Junkrat);
+		Is Alive(Event Player) == True;
+		Is Button Held(Event Player, Ability 2) == True;
+		Player Variable(Event Player, trashBagCooldown) <= 0;
+	}
+
+	actions
+	{
+		Destroy Effect(Player Variable(Event Player, fTrashBagEffectId));
+		Create Effect(All Players(Team Of(Event Player)), Sphere, Green, Player Variable(Event Player, trashBagPosition), Global Variable(
+			TRASH_BAG_RADIUS), Position and Radius);
+		Set Player Variable(Event Player, fTrashBagEffectId, Last Created Entity);
+		Destroy Effect(Player Variable(Event Player, eTrashBagEffectId));
+		Create Effect(All Players(Opposite Team Of(Team Of(Event Player))), Sphere, Yellow, Player Variable(Event Player,
+			trashBagPosition), Global Variable(TRASH_BAG_RADIUS), Position and Radius);
+		Set Player Variable(Event Player, eTrashBagEffectId, Last Created Entity);
+		Stop Chasing Player Variable(Event Player, trashBagPosition);
+		Stop Chasing Player Variable(Event Player, trashBagVelocity);
+		Set Player Variable(Event Player, trashBagPosition, Eye Position(Event Player));
+		Set Player Variable(Event Player, trashBagVelocity, Multiply(Facing Direction Of(Event Player), Global Variable(TRASH_BAG_SPEED)));
+		Chase Player Variable At Rate(Event Player, trashBagPosition, Add(Player Variable(Event Player, trashBagPosition), Player Variable(
+			Event Player, trashBagVelocity)), Global Variable(TRASH_BAG_SPEED), Destination and Rate);
+		Chase Player Variable At Rate(Event Player, trashBagVelocity, Down, Global Variable(TRASH_BAG_GRAVITY), None);
 	}
 }
