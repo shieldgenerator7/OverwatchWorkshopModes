@@ -17,9 +17,12 @@ variables
 		13: WIND_TUNNEL_TICK_RATE
 		14: WIND_TUNNEL_MAX_VELOCITY
 		17: TRASH_BAG_SPEED
+		18: TRASH_BAG_DAMAGE_IMPACT
 		19: TRASH_BAG_RADIUS
+		20: TRASH_BAG_RADIUS_SPLASH
 		21: TRASH_BAG_GRAVITY
 		22: TRASH_BAG_TICK_RATE
+		23: TRASH_BAG_DAMAGE_SPLASH
 
 	player:
 		0: fBeamEffectId
@@ -41,6 +44,8 @@ variables
 		16: trashBagVelocity
 		18: fTrashBagEffectId
 		19: eTrashBagEffectId
+		20: eTrashBagTargetList
+		21: trashBagHitNormal
 }
 
 rule("Game Setup")
@@ -67,10 +72,13 @@ rule("Game Setup")
 		Set Global Variable(WIND_TUNNEL_COOLDOWN, 5);
 		Set Global Variable(WIND_TUNNEL_TICK_RATE, 20);
 		Set Global Variable(WIND_TUNNEL_MAX_VELOCITY, 5);
-		Set Global Variable(TRASH_BAG_SPEED, 15);
+		Set Global Variable(TRASH_BAG_SPEED, 40);
 		Set Global Variable(TRASH_BAG_RADIUS, 0.500);
-		Set Global Variable(TRASH_BAG_GRAVITY, 9.810);
-		Set Global Variable(TRASH_BAG_TICK_RATE, 20);
+		Set Global Variable(TRASH_BAG_GRAVITY, 1);
+		Set Global Variable(TRASH_BAG_TICK_RATE, 40);
+		Set Global Variable(TRASH_BAG_DAMAGE_SPLASH, 50);
+		Set Global Variable(TRASH_BAG_DAMAGE_IMPACT, 70);
+		Set Global Variable(TRASH_BAG_RADIUS_SPLASH, 3);
 	}
 }
 
@@ -504,7 +512,101 @@ rule("Garbage Man Ability 2 \"Trash Bag\" (ACTIVE)")
 	{
 		Modify Player Variable(Event Player, trashBagPosition, Add, Multiply(Player Variable(Event Player, trashBagVelocity), Divide(
 			Global Variable(TRASH_BAG_SPEED), Global Variable(TRASH_BAG_TICK_RATE))));
+		Skip If(Compare(Count Of(Player Variable(Event Player, eTrashBagTargetList)), >, 0), 1);
+		Set Player Variable(Event Player, eTrashBagTargetList, Ray Cast Hit Player(Player Variable(Event Player, trashBagPosition), Add(
+			Player Variable(Event Player, trashBagPosition), Multiply(Player Variable(Event Player, trashBagVelocity), Divide(
+			Global Variable(TRASH_BAG_SPEED), Global Variable(TRASH_BAG_TICK_RATE)))), All Players(Opposite Team Of(Team Of(
+			Event Player))), All Players(Team Of(Event Player)), True));
+		Skip If(Compare(Count Of(Player Variable(Event Player, eTrashBagTargetList)), >, 0), 1);
+		Set Player Variable(Event Player, trashBagHitNormal, Ray Cast Hit Normal(Player Variable(Event Player, trashBagPosition), Add(
+			Player Variable(Event Player, trashBagPosition), Multiply(Player Variable(Event Player, trashBagVelocity), Divide(
+			Global Variable(TRASH_BAG_SPEED), Global Variable(TRASH_BAG_TICK_RATE)))), Empty Array, All Players(All Teams), False));
 		Wait(Divide(1, Global Variable(TRASH_BAG_TICK_RATE)), Abort When False);
 		Loop If Condition Is True;
+	}
+}
+
+rule("Garbage Man Ability 2 \"Trash Bag\" (HIT PLAYER)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Junkrat);
+		Player Variable(Event Player, trashBagVelocity) != Vector(0, 0, 0);
+		Count Of(Player Variable(Event Player, eTrashBagTargetList)) > 0;
+	}
+
+	actions
+	{
+		Damage(Player Variable(Event Player, eTrashBagTargetList), Event Player, Global Variable(TRASH_BAG_DAMAGE_IMPACT));
+		Modify Player Variable(Event Player, trashBagVelocity, Multiply, Vector(-1.000, 0, -1.000));
+		Set Player Variable(Event Player, eTrashBagTargetList, Empty Array);
+	}
+}
+
+rule("Garbage Man Ability 2 \"Trash Bag\" (HIT WALL)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Junkrat);
+		Player Variable(Event Player, trashBagVelocity) != Vector(0, 0, 0);
+		Player Variable(Event Player, trashBagHitNormal) != Multiply(Player Variable(Event Player, trashBagVelocity), Divide(
+			Global Variable(TRASH_BAG_SPEED), Global Variable(TRASH_BAG_TICK_RATE)));
+		Player Variable(Event Player, trashBagHitNormal) != Vector(0, 0, 0);
+		Player Variable(Event Player, trashBagHitNormal) != Vector(0, 1, 0);
+		Count Of(Player Variable(Event Player, eTrashBagTargetList)) <= 0;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, trashBagVelocity, Multiply, Vector(-1.000, 0, -1.000));
+		Set Player Variable(Event Player, trashBagHitNormal, Vector(0, 0, 0));
+	}
+}
+
+rule("Garbage Man Ability 2 \"Trash Bag\" (HIT FLOOR)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Junkrat);
+		Player Variable(Event Player, trashBagVelocity) != Vector(0, 0, 0);
+		Player Variable(Event Player, trashBagHitNormal) != Multiply(Player Variable(Event Player, trashBagVelocity), Divide(
+			Global Variable(TRASH_BAG_SPEED), Global Variable(TRASH_BAG_TICK_RATE)));
+		Player Variable(Event Player, trashBagHitNormal) != Vector(0, 0, 0);
+		Player Variable(Event Player, trashBagHitNormal) == Vector(0, 1, 0);
+		Count Of(Player Variable(Event Player, eTrashBagTargetList)) <= 0;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, trashBagHitNormal, Vector(0, 0, 0));
+		Stop Chasing Player Variable(Event Player, trashBagVelocity);
+		Set Player Variable(Event Player, trashBagVelocity, Vector(0, 0, 0));
+		Set Player Variable(Event Player, eTrashBagTargetList, Players Within Radius(Player Variable(Event Player, trashBagPosition),
+			Global Variable(TRASH_BAG_RADIUS_SPLASH), Opposite Team Of(Team Of(Event Player)), Surfaces And Enemy Barriers));
+		Damage(Player Variable(Event Player, eTrashBagTargetList), Event Player, Global Variable(TRASH_BAG_DAMAGE_SPLASH));
+		Apply Impulse(Player Variable(Event Player, eTrashBagTargetList), Subtract(Position Of(Player Variable(Event Player,
+			eTrashBagTargetList)), Player Variable(Event Player, trashBagPosition)), Global Variable(TRASH_BAG_DAMAGE_SPLASH), To World,
+			Cancel Contrary Motion);
 	}
 }
