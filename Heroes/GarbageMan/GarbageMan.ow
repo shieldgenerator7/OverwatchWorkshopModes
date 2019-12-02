@@ -332,7 +332,9 @@ rule("Garbage Man Ability 1 \"Wind Tunnel\" (START)")
 		Create Effect(All Players(Opposite Team Of(Team Of(Event Player))), Light Shaft, Orange, Player Variable(Event Player,
 			windTunnelPosition), Global Variable(WIND_TUNNEL_RADIUS), None);
 		Set Player Variable(Event Player, eWindTunnelEffectId, Last Created Entity);
+		Stop Chasing Player Variable(Event Player, windTunnelTimeLeft);
 		Set Player Variable(Event Player, windTunnelTimeLeft, Global Variable(WIND_TUNNEL_DURATION));
+		Chase Player Variable At Rate(Event Player, windTunnelTimeLeft, 0, 1, None);
 	}
 }
 
@@ -368,5 +370,27 @@ rule("Garbage Man Ability 1 \"Wind Tunnel\" (EFFECT)")
 			Incorporate Contrary Motion);
 		Wait(Divide(1, Global Variable(WIND_TUNNEL_TICK_RATE)), Abort When False);
 		Loop If Condition Is True;
+	}
+}
+
+rule("Garbage Man Ability 1 \"Wind Tunnel\" (END)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, windTunnelTimeLeft) <= 0;
+	}
+
+	actions
+	{
+		Destroy Effect(Player Variable(Event Player, fWindTunnelEffectId));
+		Destroy Effect(Player Variable(Event Player, eWindTunnelEffectId));
+		Set Player Variable(Event Player, windTunnelTimeLeft, 0);
 	}
 }
