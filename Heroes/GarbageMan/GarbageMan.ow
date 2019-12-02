@@ -2,10 +2,14 @@ variables
 {
 	global:
 		0: BEAM_RANGE
+		1: BEAM_VIEW_ANGLE
+		2: BEAM_DAMAGE_PER_SECOND
+		3: BEAM_TICK_RATE
 
 	player:
 		0: fBeamEffectId
 		1: eBeamEffectId
+		2: eBeamTargetList
 }
 
 rule("Game Setup")
@@ -18,6 +22,9 @@ rule("Game Setup")
 	actions
 	{
 		Set Global Variable(BEAM_RANGE, 15);
+		Set Global Variable(BEAM_VIEW_ANGLE, 10);
+		Set Global Variable(BEAM_DAMAGE_PER_SECOND, 90);
+		Set Global Variable(BEAM_TICK_RATE, 20);
 	}
 }
 
@@ -71,7 +78,7 @@ rule("Non-Garbage Man Setup")
 	}
 }
 
-rule("Garbage Man Primary Fire")
+rule("Garbage Man Primary Fire (START)")
 {
 	event
 	{
@@ -118,5 +125,56 @@ rule("Garbage Man Primary Fire (END)")
 	{
 		Destroy Effect(Player Variable(Event Player, fBeamEffectId));
 		Destroy Effect(Player Variable(Event Player, eBeamEffectId));
+		Set Player Variable(Event Player, eBeamTargetList, Empty Array);
+	}
+}
+
+rule("Garbage Man Primary Fire (EFFECT)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Junkrat);
+		Is Alive(Event Player) == True;
+		Is Button Held(Event Player, Primary Fire) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, eBeamTargetList, Filtered Array(Players in View Angle(Event Player, Opposite Team Of(Team Of(
+			Event Player)), Global Variable(BEAM_VIEW_ANGLE)), And(Is In Line of Sight(Eye Position(Event Player), Eye Position(
+			Current Array Element), Enemy Barriers Block LOS), Compare(Distance Between(Position Of(Event Player), Position Of(
+			Current Array Element)), <=, Global Variable(BEAM_RANGE)))));
+		Damage(Player Variable(Event Player, eBeamTargetList), Event Player, Divide(Global Variable(BEAM_DAMAGE_PER_SECOND),
+			Global Variable(BEAM_TICK_RATE)));
+		Apply Impulse(Player Variable(Event Player, eBeamTargetList), Facing Direction Of(Event Player), 3, To World,
+			Incorporate Contrary Motion);
+	}
+}
+
+rule("TEST COMMAND Bring everyone to the objective")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player == Host Player;
+		Is Button Held(Event Player, Interact) == True;
+	}
+
+	actions
+	{
+		Teleport(All Players(All Teams), Objective Position(1));
 	}
 }
