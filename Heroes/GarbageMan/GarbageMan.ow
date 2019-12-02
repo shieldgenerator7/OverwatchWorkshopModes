@@ -43,6 +43,7 @@ variables
 		14: trashBagCooldown
 		15: trashBagPosition
 		16: trashBagVelocity
+		17: trashBagCooldownTextId
 		18: fTrashBagEffectId
 		19: eTrashBagEffectId
 		20: eTrashBagTargetList
@@ -135,6 +136,10 @@ rule("Garbage Man Setup")
 		Create HUD Text(Event Player, Custom String("Wind Tunnel: READY", Null, Null, Null), Null, Null, Left, 0, White, White, White,
 			String, Default Visibility);
 		Set Player Variable(Event Player, windTunnelCooldownTextId, Last Text ID);
+		Destroy HUD Text(Player Variable(Event Player, trashBagCooldownTextId));
+		Create HUD Text(Event Player, Custom String("Trash Bag: READY", Null, Null, Null), Null, Null, Left, 1, White, White, White,
+			String, Default Visibility);
+		Set Player Variable(Event Player, trashBagCooldownTextId, Last Text ID);
 	}
 }
 
@@ -473,7 +478,7 @@ rule("Garbage Man Ability 2 \"Trash Bag\" (START)")
 		Hero Of(Event Player) == Hero(Junkrat);
 		Is Alive(Event Player) == True;
 		Is Button Held(Event Player, Ability 2) == True;
-		disabled Player Variable(Event Player, trashBagCooldown) <= 0;
+		Player Variable(Event Player, trashBagCooldown) <= 0;
 	}
 
 	actions
@@ -497,6 +502,10 @@ rule("Garbage Man Ability 2 \"Trash Bag\" (START)")
 		Stop Chasing Player Variable(Event Player, trashBagCooldown);
 		Set Player Variable(Event Player, trashBagCooldown, Global Variable(TRASH_BAG_COOLDOWN));
 		Chase Player Variable At Rate(Event Player, trashBagCooldown, 0, 1, None);
+		Destroy HUD Text(Player Variable(Event Player, trashBagCooldownTextId));
+		Create HUD Text(Event Player, Custom String("Trash Bag: {0} sec", Player Variable(Event Player, trashBagCooldown), Null, Null),
+			Null, Null, Left, 1, White, White, White, String, Default Visibility);
+		Set Player Variable(Event Player, trashBagCooldownTextId, Last Text ID);
 	}
 }
 
@@ -629,5 +638,29 @@ rule("Garbage Man Ability 2 \"Trash Bag\" (HIT FLOOR)")
 		Apply Impulse(Player Variable(Event Player, eTrashBagTargetList), Subtract(Position Of(Player Variable(Event Player,
 			eTrashBagTargetList)), Player Variable(Event Player, trashBagPosition)), Global Variable(TRASH_BAG_DAMAGE_SPLASH), To World,
 			Cancel Contrary Motion);
+	}
+}
+
+rule("Garbage Man Ability 2 \"Trash Bag\" (READY)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Junkrat);
+		Player Variable(Event Player, trashBagCooldown) <= 0;
+	}
+
+	actions
+	{
+		Destroy HUD Text(Player Variable(Event Player, trashBagCooldownTextId));
+		Create HUD Text(Event Player, Custom String("Trash Bag: READY", Null, Null, Null), Null, Null, Left, 1, White, White, White,
+			String, Default Visibility);
+		Set Player Variable(Event Player, trashBagCooldownTextId, Last Text ID);
 	}
 }
