@@ -5,11 +5,13 @@ variables
 		1: BEAM_VIEW_ANGLE
 		2: BEAM_DAMAGE_PER_SECOND
 		3: BEAM_TICK_RATE
+		4: BEAM_KNOCK_BACK
 
 	player:
 		0: fBeamEffectId
 		1: eBeamEffectId
 		2: eBeamTargetList
+		3: beamType
 }
 
 rule("Game Setup")
@@ -25,6 +27,28 @@ rule("Game Setup")
 		Set Global Variable(BEAM_VIEW_ANGLE, 10);
 		Set Global Variable(BEAM_DAMAGE_PER_SECOND, 90);
 		Set Global Variable(BEAM_TICK_RATE, 20);
+		Set Global Variable(BEAM_KNOCK_BACK, 3);
+	}
+}
+
+rule("TEST COMMAND Bring everyone to the objective")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player == Host Player;
+		Is Button Held(Event Player, Interact) == True;
+	}
+
+	actions
+	{
+		Teleport(All Players(All Teams), Objective Position(1));
 	}
 }
 
@@ -96,40 +120,11 @@ rule("Garbage Man Primary Fire (START)")
 
 	actions
 	{
-		Destroy Effect(Player Variable(Event Player, fBeamEffectId));
-		Create Beam Effect(All Players(Team Of(Event Player)), Bad Beam, Event Player, Add(Position Of(Event Player), Multiply(
-			Global Variable(BEAM_RANGE), Facing Direction Of(Event Player))), White, Position and Radius);
-		Set Player Variable(Event Player, fBeamEffectId, Last Created Entity);
-		Destroy Effect(Player Variable(Event Player, eBeamEffectId));
-		Create Beam Effect(All Players(Opposite Team Of(Team Of(Event Player))), Bad Beam, Event Player, Add(Position Of(Event Player),
-			Multiply(Global Variable(BEAM_RANGE), Facing Direction Of(Event Player))), Orange, Position and Radius);
-		Set Player Variable(Event Player, eBeamEffectId, Last Created Entity);
+		Set Player Variable(Event Player, beamType, 1);
 	}
 }
 
-rule("Garbage Man Primary Fire (END)")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		Junkrat;
-	}
-
-	conditions
-	{
-		Is Button Held(Event Player, Primary Fire) == False;
-	}
-
-	actions
-	{
-		Destroy Effect(Player Variable(Event Player, fBeamEffectId));
-		Destroy Effect(Player Variable(Event Player, eBeamEffectId));
-		Set Player Variable(Event Player, eBeamTargetList, Empty Array);
-	}
-}
-
-rule("Garbage Man Primary Fire (EFFECT)")
+rule("Garbage Man Secondary Fire (START)")
 {
 	event
 	{
@@ -142,7 +137,58 @@ rule("Garbage Man Primary Fire (EFFECT)")
 	{
 		Hero Of(Event Player) == Hero(Junkrat);
 		Is Alive(Event Player) == True;
-		Is Button Held(Event Player, Primary Fire) == True;
+		Is Button Held(Event Player, Secondary Fire) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, beamType, 2);
+	}
+}
+
+rule("Garbage Man Beam (START)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Junkrat);
+		Is Alive(Event Player) == True;
+		Player Variable(Event Player, beamType) > 0;
+	}
+
+	actions
+	{
+		Destroy Effect(Player Variable(Event Player, fBeamEffectId));
+		Create Beam Effect(All Players(Team Of(Event Player)), Bad Beam, Event Player, Add(Position Of(Event Player), Multiply(
+			Global Variable(BEAM_RANGE), Facing Direction Of(Event Player))), White, Position and Radius);
+		Set Player Variable(Event Player, fBeamEffectId, Last Created Entity);
+		Destroy Effect(Player Variable(Event Player, eBeamEffectId));
+		Create Beam Effect(All Players(Opposite Team Of(Team Of(Event Player))), Bad Beam, Event Player, Add(Position Of(Event Player),
+			Multiply(Global Variable(BEAM_RANGE), Facing Direction Of(Event Player))), Orange, Position and Radius);
+		Set Player Variable(Event Player, eBeamEffectId, Last Created Entity);
+	}
+}
+
+rule("Garbage Man Beam (EFFECT)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Junkrat);
+		Is Alive(Event Player) == True;
+		Player Variable(Event Player, beamType) > 0;
 	}
 
 	actions
@@ -153,30 +199,76 @@ rule("Garbage Man Primary Fire (EFFECT)")
 			Current Array Element)), <=, Global Variable(BEAM_RANGE)))));
 		Damage(Player Variable(Event Player, eBeamTargetList), Event Player, Divide(Global Variable(BEAM_DAMAGE_PER_SECOND),
 			Global Variable(BEAM_TICK_RATE)));
-		Apply Impulse(Player Variable(Event Player, eBeamTargetList), Facing Direction Of(Event Player), 3, To World,
-			Incorporate Contrary Motion);
+		Skip If(Compare(Player Variable(Event Player, beamType), !=, 1), 1);
+		Apply Impulse(Player Variable(Event Player, eBeamTargetList), Facing Direction Of(Event Player), Global Variable(BEAM_KNOCK_BACK),
+			To World, Incorporate Contrary Motion);
+		Skip If(Compare(Player Variable(Event Player, beamType), !=, 2), 1);
+		Apply Impulse(Player Variable(Event Player, eBeamTargetList), Multiply(Facing Direction Of(Event Player), -1.000), Global Variable(
+			BEAM_KNOCK_BACK), To World, Incorporate Contrary Motion);
 		Wait(Divide(1, Global Variable(BEAM_TICK_RATE)), Abort When False);
 		Loop If Condition Is True;
 	}
 }
 
-rule("TEST COMMAND Bring everyone to the objective")
+rule("Garbage Man Beam (END: OFF)")
 {
 	event
 	{
 		Ongoing - Each Player;
 		All;
-		All;
+		Junkrat;
 	}
 
 	conditions
 	{
-		Event Player == Host Player;
-		Is Button Held(Event Player, Interact) == True;
+		Is Button Held(Event Player, Primary Fire) == False;
+		Is Button Held(Event Player, Secondary Fire) == False;
 	}
 
 	actions
 	{
-		Teleport(All Players(All Teams), Objective Position(1));
+		Set Player Variable(Event Player, beamType, 0);
+	}
+}
+
+rule("Garbage Man Beam (END: DEATH)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == False;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, beamType, 0);
+	}
+}
+
+rule("Garbage Man Beam (END)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, beamType) == 0;
+	}
+
+	actions
+	{
+		Destroy Effect(Player Variable(Event Player, fBeamEffectId));
+		Destroy Effect(Player Variable(Event Player, eBeamEffectId));
+		Set Player Variable(Event Player, eBeamTargetList, Empty Array);
 	}
 }
