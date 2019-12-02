@@ -489,8 +489,8 @@ rule("Garbage Man Ability 2 \"Trash Bag\" (START)")
 		Stop Chasing Player Variable(Event Player, trashBagPosition);
 		Stop Chasing Player Variable(Event Player, trashBagVelocity);
 		Set Player Variable(Event Player, trashBagPosition, Eye Position(Event Player));
-		Set Player Variable(Event Player, trashBagVelocity, Vector(Multiply(X Component Of(Facing Direction Of(Event Player)), -1.000),
-			Y Component Of(Facing Direction Of(Event Player)), Multiply(Z Component Of(Facing Direction Of(Event Player)), -1.000)));
+		Set Player Variable(Event Player, trashBagVelocity, Vector(Multiply(X Component Of(Facing Direction Of(Event Player)), 1),
+			Y Component Of(Facing Direction Of(Event Player)), Multiply(Z Component Of(Facing Direction Of(Event Player)), 1)));
 		disabled Chase Player Variable At Rate(Event Player, trashBagPosition, Add(Player Variable(Event Player, trashBagPosition), Player Variable(
 			Event Player, trashBagVelocity)), Global Variable(TRASH_BAG_SPEED), Destination and Rate);
 		Chase Player Variable At Rate(Event Player, trashBagVelocity, Down, Global Variable(TRASH_BAG_GRAVITY), None);
@@ -580,8 +580,9 @@ rule("Garbage Man Ability 2 \"Trash Bag\" (HIT WALL)")
 			Global Variable(TRASH_BAG_SPEED), 2), Global Variable(TRASH_BAG_TICK_RATE)));
 		disabled Player Variable(Event Player, trashBagHitPosition) != Multiply(Player Variable(Event Player, trashBagVelocity), Divide(Multiply(
 			Global Variable(TRASH_BAG_SPEED), 2), Global Variable(TRASH_BAG_TICK_RATE)));
-		Distance Between(Player Variable(Event Player, trashBagHitPosition), Multiply(Player Variable(Event Player, trashBagVelocity),
-			Divide(Multiply(Global Variable(TRASH_BAG_SPEED), 2), Global Variable(TRASH_BAG_TICK_RATE)))) < 0.010;
+		Distance Between(Player Variable(Event Player, trashBagHitPosition), Add(Player Variable(Event Player, trashBagPosition), Multiply(
+			Player Variable(Event Player, trashBagVelocity), Divide(Multiply(Global Variable(TRASH_BAG_SPEED), 2), Global Variable(
+			TRASH_BAG_TICK_RATE))))) > 0.100;
 		Player Variable(Event Player, trashBagHitNormal) != Vector(0, 0, 0);
 		Player Variable(Event Player, trashBagHitNormal) != Vector(0, 1, 0);
 		Count Of(Player Variable(Event Player, eTrashBagTargetList)) <= 0;
