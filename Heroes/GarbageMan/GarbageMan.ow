@@ -10,6 +10,10 @@ variables
 		6: BEAM_DISARM_STACK_LIMIT
 		7: BEAM_DISARM_STACK_DECAY_P_SECOND
 		8: BEAM_DISARM_DURATION
+		9: WIND_TUNNEL_FORCE
+		10: WIND_TUNNEL_RADIUS
+		11: WIND_TUNNEL_DURATION
+		12: WIND_TUNNEL_COOLDOWN
 
 	player:
 		0: fBeamEffectId
@@ -18,6 +22,9 @@ variables
 		3: beamType
 		4: beamDisarmStacks
 		5: beamDisarmTimeLeft
+		6: windTunnelPosition
+		11: fWindTunnelEffectId
+		12: eWindTunnelEffectId
 }
 
 rule("Game Setup")
@@ -38,6 +45,10 @@ rule("Game Setup")
 		Set Global Variable(BEAM_DISARM_STACK_LIMIT, 100);
 		Set Global Variable(BEAM_DISARM_STACK_DECAY_P_SECOND, 25);
 		Set Global Variable(BEAM_DISARM_DURATION, 5);
+		Set Global Variable(WIND_TUNNEL_FORCE, 5);
+		Set Global Variable(WIND_TUNNEL_RADIUS, 2);
+		Set Global Variable(WIND_TUNNEL_DURATION, 10);
+		Set Global Variable(WIND_TUNNEL_COOLDOWN, 10);
 	}
 }
 
@@ -116,7 +127,7 @@ rule("Non-Garbage Man Setup")
 	}
 }
 
-rule("Garbage Man Primary Fire (START)")
+rule("Garbage Man Primary Fire \"Leaf Blower\" (START)")
 {
 	event
 	{
@@ -138,7 +149,7 @@ rule("Garbage Man Primary Fire (START)")
 	}
 }
 
-rule("Garbage Man Secondary Fire (START)")
+rule("Garbage Man Secondary Fire \"Trash Vac\" (START)")
 {
 	event
 	{
@@ -284,5 +295,36 @@ rule("Garbage Man Beam (END)")
 		Destroy Effect(Player Variable(Event Player, fBeamEffectId));
 		Destroy Effect(Player Variable(Event Player, eBeamEffectId));
 		Set Player Variable(Event Player, eBeamTargetList, Empty Array);
+	}
+}
+
+rule("Garbage Man Ability 1 \"Wind Tunnel\" (START)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Junkrat);
+		Is Alive(Event Player) == True;
+		Is Button Held(Event Player, Ability 1) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, windTunnelPosition, Position Of(Event Player));
+		Destroy Effect(Player Variable(Event Player, fWindTunnelEffectId));
+		Create Effect(All Players(Team Of(Event Player)), Light Shaft, White, Player Variable(Event Player, windTunnelPosition),
+			Global Variable(WIND_TUNNEL_RADIUS), None);
+		Set Player Variable(Event Player, fWindTunnelEffectId, Last Created Entity);
+		Destroy Effect(Player Variable(Event Player, eWindTunnelEffectId));
+		Create Effect(All Players(Opposite Team Of(Team Of(Event Player))), Light Shaft, Orange, Player Variable(Event Player,
+			windTunnelPosition), Global Variable(WIND_TUNNEL_RADIUS), None);
+		Set Player Variable(Event Player, eWindTunnelEffectId, Last Created Entity);
+		Set Player Variable(Event Player, beamDisarmTimeLeft, Global Variable(WIND_TUNNEL_DURATION));
 	}
 }
