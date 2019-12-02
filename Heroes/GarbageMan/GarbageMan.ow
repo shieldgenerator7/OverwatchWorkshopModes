@@ -6,12 +6,18 @@ variables
 		2: BEAM_DAMAGE_PER_SECOND
 		3: BEAM_TICK_RATE
 		4: BEAM_KNOCK_BACK
+		5: BEAM_DISARM_STACKS_PER_SECOND
+		6: BEAM_DISARM_STACK_LIMIT
+		7: BEAM_DISARM_STACK_DECAY_P_SECOND
+		8: BEAM_DISARM_DURATION
 
 	player:
 		0: fBeamEffectId
 		1: eBeamEffectId
 		2: eBeamTargetList
 		3: beamType
+		4: beamDisarmStacks
+		5: beamDisarmTimeLeft
 }
 
 rule("Game Setup")
@@ -28,6 +34,10 @@ rule("Game Setup")
 		Set Global Variable(BEAM_DAMAGE_PER_SECOND, 90);
 		Set Global Variable(BEAM_TICK_RATE, 20);
 		Set Global Variable(BEAM_KNOCK_BACK, 3);
+		Set Global Variable(BEAM_DISARM_STACKS_PER_SECOND, 50);
+		Set Global Variable(BEAM_DISARM_STACK_LIMIT, 100);
+		Set Global Variable(BEAM_DISARM_STACK_DECAY_P_SECOND, 25);
+		Set Global Variable(BEAM_DISARM_DURATION, 5);
 	}
 }
 
@@ -74,6 +84,8 @@ rule("Garbage Man Setup")
 		Set Ability 1 Enabled(Event Player, False);
 		Set Ability 2 Enabled(Event Player, False);
 		Set Ultimate Ability Enabled(Event Player, False);
+		Set Player Variable(Event Player, beamDisarmStacks, 0);
+		Set Player Variable(Event Player, beamDisarmTimeLeft, 0);
 	}
 }
 
@@ -99,6 +111,8 @@ rule("Non-Garbage Man Setup")
 		Set Ability 1 Enabled(Event Player, True);
 		Set Ability 2 Enabled(Event Player, True);
 		Set Ultimate Ability Enabled(Event Player, True);
+		Set Player Variable(Event Player, beamDisarmStacks, 0);
+		Set Player Variable(Event Player, beamDisarmTimeLeft, 0);
 	}
 }
 
