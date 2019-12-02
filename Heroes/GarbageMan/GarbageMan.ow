@@ -14,6 +14,7 @@ variables
 		10: WIND_TUNNEL_RADIUS
 		11: WIND_TUNNEL_DURATION
 		12: WIND_TUNNEL_COOLDOWN
+		13: WIND_TUNNEL_TICK_RATE
 
 	player:
 		0: fBeamEffectId
@@ -23,8 +24,11 @@ variables
 		4: beamDisarmStacks
 		5: beamDisarmTimeLeft
 		6: windTunnelPosition
+		7: fWindTunnelTargetList
+		8: eWindTunnelTargetList
 		11: fWindTunnelEffectId
 		12: eWindTunnelEffectId
+		13: windTunnelTimeLeft
 }
 
 rule("Game Setup")
@@ -45,10 +49,11 @@ rule("Game Setup")
 		Set Global Variable(BEAM_DISARM_STACK_LIMIT, 100);
 		Set Global Variable(BEAM_DISARM_STACK_DECAY_P_SECOND, 25);
 		Set Global Variable(BEAM_DISARM_DURATION, 5);
-		Set Global Variable(WIND_TUNNEL_FORCE, 5);
+		Set Global Variable(WIND_TUNNEL_FORCE, 1);
 		Set Global Variable(WIND_TUNNEL_RADIUS, 2);
 		Set Global Variable(WIND_TUNNEL_DURATION, 10);
 		Set Global Variable(WIND_TUNNEL_COOLDOWN, 10);
+		Set Global Variable(WIND_TUNNEL_TICK_RATE, 20);
 	}
 }
 
@@ -325,6 +330,40 @@ rule("Garbage Man Ability 1 \"Wind Tunnel\" (START)")
 		Create Effect(All Players(Opposite Team Of(Team Of(Event Player))), Light Shaft, Orange, Player Variable(Event Player,
 			windTunnelPosition), Global Variable(WIND_TUNNEL_RADIUS), None);
 		Set Player Variable(Event Player, eWindTunnelEffectId, Last Created Entity);
-		Set Player Variable(Event Player, beamDisarmTimeLeft, Global Variable(WIND_TUNNEL_DURATION));
+		Set Player Variable(Event Player, windTunnelTimeLeft, Global Variable(WIND_TUNNEL_DURATION));
+	}
+}
+
+rule("Garbage Man Ability 1 \"Wind Tunnel\" (EFFECT)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Junkrat);
+		Player Variable(Event Player, windTunnelTimeLeft) > 0;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, fWindTunnelTargetList, Filtered Array(All Players(Team Of(Event Player)), And(Is Button Held(
+			Current Array Element, Jump), Compare(Distance Between(Vector(X Component Of(Position Of(Current Array Element)), 0,
+			Z Component Of(Position Of(Current Array Element))), Vector(X Component Of(Player Variable(Event Player, windTunnelPosition)),
+			0, Z Component Of(Player Variable(Event Player, windTunnelPosition)))), <=, Global Variable(WIND_TUNNEL_RADIUS)))));
+		Apply Impulse(Player Variable(Event Player, fWindTunnelTargetList), Up, Global Variable(WIND_TUNNEL_FORCE), To World,
+			Incorporate Contrary Motion);
+		Set Player Variable(Event Player, eWindTunnelTargetList, Filtered Array(All Players(Opposite Team Of(Team Of(Event Player))), And(
+			True, Compare(Distance Between(Vector(X Component Of(Position Of(Current Array Element)), 0, Z Component Of(Position Of(
+			Current Array Element))), Vector(X Component Of(Player Variable(Event Player, windTunnelPosition)), 0, Z Component Of(
+			Player Variable(Event Player, windTunnelPosition)))), <=, Global Variable(WIND_TUNNEL_RADIUS)))));
+		Apply Impulse(Player Variable(Event Player, eWindTunnelTargetList), Down, Global Variable(WIND_TUNNEL_FORCE), To World,
+			Incorporate Contrary Motion);
+		Wait(Divide(1, Global Variable(WIND_TUNNEL_TICK_RATE)), Abort When False);
+		Loop If Condition Is True;
 	}
 }
