@@ -77,7 +77,7 @@ rule("Player emote to call a mate")
 
 	conditions
 	{
-		Is Communicating Any Emote(Event Player) == True;
+		Is Firing Primary(Event Player) == True;
 	}
 
 	actions
@@ -99,7 +99,7 @@ rule("Player stop emoting")
 
 	conditions
 	{
-		Is Communicating Any Emote(Event Player) == False;
+		Is Firing Primary(Event Player) == False;
 	}
 
 	actions
@@ -119,9 +119,9 @@ rule("Player emote next to another emoting player to mate")
 
 	conditions
 	{
-		Is Communicating Any Emote(Event Player) == True;
+		Is Firing Primary(Event Player) == True;
 		Is True For Any(Players Within Radius(Position Of(Event Player), 5, Team Of(Event Player), Surfaces And Enemy Barriers), And(
-			Compare(Current Array Element, !=, Event Player), Compare(Is Communicating Any Emote(Current Array Element), ==, True)))
+			Compare(Current Array Element, !=, Event Player), Compare(Is Firing Primary(Current Array Element), ==, True)))
 			== True;
 	}
 
@@ -129,7 +129,7 @@ rule("Player emote next to another emoting player to mate")
 	{
 		Set Player Variable(Event Player, M, Index Of Array Value(Filtered Array(Players Within Radius(Position Of(Event Player), 5,
 			Team Of(Event Player), Surfaces And Enemy Barriers), And(Compare(Current Array Element, !=, Event Player), Compare(
-			Is Communicating Any Emote(Current Array Element), ==, True))), 0));
+			Is Firing Primary(Current Array Element), ==, True))), 0));
 		Set Player Variable(Event Player, P, Position Of(Event Player));
 		Destroy Effect(Player Variable(Event Player, F));
 		Create Effect(All Players(All Teams), Sphere, Yellow, Player Variable(Event Player, P), 0.500, Visible To Position and Radius);
@@ -198,6 +198,7 @@ rule("Player dies, is egg available? Then spawn at that egg")
 
 	actions
 	{
+        Wait(5, Ignore Condition);
 		Set Player Variable(Event Player, T, Value In Array(Filtered Array(All Players(Team Of(Event Player)), Compare(Player Variable(
 			Current Array Element, P), !=, Null)), 0));
 		Set Player Variable(Event Player, S, Player Variable(Player Variable(Event Player, T), P));
@@ -207,3 +208,21 @@ rule("Player dies, is egg available? Then spawn at that egg")
 		Destroy Effect(Player Variable(Player Variable(Event Player, T), F));
 	}
 }
+
+rule("Enemy walks over your egg, it dies (UNTESTED)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is True For Any(Players Within Radius(Player Variable(Event Player, P), 1, Opposite Team Of(Team Of(Event Player)),
+			Surfaces And Enemy Barriers), True) == True;
+		Player Variable(Event Player, P) != Null;
+	}
+}
+
