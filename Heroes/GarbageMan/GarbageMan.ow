@@ -19,6 +19,7 @@ variables
 		17: TRASH_BAG_SPEED
 		19: TRASH_BAG_RADIUS
 		21: TRASH_BAG_GRAVITY
+		22: TRASH_BAG_TICK_RATE
 
 	player:
 		0: fBeamEffectId
@@ -68,7 +69,8 @@ rule("Game Setup")
 		Set Global Variable(WIND_TUNNEL_MAX_VELOCITY, 5);
 		Set Global Variable(TRASH_BAG_SPEED, 15);
 		Set Global Variable(TRASH_BAG_RADIUS, 0.500);
-		Set Global Variable(TRASH_BAG_GRAVITY, 20);
+		Set Global Variable(TRASH_BAG_GRAVITY, 9.810);
+		Set Global Variable(TRASH_BAG_TICK_RATE, 20);
 	}
 }
 
@@ -476,9 +478,33 @@ rule("Garbage Man Ability 2 \"Trash Bag\" (START)")
 		Stop Chasing Player Variable(Event Player, trashBagPosition);
 		Stop Chasing Player Variable(Event Player, trashBagVelocity);
 		Set Player Variable(Event Player, trashBagPosition, Eye Position(Event Player));
-		Set Player Variable(Event Player, trashBagVelocity, Multiply(Facing Direction Of(Event Player), Global Variable(TRASH_BAG_SPEED)));
-		Chase Player Variable At Rate(Event Player, trashBagPosition, Add(Player Variable(Event Player, trashBagPosition), Player Variable(
+		Set Player Variable(Event Player, trashBagVelocity, Facing Direction Of(Event Player));
+		disabled Chase Player Variable At Rate(Event Player, trashBagPosition, Add(Player Variable(Event Player, trashBagPosition), Player Variable(
 			Event Player, trashBagVelocity)), Global Variable(TRASH_BAG_SPEED), Destination and Rate);
 		Chase Player Variable At Rate(Event Player, trashBagVelocity, Down, Global Variable(TRASH_BAG_GRAVITY), None);
+	}
+}
+
+rule("Garbage Man Ability 2 \"Trash Bag\" (ACTIVE)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Junkrat);
+		Player Variable(Event Player, trashBagVelocity) != Vector(0, 0, 0);
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, trashBagPosition, Add, Multiply(Player Variable(Event Player, trashBagVelocity), Divide(
+			Global Variable(TRASH_BAG_SPEED), Global Variable(TRASH_BAG_TICK_RATE))));
+		Wait(Divide(1, Global Variable(TRASH_BAG_TICK_RATE)), Abort When False);
+		Loop If Condition Is True;
 	}
 }
