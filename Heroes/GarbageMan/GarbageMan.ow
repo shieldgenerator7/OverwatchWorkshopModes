@@ -15,6 +15,7 @@ variables
 		11: WIND_TUNNEL_DURATION
 		12: WIND_TUNNEL_COOLDOWN
 		13: WIND_TUNNEL_TICK_RATE
+		14: WIND_TUNNEL_MAX_VELOCITY
 
 	player:
 		0: fBeamEffectId
@@ -44,16 +45,17 @@ rule("Game Setup")
 		Set Global Variable(BEAM_VIEW_ANGLE, 10);
 		Set Global Variable(BEAM_DAMAGE_PER_SECOND, 90);
 		Set Global Variable(BEAM_TICK_RATE, 20);
-		Set Global Variable(BEAM_KNOCK_BACK, 3);
+		Set Global Variable(BEAM_KNOCK_BACK, 4);
 		Set Global Variable(BEAM_DISARM_STACKS_PER_SECOND, 50);
 		Set Global Variable(BEAM_DISARM_STACK_LIMIT, 100);
 		Set Global Variable(BEAM_DISARM_STACK_DECAY_P_SECOND, 25);
 		Set Global Variable(BEAM_DISARM_DURATION, 5);
-		Set Global Variable(WIND_TUNNEL_FORCE, 1);
+		Set Global Variable(WIND_TUNNEL_FORCE, 2);
 		Set Global Variable(WIND_TUNNEL_RADIUS, 2);
 		Set Global Variable(WIND_TUNNEL_DURATION, 10);
 		Set Global Variable(WIND_TUNNEL_COOLDOWN, 10);
 		Set Global Variable(WIND_TUNNEL_TICK_RATE, 20);
+		Set Global Variable(WIND_TUNNEL_MAX_VELOCITY, 5);
 	}
 }
 
@@ -352,9 +354,10 @@ rule("Garbage Man Ability 1 \"Wind Tunnel\" (EFFECT)")
 	actions
 	{
 		Set Player Variable(Event Player, fWindTunnelTargetList, Filtered Array(All Players(Team Of(Event Player)), And(Is Button Held(
-			Current Array Element, Jump), Compare(Distance Between(Vector(X Component Of(Position Of(Current Array Element)), 0,
+			Current Array Element, Jump), And(Compare(Distance Between(Vector(X Component Of(Position Of(Current Array Element)), 0,
 			Z Component Of(Position Of(Current Array Element))), Vector(X Component Of(Player Variable(Event Player, windTunnelPosition)),
-			0, Z Component Of(Player Variable(Event Player, windTunnelPosition)))), <=, Global Variable(WIND_TUNNEL_RADIUS)))));
+			0, Z Component Of(Player Variable(Event Player, windTunnelPosition)))), <=, Global Variable(WIND_TUNNEL_RADIUS)), Compare(
+			Y Component Of(Velocity Of(Current Array Element)), <=, Global Variable(WIND_TUNNEL_MAX_VELOCITY))))));
 		Apply Impulse(Player Variable(Event Player, fWindTunnelTargetList), Up, Global Variable(WIND_TUNNEL_FORCE), To World,
 			Incorporate Contrary Motion);
 		Set Player Variable(Event Player, eWindTunnelTargetList, Filtered Array(All Players(Opposite Team Of(Team Of(Event Player))), And(
