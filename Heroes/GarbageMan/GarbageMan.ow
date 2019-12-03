@@ -135,11 +135,11 @@ rule("Garbage Man Setup")
 		Set Player Variable(Event Player, beamDisarmTimeLeft, 0);
 		Set Player Variable(Event Player, windTunnelCooldown, 0);
 		Destroy HUD Text(Player Variable(Event Player, windTunnelCooldownTextId));
-		Create HUD Text(Event Player, Custom String("Wind Tunnel: READY", Null, Null, Null), Null, Null, Left, 0, White, White, White,
+		Create HUD Text(Event Player, Custom String("Wind Tunnel: READY", Null, Null, Null), Null, Null, Left, 0, Green, White, White,
 			String, Default Visibility);
 		Set Player Variable(Event Player, windTunnelCooldownTextId, Last Text ID);
 		Destroy HUD Text(Player Variable(Event Player, trashBagCooldownTextId));
-		Create HUD Text(Event Player, Custom String("Trash Bag: READY", Null, Null, Null), Null, Null, Left, 1, White, White, White,
+		Create HUD Text(Event Player, Custom String("Trash Bag: READY", Null, Null, Null), Null, Null, Left, 1, Green, White, White,
 			String, Default Visibility);
 		Set Player Variable(Event Player, trashBagCooldownTextId, Last Text ID);
 	}
@@ -377,7 +377,7 @@ rule("Garbage Man Ability 1 \"Wind Tunnel\" (START)")
 		Chase Player Variable At Rate(Event Player, windTunnelTimeLeft, 0, 1, None);
 		Destroy HUD Text(Player Variable(Event Player, windTunnelCooldownTextId));
 		Create HUD Text(Event Player, Custom String("Wind Tunnel: {0} sec", Player Variable(Event Player, windTunnelCooldown), Null, Null),
-			Null, Null, Left, 0, White, White, White, String, Default Visibility);
+			Null, Null, Left, 0, Yellow, White, White, String, Default Visibility);
 		Set Player Variable(Event Player, windTunnelCooldownTextId, Last Text ID);
 		Stop Chasing Player Variable(Event Player, windTunnelCooldown);
 		Set Player Variable(Event Player, windTunnelCooldown, Global Variable(WIND_TUNNEL_COOLDOWN));
@@ -460,7 +460,7 @@ rule("Garbage Man Ability 1 \"Wind Tunnel\" (READY)")
 	actions
 	{
 		Destroy HUD Text(Player Variable(Event Player, windTunnelCooldownTextId));
-		Create HUD Text(Event Player, Custom String("Wind Tunnel: READY", Null, Null, Null), Null, Null, Left, 0, White, White, White,
+		Create HUD Text(Event Player, Custom String("Wind Tunnel: READY", Null, Null, Null), Null, Null, Left, 0, Green, White, White,
 			String, Default Visibility);
 		Set Player Variable(Event Player, windTunnelCooldownTextId, Last Text ID);
 	}
@@ -506,7 +506,7 @@ rule("Garbage Man Ability 2 \"Trash Bag\" (START)")
 		Chase Player Variable At Rate(Event Player, trashBagCooldown, 0, 1, None);
 		Destroy HUD Text(Player Variable(Event Player, trashBagCooldownTextId));
 		Create HUD Text(Event Player, Custom String("Trash Bag: {0} sec", Player Variable(Event Player, trashBagCooldown), Null, Null),
-			Null, Null, Left, 1, White, White, White, String, Default Visibility);
+			Null, Null, Left, 1, Yellow, White, White, String, Default Visibility);
 		Set Player Variable(Event Player, trashBagCooldownTextId, Last Text ID);
 	}
 }
@@ -658,7 +658,7 @@ rule("Garbage Man Ability 2 \"Trash Bag\" (READY)")
 	actions
 	{
 		Destroy HUD Text(Player Variable(Event Player, trashBagCooldownTextId));
-		Create HUD Text(Event Player, Custom String("Trash Bag: READY", Null, Null, Null), Null, Null, Left, 1, White, White, White,
+		Create HUD Text(Event Player, Custom String("Trash Bag: READY", Null, Null, Null), Null, Null, Left, 1, Green, White, White,
 			String, Default Visibility);
 		Set Player Variable(Event Player, trashBagCooldownTextId, Last Text ID);
 	}
