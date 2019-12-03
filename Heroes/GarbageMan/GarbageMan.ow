@@ -536,7 +536,7 @@ rule("Garbage Man Ability 2 \"Trash Bag\" (ACTIVE)")
 		Skip If(Compare(Count Of(Player Variable(Event Player, eTrashBagTargetList)), >, 0), 1);
 		Set Player Variable(Event Player, trashBagHitPosition, Ray Cast Hit Position(Player Variable(Event Player, trashBagPosition), Add(
 			Player Variable(Event Player, trashBagPosition), Multiply(Player Variable(Event Player, trashBagVelocity), Divide(Multiply(
-			Global Variable(TRASH_BAG_SPEED), 1), Global Variable(TRASH_BAG_TICK_RATE)))), Empty Array, All Players(All Teams), False));
+			Global Variable(TRASH_BAG_SPEED), 2), Global Variable(TRASH_BAG_TICK_RATE)))), Empty Array, All Players(All Teams), False));
 		Wait(Divide(1, Global Variable(TRASH_BAG_TICK_RATE)), Abort When False);
 		Loop If Condition Is True;
 		Set Global Variable(BEAM_RANGE, Ray Cast Hit Position(Vector(0, 0, 0), Vector(0, 0, 0), All Players(All Teams), Event Player,
@@ -566,6 +566,7 @@ rule("Garbage Man Ability 2 \"Trash Bag\" (HIT PLAYER)")
 		Set Player Variable(Event Player, eTrashBagImpactTarget, Null);
 		Stop Chasing Player Variable(Event Player, trashBagVelocity);
 		Set Player Variable(Event Player, trashBagVelocity, Down);
+		Set Player Variable(Event Player, trashBagPosition, Player Variable(Event Player, trashBagHitPosition));
 		Set Player Variable(Event Player, trashBagHitPosition, Ray Cast Hit Position(Player Variable(Event Player, trashBagPosition), Add(
 			Player Variable(Event Player, trashBagPosition), Multiply(Player Variable(Event Player, trashBagVelocity), Divide(Multiply(
 			Global Variable(TRASH_BAG_SPEED), 2), Global Variable(TRASH_BAG_TICK_RATE)))), Empty Array, All Players(All Teams), False));
@@ -597,6 +598,7 @@ rule("Garbage Man Ability 2 \"Trash Bag\" (HIT WALL)")
 	{
 		Stop Chasing Player Variable(Event Player, trashBagVelocity);
 		Set Player Variable(Event Player, trashBagVelocity, Down);
+		Set Player Variable(Event Player, trashBagPosition, Player Variable(Event Player, trashBagHitPosition));
 		Set Player Variable(Event Player, trashBagHitPosition, Ray Cast Hit Position(Player Variable(Event Player, trashBagPosition), Add(
 			Player Variable(Event Player, trashBagPosition), Multiply(Player Variable(Event Player, trashBagVelocity), Divide(Multiply(
 			Global Variable(TRASH_BAG_SPEED), 2), Global Variable(TRASH_BAG_TICK_RATE)))), Empty Array, All Players(All Teams), False));
@@ -628,6 +630,7 @@ rule("Garbage Man Ability 2 \"Trash Bag\" (HIT FLOOR)")
 		Set Player Variable(Event Player, trashBagVelocity, Vector(0, 0, 0));
 		Set Player Variable(Event Player, eTrashBagTargetList, Players Within Radius(Player Variable(Event Player, trashBagPosition),
 			Global Variable(TRASH_BAG_RADIUS_SPLASH), Opposite Team Of(Team Of(Event Player)), Surfaces And Enemy Barriers));
+		Set Player Variable(Event Player, trashBagPosition, Player Variable(Event Player, trashBagHitPosition));
 		Damage(Player Variable(Event Player, eTrashBagTargetList), Event Player, Global Variable(TRASH_BAG_DAMAGE_SPLASH));
 		Apply Impulse(Player Variable(Event Player, eTrashBagTargetList), Subtract(Position Of(Player Variable(Event Player,
 			eTrashBagTargetList)), Player Variable(Event Player, trashBagPosition)), Global Variable(TRASH_BAG_DAMAGE_SPLASH), To World,
