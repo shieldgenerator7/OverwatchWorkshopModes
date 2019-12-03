@@ -5,7 +5,7 @@ variables
 		1: BEAM_VIEW_ANGLE
 		2: BEAM_DAMAGE_PER_SECOND
 		3: BEAM_TICK_RATE
-		4: BEAM_KNOCK_BACK
+		4: BEAM_KNOCKBACK
 		5: BEAM_DISARM_STACKS_PER_SECOND
 		6: BEAM_DISARM_STACK_LIMIT
 		7: BEAM_DISARM_STACK_DECAY_P_SECOND
@@ -24,6 +24,7 @@ variables
 		21: TRASH_BAG_GRAVITY
 		22: TRASH_BAG_TICK_RATE
 		23: TRASH_BAG_DAMAGE_SPLASH
+		24: TRASH_BAG_KNOCKBACK_SPLASH
 
 	player:
 		0: fBeamEffectId
@@ -64,7 +65,7 @@ rule("Game Setup")
 		Set Global Variable(BEAM_VIEW_ANGLE, 12);
 		Set Global Variable(BEAM_DAMAGE_PER_SECOND, 90);
 		Set Global Variable(BEAM_TICK_RATE, 50);
-		Set Global Variable(BEAM_KNOCK_BACK, 4);
+		Set Global Variable(BEAM_KNOCKBACK, 4);
 		Set Global Variable(BEAM_DISARM_STACKS_PER_SECOND, 50);
 		Set Global Variable(BEAM_DISARM_STACK_LIMIT, 100);
 		Set Global Variable(BEAM_DISARM_STACK_DECAY_P_SECOND, 25);
@@ -83,6 +84,7 @@ rule("Game Setup")
 		Set Global Variable(TRASH_BAG_DAMAGE_IMPACT, 70);
 		Set Global Variable(TRASH_BAG_RADIUS_SPLASH, 3);
 		Set Global Variable(TRASH_BAG_COOLDOWN, 8);
+		Set Global Variable(TRASH_BAG_KNOCKBACK_SPLASH, 15);
 	}
 }
 
@@ -269,11 +271,11 @@ rule("Garbage Man Beam (EFFECT)")
 		Damage(Player Variable(Event Player, eBeamTargetList), Event Player, Divide(Global Variable(BEAM_DAMAGE_PER_SECOND),
 			Global Variable(BEAM_TICK_RATE)));
 		Skip If(Compare(Player Variable(Event Player, beamType), !=, 1), 1);
-		Apply Impulse(Player Variable(Event Player, eBeamTargetList), Facing Direction Of(Event Player), Global Variable(BEAM_KNOCK_BACK),
+		Apply Impulse(Player Variable(Event Player, eBeamTargetList), Facing Direction Of(Event Player), Global Variable(BEAM_KNOCKBACK),
 			To World, Incorporate Contrary Motion);
 		Skip If(Compare(Player Variable(Event Player, beamType), !=, 2), 1);
 		Apply Impulse(Player Variable(Event Player, eBeamTargetList), Multiply(Facing Direction Of(Event Player), -1.000), Global Variable(
-			BEAM_KNOCK_BACK), To World, Incorporate Contrary Motion);
+			BEAM_KNOCKBACK), To World, Incorporate Contrary Motion);
 		Wait(Divide(1, Global Variable(BEAM_TICK_RATE)), Abort When False);
 		Loop If Condition Is True;
 	}
@@ -632,8 +634,8 @@ rule("Garbage Man Ability 2 \"Trash Bag\" (HIT FLOOR)")
 			Global Variable(TRASH_BAG_RADIUS_SPLASH), Opposite Team Of(Team Of(Event Player)), Surfaces And Enemy Barriers));
 		Set Player Variable(Event Player, trashBagPosition, Player Variable(Event Player, trashBagHitPosition));
 		Damage(Player Variable(Event Player, eTrashBagTargetList), Event Player, Global Variable(TRASH_BAG_DAMAGE_SPLASH));
-		Apply Impulse(Player Variable(Event Player, eTrashBagTargetList), Subtract(Position Of(Player Variable(Event Player,
-			eTrashBagTargetList)), Player Variable(Event Player, trashBagPosition)), Global Variable(TRASH_BAG_DAMAGE_SPLASH), To World,
+		Apply Impulse(Player Variable(Event Player, eTrashBagTargetList), Vector(X Component Of(Facing Direction Of(Event Player)), 1,
+			Z Component Of(Facing Direction Of(Event Player))), Global Variable(TRASH_BAG_KNOCKBACK_SPLASH), To World,
 			Cancel Contrary Motion);
 	}
 }
