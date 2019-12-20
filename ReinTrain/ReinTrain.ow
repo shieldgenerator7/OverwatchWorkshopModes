@@ -2,6 +2,12 @@ variables
 {
 	global:
 		0: REIN_TURN_AMOUNT
+		1: TRAIN_JOIN_RADIUS
+
+	player:
+		0: isCar
+		1: carParent
+		2: carChild
 }
 
 rule("Game Setup")
@@ -38,10 +44,11 @@ rule("Reinhardt Setup")
 		Set Secondary Fire Enabled(Event Player, False);
 		Set Ability 2 Enabled(Event Player, False);
 		Set Ultimate Ability Enabled(Event Player, False);
-		disabled Destroy HUD Text(Player Variable(Event Player, A));
+		Set Player Variable(Event Player, isCar, True);
+		disabled Destroy HUD Text(Player Variable(Event Player, isCar));
 		disabled Create HUD Text(Event Player, Custom String("Wind Tunnel: READY", Null, Null, Null), Null, Null, Left, 0, Green, White, White,
 			String, Default Visibility);
-		disabled Set Player Variable(Event Player, A, Last Text ID);
+		disabled Set Player Variable(Event Player, isCar, Last Text ID);
 	}
 }
 
@@ -67,7 +74,8 @@ rule("Non-Rein Setup")
 		Set Ability 1 Enabled(Event Player, True);
 		Set Ability 2 Enabled(Event Player, True);
 		Set Ultimate Ability Enabled(Event Player, True);
-		disabled Destroy HUD Text(Player Variable(Event Player, A));
+		Set Player Variable(Event Player, isCar, False);
+		disabled Destroy HUD Text(Player Variable(Event Player, isCar));
 	}
 }
 
@@ -138,5 +146,32 @@ rule("Rein Controls - Right")
 	actions
 	{
 		Set Facing(Event Player, Direction From Angles(Multiply(Global Variable(REIN_TURN_AMOUNT), -1.000), 0), To Player);
+	}
+}
+
+rule("Player Joins the Train")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Is True For Any(Players Within Radius(Position Of(Event Player), Global Variable(TRAIN_JOIN_RADIUS), Team Of(Event Player),
+			Surfaces), And(Compare(Player Variable(Current Array Element, isCar), ==, True), Compare(Player Variable(Current Array Element,
+			carChild), ==, Null))) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, isCar, True);
+		Set Player Variable(Event Player, carParent, Value In Array(Filtered Array(Players Within Radius(Position Of(Event Player),
+			Global Variable(TRAIN_JOIN_RADIUS), Team Of(Event Player), Surfaces), And(Compare(Player Variable(Current Array Element,
+			isCar), ==, True), Compare(Player Variable(Current Array Element, carChild), ==, Null))), 0));
+		Set Player Variable(Player Variable(Event Player, carParent), carChild, Event Player);
 	}
 }
