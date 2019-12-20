@@ -20,6 +20,20 @@ rule("Game Setup")
 	actions
 	{
 		Set Global Variable(REIN_TURN_AMOUNT, 90);
+		Create Dummy Bot(Hero(Brigitte), Team 1, -1.000, Objective Position(1), Vector(1, 0, 0));
+	}
+}
+
+rule("TEST BOT SETUP")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Hero(Brigitte), Team 1, -1.000, Objective Position(1), Vector(1, 0, 0));
 	}
 }
 
@@ -45,6 +59,7 @@ rule("Reinhardt Setup")
 		Set Ability 2 Enabled(Event Player, False);
 		Set Ultimate Ability Enabled(Event Player, False);
 		Set Player Variable(Event Player, isCar, True);
+		Set Player Variable(Event Player, carChild, Null);
 		disabled Destroy HUD Text(Player Variable(Event Player, isCar));
 		disabled Create HUD Text(Event Player, Custom String("Wind Tunnel: READY", Null, Null, Null), Null, Null, Left, 0, Green, White, White,
 			String, Default Visibility);
@@ -75,6 +90,7 @@ rule("Non-Rein Setup")
 		Set Ability 2 Enabled(Event Player, True);
 		Set Ultimate Ability Enabled(Event Player, True);
 		Set Player Variable(Event Player, isCar, False);
+		Set Player Variable(Event Player, carChild, Null);
 		disabled Destroy HUD Text(Player Variable(Event Player, isCar));
 	}
 }
