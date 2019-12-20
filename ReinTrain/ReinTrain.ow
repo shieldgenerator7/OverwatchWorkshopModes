@@ -3,11 +3,14 @@ variables
 	global:
 		0: REIN_TURN_AMOUNT
 		1: TRAIN_JOIN_RADIUS
+		2: CAR_POS_UPDATE_WAIT
+		3: CAR_POS_COUNT
 
 	player:
 		0: isCar
 		1: carParent
 		2: carChild
+		3: carPositions
 }
 
 rule("Game Setup")
@@ -21,6 +24,8 @@ rule("Game Setup")
 	{
 		Set Global Variable(REIN_TURN_AMOUNT, 90);
 		Set Global Variable(TRAIN_JOIN_RADIUS, 5);
+		Set Global Variable(CAR_POS_UPDATE_WAIT, 0.050);
+		Set Global Variable(CAR_POS_COUNT, 100);
 		Create Dummy Bot(Hero(Brigitte), Team 1, -1.000, Objective Position(1), Vector(1, 0, 0));
 	}
 }
@@ -196,6 +201,56 @@ rule("Player Joins the Train")
 		Small Message(All Players(All Teams), Custom String("{0} JOINED {1}", Event Player, Player Variable(Event Player, carParent),
 			Null));
 		Wait(1, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Cars Store Positions")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Player Variable(Event Player, isCar) == True;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, carPositions, Append To Array, Position Of(Event Player));
+		Skip If(Compare(Count Of(Player Variable(Event Player, carPositions)), <=, Global Variable(CAR_POS_COUNT)), 1);
+		Modify Player Variable(Event Player, carPositions, Remove From Array By Index, 0);
+		Wait(Global Variable(CAR_POS_UPDATE_WAIT), Abort When False);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Car Follow Parent")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Player Variable(Event Player, isCar) == True;
+		Player Variable(Event Player, carParent) != Null;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Value In Array(Player Variable(Player Variable(Event Player, carParent), carPositions), 0));
+		Modify Player Variable(Player Variable(Event Player, carParent), carPositions, Remove From Array By Index, 0);
+		Wait(Global Variable(CAR_POS_UPDATE_WAIT), Abort When False);
 		Loop If Condition Is True;
 	}
 }
