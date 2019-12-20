@@ -20,6 +20,7 @@ rule("Game Setup")
 	actions
 	{
 		Set Global Variable(REIN_TURN_AMOUNT, 90);
+		Set Global Variable(TRAIN_JOIN_RADIUS, 5);
 		Create Dummy Bot(Hero(Brigitte), Team 1, -1.000, Objective Position(1), Vector(1, 0, 0));
 	}
 }
@@ -177,17 +178,24 @@ rule("Player Joins the Train")
 	conditions
 	{
 		Is Alive(Event Player) == True;
-		Is True For Any(Players Within Radius(Position Of(Event Player), Global Variable(TRAIN_JOIN_RADIUS), Team Of(Event Player),
+		Player Variable(Event Player, carParent) == Null;
+		Player Variable(Event Player, isCar) == False;
+		disabled Is True For Any(Players Within Radius(Position Of(Event Player), Global Variable(TRAIN_JOIN_RADIUS), Team Of(Event Player),
 			Surfaces), And(Compare(Player Variable(Current Array Element, isCar), ==, True), Compare(Player Variable(Current Array Element,
 			carChild), ==, Null))) == True;
 	}
 
 	actions
 	{
-		Set Player Variable(Event Player, isCar, True);
 		Set Player Variable(Event Player, carParent, Value In Array(Filtered Array(Players Within Radius(Position Of(Event Player),
 			Global Variable(TRAIN_JOIN_RADIUS), Team Of(Event Player), Surfaces), And(Compare(Player Variable(Current Array Element,
 			isCar), ==, True), Compare(Player Variable(Current Array Element, carChild), ==, Null))), 0));
+		Skip If(Compare(Player Variable(Event Player, carParent), ==, Null), 3);
 		Set Player Variable(Player Variable(Event Player, carParent), carChild, Event Player);
+		Set Player Variable(Event Player, isCar, True);
+		Small Message(All Players(All Teams), Custom String("{0} JOINED {1}", Event Player, Player Variable(Event Player, carParent),
+			Null));
+		Wait(1, Ignore Condition);
+		Loop If Condition Is True;
 	}
 }
