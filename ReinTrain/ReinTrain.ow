@@ -1,0 +1,129 @@
+rule("Game Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Reinhardt Setup")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Primary Fire Enabled(Event Player, False);
+		Set Secondary Fire Enabled(Event Player, False);
+		Set Ability 2 Enabled(Event Player, False);
+		Set Ultimate Ability Enabled(Event Player, False);
+		disabled Destroy HUD Text(Player Variable(Event Player, A));
+		disabled Create HUD Text(Event Player, Custom String("Wind Tunnel: READY", Null, Null, Null), Null, Null, Left, 0, Green, White, White,
+			String, Default Visibility);
+		disabled Set Player Variable(Event Player, A, Last Text ID);
+	}
+}
+
+rule("Non-Rein Setup")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != Hero(Reinhardt);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Primary Fire Enabled(Event Player, True);
+		Set Secondary Fire Enabled(Event Player, True);
+		Set Ability 1 Enabled(Event Player, True);
+		Set Ability 2 Enabled(Event Player, True);
+		Set Ultimate Ability Enabled(Event Player, True);
+		disabled Destroy HUD Text(Player Variable(Event Player, A));
+	}
+}
+
+disabled rule("Rein Always Charge")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Is Alive(Event Player) == True;
+		disabled Is Using Ability 1(Event Player) == False;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Ability 1);
+		Wait(0.500, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Rein Controls - Left")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Is Alive(Event Player) == True;
+		Is Button Held(Event Player, Primary Fire) == True;
+	}
+
+	actions
+	{
+		Set Facing(Event Player, Direction From Angles(15, 0), To Player);
+	}
+}
+
+rule("Rein Controls - Right")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Is Alive(Event Player) == True;
+		Is Button Held(Event Player, Primary Fire) == True;
+	}
+
+	actions
+	{
+		Set Facing(Event Player, Direction From Angles(-15.000, 0), To Player);
+	}
+}
