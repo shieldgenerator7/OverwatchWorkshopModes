@@ -1,8 +1,19 @@
+variables
+{
+	global:
+		0: REIN_TURN_AMOUNT
+}
+
 rule("Game Setup")
 {
 	event
 	{
 		Ongoing - Global;
+	}
+
+	actions
+	{
+		Set Global Variable(REIN_TURN_AMOUNT, 90);
 	}
 }
 
@@ -60,7 +71,7 @@ rule("Non-Rein Setup")
 	}
 }
 
-disabled rule("Rein Always Charge")
+rule("Rein Always Charge")
 {
 	event
 	{
@@ -98,11 +109,12 @@ rule("Rein Controls - Left")
 		Hero Of(Event Player) == Hero(Reinhardt);
 		Is Alive(Event Player) == True;
 		Is Button Held(Event Player, Primary Fire) == True;
+		disabled X Component Of(Throttle Of(Event Player)) > 0;
 	}
 
 	actions
 	{
-		Set Facing(Event Player, Direction From Angles(15, 0), To Player);
+		Set Facing(Event Player, Direction From Angles(Global Variable(REIN_TURN_AMOUNT), 0), To Player);
 	}
 }
 
@@ -119,7 +131,16 @@ rule("Rein Controls - Right")
 	{
 		Hero Of(Event Player) == Hero(Reinhardt);
 		Is Alive(Event Player) == True;
-		Is Button Held(Event Player, Primary Fire) == True;
+		Is Button Held(Event Player, Secondary Fire) == True;
+		disabled X Component Of(Throttle Of(Event Player)) < 0;
+	}
+
+	actions
+	{
+		Set Facing(Event Player, Direction From Angles(Multiply(Global Variable(REIN_TURN_AMOUNT), -1.000), 0), To Player);
+	}
+}
+
 	}
 
 	actions
