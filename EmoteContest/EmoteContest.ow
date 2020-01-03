@@ -278,3 +278,41 @@ rule("Judge is not allowed to emote")
 		Set Status(Global Variable(JUDGE), Null, Stunned, 0.100);
 	}
 }
+
+rule("Special Case: D. Va")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(D.Va);
+		Health(Event Player) <= 150;
+	}
+
+	actions
+	{
+		Wait(1, Ignore Condition);
+		Kill(Event Player, Null);
+	}
+}
+
+rule("Player Died")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Add(Global Variable(JUDGE_POSITION), Subtract(Global Variable(JUDGE_POSITION), Global Variable(
+			STAGE_CENTER))));
+	}
+}
