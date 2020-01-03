@@ -3,6 +3,9 @@ variables
 	global:
 		0: JUDGE
 		1: JUDGE_POSITION
+		3: STAGE_CENTER
+		4: STAGE_RADIUS
+		5: WINNER
 }
 
 rule("Game Setup")
@@ -15,7 +18,10 @@ rule("Game Setup")
 	actions
 	{
 		Disable Built-In Game Mode Scoring;
+		Set Global Variable(JUDGE, Null);
 		Set Global Variable(JUDGE_POSITION, Vector(13.970, 12.270, -81.440));
+		Set Global Variable(STAGE_CENTER, Vector(11.123, 5.812, -71.643));
+		Set Global Variable(STAGE_RADIUS, 4);
 	}
 }
 
@@ -35,7 +41,8 @@ rule("====TEST====player score up")
 
 	actions
 	{
-		Modify Player Score(Event Player, 1);
+		disabled Modify Player Score(Event Player, 1);
+		Set Global Variable(STAGE_CENTER, Position Of(Event Player));
 	}
 }
 
@@ -94,6 +101,32 @@ rule("No Judge? Randomly choose a player")
 	}
 }
 
+rule("Player Setup")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Event Player != Global Variable(JUDGE);
+	}
+
+	actions
+	{
+		Set Primary Fire Enabled(Event Player, False);
+		Set Secondary Fire Enabled(Event Player, False);
+		Set Ability 1 Enabled(Event Player, False);
+		Set Ability 2 Enabled(Event Player, False);
+		Set Ultimate Ability Enabled(Event Player, False);
+		Clear Status(Event Player, Rooted);
+	}
+}
+
 rule("Judge Setup")
 {
 	event
@@ -111,7 +144,82 @@ rule("Judge Setup")
 
 	actions
 	{
-		Wait(0.250, Ignore Condition);
+		Wait(1, Ignore Condition);
 		Teleport(Event Player, Global Variable(JUDGE_POSITION));
+		Set Status(Event Player, Null, Rooted, 9999);
+	}
+}
+
+rule("Judge selects winner")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player == Global Variable(JUDGE);
+		Is Button Held(Event Player, Primary Fire) == True;
+	}
+
+	actions
+	{
+		Set Global Variable(WINNER, Player Closest To Reticle(Event Player, All Teams));
+		Modify Player Score(Global Variable(WINNER), 1);
+		Kill(Global Variable(WINNER), Global Variable(JUDGE));
+		Kill(Global Variable(JUDGE), Global Variable(WINNER));
+		Set Global Variable(WINNER, Null);
+		Set Global Variable(JUDGE, Null);
+	}
+}
+
+rule("Contestant out of bounds")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player != Global Variable(JUDGE);
+		Distance Between(Position Of(Event Player), Global Variable(STAGE_CENTER)) > Global Variable(STAGE_RADIUS);
+	}
+
+	actions
+	{
+		Teleport(Event Player, Vector(Add(X Component Of(Global Variable(STAGE_CENTER)), Multiply(Global Variable(STAGE_RADIUS),
+			Random Real(-1.000, 1))), Y Component Of(Global Variable(STAGE_CENTER)), Add(Z Component Of(Global Variable(STAGE_CENTER)),
+			Multiply(Global Variable(STAGE_RADIUS), Random Real(-1.000, 1)))));
+		Wait(1, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Judge out of bounds")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player == Global Variable(JUDGE);
+		Distance Between(Position Of(Event Player), Global Variable(JUDGE_POSITION)) > 2;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Global Variable(JUDGE_POSITION));
+		Wait(1, Ignore Condition);
+		Loop If Condition Is True;
 	}
 }
