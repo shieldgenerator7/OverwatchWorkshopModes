@@ -154,7 +154,7 @@ rule("Judge Setup")
 		Set Facing(Event Player, Direction Towards(Eye Position(Event Player), Global Variable(STAGE_CENTER)), To World);
 		Set Status(Event Player, Null, Rooted, 9999);
 		Create In-World Text(Global Variable(JUDGE), Custom String("Select {0} - LMB", Hero Of(Player Closest To Reticle(Event Player,
-			All Teams)), Null, Null), Eye Position(Player Closest To Reticle(Event Player, All Teams)), 2, Clip Against Surfaces,
+			All Teams)), Null, Null), Eye Position(Player Closest To Reticle(Event Player, All Teams)), 2, Do Not Clip,
 			Visible To Position and String, White, Default Visibility);
 		Set Player Variable(Event Player, contestSelectEffectId, Last Text ID);
 	}
@@ -200,6 +200,7 @@ rule("Judge selects winner")
 	{
 		Set Global Variable(WINNER, Player Closest To Reticle(Event Player, All Teams));
 		Abort If(Compare(Global Variable(WINNER), ==, Null));
+		Abort If(Compare(Is Alive(Global Variable(WINNER)), ==, False));
 		Modify Player Score(Global Variable(WINNER), 1);
 		Kill(Global Variable(WINNER), Global Variable(JUDGE));
 		Kill(Global Variable(JUDGE), Global Variable(WINNER));
@@ -219,6 +220,7 @@ rule("Contestant out of bounds")
 
 	conditions
 	{
+		Is Alive(Event Player) == True;
 		Event Player != Global Variable(JUDGE);
 		Distance Between(Position Of(Event Player), Global Variable(STAGE_CENTER)) > Global Variable(STAGE_RADIUS);
 	}
@@ -228,7 +230,7 @@ rule("Contestant out of bounds")
 		Teleport(Event Player, Vector(Add(X Component Of(Global Variable(STAGE_CENTER)), Multiply(Global Variable(STAGE_RADIUS),
 			Random Real(-1.000, 1))), Y Component Of(Global Variable(STAGE_CENTER)), Add(Z Component Of(Global Variable(STAGE_CENTER)),
 			Multiply(Global Variable(STAGE_RADIUS), Random Real(-1.000, 1)))));
-		Set Facing(Event Player, Direction Towards(Eye Position(Event Player), Eye Position(Global Variable(JUDGE))), To World);
+		Set Facing(Event Player, Direction Towards(Eye Position(Event Player), Global Variable(JUDGE_POSITION)), To World);
 		Wait(1, Ignore Condition);
 		Loop If Condition Is True;
 	}
@@ -245,6 +247,7 @@ rule("Judge out of bounds")
 
 	conditions
 	{
+		Is Alive(Event Player) == True;
 		Event Player == Global Variable(JUDGE);
 		Distance Between(Position Of(Event Player), Global Variable(JUDGE_POSITION)) > 3;
 	}
