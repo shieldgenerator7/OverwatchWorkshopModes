@@ -1,0 +1,117 @@
+variables
+{
+	global:
+		0: JUDGE
+		1: JUDGE_POSITION
+}
+
+rule("Game Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Disable Built-In Game Mode Scoring;
+		Set Global Variable(JUDGE_POSITION, Vector(13.970, 12.270, -81.440));
+	}
+}
+
+rule("====TEST====player score up")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Interact) == True;
+	}
+
+	actions
+	{
+		Modify Player Score(Event Player, 1);
+	}
+}
+
+rule("====TEST====POSITION====")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Create HUD Text(Event Player, Custom String("POSITION: {0}", Position Of(Event Player), Null, Null), Null, Null, Left, 0, White,
+			White, White, String, Default Visibility);
+	}
+}
+
+disabled rule("====TEST====player teleport")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Crouch) == True;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Add(Position Of(Event Player), Multiply(Facing Direction Of(Event Player), 10)));
+	}
+}
+
+rule("No Judge? Randomly choose a player")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(JUDGE) == Null;
+		Count Of(All Living Players(All Teams)) > 0;
+	}
+
+	actions
+	{
+		Set Global Variable(JUDGE, Random Value In Array(All Living Players(All Teams)));
+	}
+}
+
+rule("Judge Setup")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Event Player == Global Variable(JUDGE);
+	}
+
+	actions
+	{
+		Wait(0.250, Ignore Condition);
+		Teleport(Event Player, Global Variable(JUDGE_POSITION));
+	}
+}
