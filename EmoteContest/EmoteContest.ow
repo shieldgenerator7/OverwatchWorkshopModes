@@ -6,6 +6,9 @@ variables
 		3: STAGE_CENTER
 		4: STAGE_RADIUS
 		5: WINNER
+
+	player:
+		0: contestSelectEffectId
 }
 
 rule("Game Setup")
@@ -19,13 +22,13 @@ rule("Game Setup")
 	{
 		Disable Built-In Game Mode Scoring;
 		Set Global Variable(JUDGE, Null);
-		Set Global Variable(JUDGE_POSITION, Vector(13.970, 13.270, -81.440));
+		Set Global Variable(JUDGE_POSITION, Vector(13.970, 12.270, -81.440));
 		Set Global Variable(STAGE_CENTER, Vector(11.123, 5.812, -71.643));
-		Set Global Variable(STAGE_RADIUS, 4);
+		Set Global Variable(STAGE_RADIUS, 5);
 	}
 }
 
-rule("====TEST====player score up")
+disabled rule("====TEST====player score up")
 {
 	event
 	{
@@ -46,7 +49,7 @@ rule("====TEST====player score up")
 	}
 }
 
-rule("====TEST====POSITION====")
+disabled rule("====TEST====POSITION====")
 {
 	event
 	{
@@ -98,6 +101,9 @@ rule("No Judge? Randomly choose a player")
 	actions
 	{
 		Set Global Variable(JUDGE, Random Value In Array(All Living Players(All Teams)));
+		Set Status(Global Variable(JUDGE), Null, Stunned, 0.100);
+		Wait(1, Ignore Condition);
+		Loop If Condition Is True;
 	}
 }
 
@@ -122,7 +128,7 @@ rule("All Player Setup")
 		Set Ability 1 Enabled(Event Player, False);
 		Set Ability 2 Enabled(Event Player, False);
 		Set Ultimate Ability Enabled(Event Player, False);
-		Clear Status(Event Player, Rooted);
+		Destroy In-World Text(Player Variable(Event Player, contestSelectEffectId));
 	}
 }
 
@@ -143,9 +149,14 @@ rule("Judge Setup")
 
 	actions
 	{
-		Wait(1, Ignore Condition);
+		Set Status(Global Variable(JUDGE), Null, Stunned, 0.100);
 		Teleport(Event Player, Global Variable(JUDGE_POSITION));
+		Set Facing(Event Player, Direction Towards(Eye Position(Event Player), Global Variable(STAGE_CENTER)), To World);
 		Set Status(Event Player, Null, Rooted, 9999);
+		Create In-World Text(Global Variable(JUDGE), Custom String("Select {0} - LMB", Hero Of(Player Closest To Reticle(Event Player,
+			All Teams)), Null, Null), Eye Position(Player Closest To Reticle(Event Player, All Teams)), 2, Clip Against Surfaces,
+			Visible To Position and String, White, Default Visibility);
+		Set Player Variable(Event Player, contestSelectEffectId, Last Text ID);
 	}
 }
 
@@ -217,6 +228,7 @@ rule("Contestant out of bounds")
 		Teleport(Event Player, Vector(Add(X Component Of(Global Variable(STAGE_CENTER)), Multiply(Global Variable(STAGE_RADIUS),
 			Random Real(-1.000, 1))), Y Component Of(Global Variable(STAGE_CENTER)), Add(Z Component Of(Global Variable(STAGE_CENTER)),
 			Multiply(Global Variable(STAGE_RADIUS), Random Real(-1.000, 1)))));
+		Set Facing(Event Player, Direction Towards(Eye Position(Event Player), Eye Position(Global Variable(JUDGE))), To World);
 		Wait(1, Ignore Condition);
 		Loop If Condition Is True;
 	}
@@ -234,12 +246,13 @@ rule("Judge out of bounds")
 	conditions
 	{
 		Event Player == Global Variable(JUDGE);
-		Distance Between(Position Of(Event Player), Global Variable(JUDGE_POSITION)) > 2;
+		Distance Between(Position Of(Event Player), Global Variable(JUDGE_POSITION)) > 3;
 	}
 
 	actions
 	{
 		Teleport(Event Player, Global Variable(JUDGE_POSITION));
+		Set Facing(Event Player, Direction Towards(Eye Position(Event Player), Global Variable(STAGE_CENTER)), To World);
 		Wait(1, Ignore Condition);
 		Loop If Condition Is True;
 	}
@@ -262,6 +275,6 @@ rule("Judge is not allowed to emote")
 
 	actions
 	{
-		Kill(Event Player, Null);
+		Set Status(Global Variable(JUDGE), Null, Stunned, 0.100);
 	}
 }
