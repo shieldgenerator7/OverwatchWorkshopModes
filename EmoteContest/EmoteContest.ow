@@ -19,7 +19,7 @@ rule("Game Setup")
 	{
 		Disable Built-In Game Mode Scoring;
 		Set Global Variable(JUDGE, Null);
-		Set Global Variable(JUDGE_POSITION, Vector(13.970, 12.270, -81.440));
+		Set Global Variable(JUDGE_POSITION, Vector(13.970, 13.270, -81.440));
 		Set Global Variable(STAGE_CENTER, Vector(11.123, 5.812, -71.643));
 		Set Global Variable(STAGE_RADIUS, 4);
 	}
@@ -101,7 +101,7 @@ rule("No Judge? Randomly choose a player")
 	}
 }
 
-rule("Player Setup")
+rule("All Player Setup")
 {
 	event
 	{
@@ -113,7 +113,6 @@ rule("Player Setup")
 	conditions
 	{
 		Is Alive(Event Player) == True;
-		Event Player != Global Variable(JUDGE);
 	}
 
 	actions
@@ -150,6 +149,27 @@ rule("Judge Setup")
 	}
 }
 
+rule("Contestant Setup")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Event Player != Global Variable(JUDGE);
+	}
+
+	actions
+	{
+		Clear Status(Event Player, Rooted);
+	}
+}
+
 rule("Judge selects winner")
 {
 	event
@@ -168,6 +188,7 @@ rule("Judge selects winner")
 	actions
 	{
 		Set Global Variable(WINNER, Player Closest To Reticle(Event Player, All Teams));
+		Abort If(Compare(Global Variable(WINNER), ==, Null));
 		Modify Player Score(Global Variable(WINNER), 1);
 		Kill(Global Variable(WINNER), Global Variable(JUDGE));
 		Kill(Global Variable(JUDGE), Global Variable(WINNER));
@@ -221,5 +242,26 @@ rule("Judge out of bounds")
 		Teleport(Event Player, Global Variable(JUDGE_POSITION));
 		Wait(1, Ignore Condition);
 		Loop If Condition Is True;
+	}
+}
+
+rule("Judge is not allowed to emote")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player == Global Variable(JUDGE);
+		Is Communicating Any Emote(Event Player) == True;
+	}
+
+	actions
+	{
+		Kill(Event Player, Null);
 	}
 }
