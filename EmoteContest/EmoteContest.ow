@@ -8,6 +8,8 @@ variables
 		5: WINNER
 		6: judgeTimer
 		7: JUDGE_TIME_MAX
+		8: emoteTimer
+		9: EMOTE_TIME_MAX
 
 	player:
 		0: contestSelectEffectId
@@ -29,7 +31,8 @@ rule("Game Setup")
 		Set Global Variable(JUDGE_POSITION, Vector(13.970, 12.270, -81.440));
 		Set Global Variable(STAGE_CENTER, Vector(11.123, 5.812, -71.643));
 		Set Global Variable(STAGE_RADIUS, 5);
-		Set Global Variable(JUDGE_TIME_MAX, 10);
+		Set Global Variable(JUDGE_TIME_MAX, 15);
+		Set Global Variable(EMOTE_TIME_MAX, 5);
 	}
 }
 
@@ -200,6 +203,7 @@ rule("All Player Setup")
 		Set Ability 2 Enabled(Event Player, False);
 		Set Ultimate Ability Enabled(Event Player, False);
 		Destroy In-World Text(Player Variable(Event Player, contestSelectEffectId));
+		Stop Camera(Event Player);
 	}
 }
 
@@ -256,7 +260,7 @@ rule("Contestant Setup")
 	}
 }
 
-rule("Judge selects winner")
+rule("Judge selects winner (Part 1)")
 {
 	event
 	{
@@ -269,10 +273,12 @@ rule("Judge selects winner")
 	{
 		Event Player == Global Variable(JUDGE);
 		Is Button Held(Event Player, Primary Fire) == True;
+		Global Variable(WINNER) == Null;
 	}
 
 	actions
 	{
+		Set Global Variable(judgeTimer, Global Variable(JUDGE_TIME_MAX));
 		Set Global Variable(WINNER, Player Closest To Reticle(Event Player, All Teams));
 		Abort If(Compare(Global Variable(WINNER), ==, Null));
 		Abort If(Compare(Is Alive(Global Variable(WINNER)), ==, False));
@@ -283,12 +289,55 @@ rule("Judge selects winner")
 		Create Effect(All Players(All Teams), Light Shaft, White, Global Variable(WINNER), 1.500, None);
 		Create Effect(All Players(All Teams), Sparkles, White, Global Variable(WINNER), 2, None);
 		Create Effect(All Players(All Teams), Sparkles Sound, White, Global Variable(WINNER), 20, None);
-		Wait(1, Ignore Condition);
+		Stop Chasing Global Variable(emoteTimer);
+		Set Global Variable(emoteTimer, Global Variable(EMOTE_TIME_MAX));
+		Chase Global Variable At Rate(emoteTimer, 0, 1, Destination and Rate);
+		Start Camera(All Players(All Teams), Add(Eye Position(Global Variable(WINNER)), Multiply(Facing Direction Of(Global Variable(
+			WINNER)), 2)), Eye Position(Global Variable(WINNER)), 0);
+	}
+}
+
+rule("Judge selects winner (Part 2)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(emoteTimer) == 0;
+	}
+
+	actions
+	{
+		Stop Camera(All Players(All Teams));
 		Kill(Global Variable(WINNER), Global Variable(JUDGE));
 		Kill(Global Variable(JUDGE), Global Variable(WINNER));
 		Set Global Variable(WINNER, Null);
 		Set Global Variable(JUDGE, Null);
 		Destroy All Effects;
+	}
+}
+
+rule("Winner stop emoting ends emote timer")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player == Global Variable(WINNER);
+		Is Communicating Any Emote(Event Player) == False;
+	}
+
+	actions
+	{
+		Set Global Variable(emoteTimer, 0);
 	}
 }
 
@@ -404,22 +453,6 @@ rule("Player Died")
 	}
 }
 
-rule("=== Created by ShieldGnrtr7 ===")
-{
-	event
-	{
-		Ongoing - Global;
-	}
-}
-
-rule("=== Testing Help: addikit ===")
-{
-	event
-	{
-		Ongoing - Global;
-	}
-}
-
 rule("Dummy Bots Play")
 {
 	event
@@ -441,5 +474,41 @@ rule("Dummy Bots Play")
 		Set Facing(Event Player, Subtract(Position Of(Random Value In Array(All Living Players(All Teams))), Position Of(Event Player)),
 			To World);
 		Press Button(Event Player, Primary Fire);
+	}
+}
+
+rule("Press F to Respawn")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Interact) == True;
+	}
+
+	actions
+	{
+		Kill(Event Player, Global Variable(JUDGE));
+	}
+}
+
+rule("=== Created by ShieldGnrtr7 ===")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("=== Testing Help: addikit, polar, oatmeal ===")
+{
+	event
+	{
+		Ongoing - Global;
 	}
 }
