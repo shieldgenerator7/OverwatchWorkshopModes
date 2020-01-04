@@ -87,6 +87,51 @@ disabled rule("====TEST====player teleport")
 	}
 }
 
+rule("====TEST====create dummy bot")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player == Global Variable(JUDGE);
+		Is Button Held(Event Player, Ultimate) == True;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Random Value In Array(All Heroes), All Teams, -1.000, Vector(0, 0, 0), Vector(0, 0, 0));
+	}
+}
+
+rule("====TEST====force emote")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player == Global Variable(JUDGE);
+		Is Button Held(Event Player, Interact) == True;
+	}
+
+	actions
+	{
+		Communicate(All Living Players(All Teams), Emote Up);
+		Communicate(All Living Players(All Teams), Emote Right);
+		Communicate(All Living Players(All Teams), Emote Down);
+		Communicate(All Living Players(All Teams), Emote Left);
+	}
+}
+
 rule("No Judge? Randomly choose a player")
 {
 	event
@@ -204,6 +249,9 @@ rule("Judge selects winner")
 		Set Global Variable(WINNER, Player Closest To Reticle(Event Player, All Teams));
 		Abort If(Compare(Global Variable(WINNER), ==, Null));
 		Abort If(Compare(Is Alive(Global Variable(WINNER)), ==, False));
+		Skip If(Compare(Is Communicating Any Emote(Global Variable(WINNER)), ==, True), 2);
+		Small Message(Event Player, Custom String("{0} is not emoting!", Hero Of(Global Variable(WINNER)), Null, Null));
+		Abort;
 		Modify Player Score(Global Variable(WINNER), 1);
 		Kill(Global Variable(WINNER), Global Variable(JUDGE));
 		Kill(Global Variable(JUDGE), Global Variable(WINNER));
