@@ -155,7 +155,7 @@ rule("Judge Setup")
 		Teleport(Event Player, Global Variable(JUDGE_POSITION));
 		Set Facing(Event Player, Direction Towards(Eye Position(Event Player), Global Variable(STAGE_CENTER)), To World);
 		Set Status(Event Player, Null, Rooted, 9999);
-		Create In-World Text(Global Variable(JUDGE), Custom String("Select {0} - LMB", Hero Of(Player Closest To Reticle(Event Player,
+		Create In-World Text(Global Variable(JUDGE), Custom String("~~ {0} ~~", Hero Of(Player Closest To Reticle(Event Player,
 			All Teams)), Null, Null), Eye Position(Player Closest To Reticle(Event Player, All Teams)), 2, Do Not Clip,
 			Visible To Position and String, White, Default Visibility);
 		Set Player Variable(Event Player, contestSelectEffectId, Last Text ID);
@@ -180,6 +180,7 @@ rule("Contestant Setup")
 	actions
 	{
 		Clear Status(Event Player, Rooted);
+		Big Message(Event Player, Custom String("EMOTE!", Null, Null, Null));
 	}
 }
 
@@ -258,6 +259,7 @@ rule("Judge out of bounds")
 	{
 		Teleport(Event Player, Global Variable(JUDGE_POSITION));
 		Set Facing(Event Player, Direction Towards(Eye Position(Event Player), Global Variable(STAGE_CENTER)), To World);
+		Big Message(Event Player, Custom String("Who's emote is best? (LMB)", Null, Null, Null));
 		Wait(1, Ignore Condition);
 		Loop If Condition Is True;
 	}
@@ -302,7 +304,7 @@ rule("Special Case: D. Va")
 	actions
 	{
 		Wait(1, Ignore Condition);
-		Kill(Event Player, Null);
+		Kill(Event Player, Global Variable(JUDGE));
 	}
 }
 
@@ -319,5 +321,21 @@ rule("Player Died")
 	{
 		Teleport(Event Player, Add(Global Variable(JUDGE_POSITION), Subtract(Global Variable(JUDGE_POSITION), Global Variable(
 			STAGE_CENTER))));
+	}
+}
+
+rule("=== Created by ShieldGnrtr7 ===")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("=== Testing Help: addikit ===")
+{
+	event
+	{
+		Ongoing - Global;
 	}
 }
