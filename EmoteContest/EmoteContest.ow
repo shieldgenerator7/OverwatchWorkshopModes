@@ -276,7 +276,7 @@ rule("Judge selects winner")
 		Set Global Variable(WINNER, Player Closest To Reticle(Event Player, All Teams));
 		Abort If(Compare(Global Variable(WINNER), ==, Null));
 		Abort If(Compare(Is Alive(Global Variable(WINNER)), ==, False));
-		Skip If(Compare(Is Communicating Any Emote(Global Variable(WINNER)), ==, True), 2);
+		Skip If(Or(Compare(Is Communicating Any Emote(Global Variable(WINNER)), ==, True), Is Dummy Bot(Global Variable(WINNER))), 2);
 		Small Message(Event Player, Custom String("{0} is not emoting!", Hero Of(Global Variable(WINNER)), Null, Null));
 		Abort;
 		Modify Player Score(Global Variable(WINNER), 1);
