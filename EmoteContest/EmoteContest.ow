@@ -6,6 +6,8 @@ variables
 		3: STAGE_CENTER
 		4: STAGE_RADIUS
 		5: WINNER
+		6: judgeTimer
+		7: JUDGE_TIME_MAX
 
 	player:
 		0: contestSelectEffectId
@@ -27,6 +29,7 @@ rule("Game Setup")
 		Set Global Variable(JUDGE_POSITION, Vector(13.970, 12.270, -81.440));
 		Set Global Variable(STAGE_CENTER, Vector(11.123, 5.812, -71.643));
 		Set Global Variable(STAGE_RADIUS, 5);
+		Set Global Variable(JUDGE_TIME_MAX, 10);
 	}
 }
 
@@ -154,6 +157,27 @@ rule("No Judge? Randomly choose a player")
 	}
 }
 
+rule("Judge time out")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global Variable(judgeTimer) == 0;
+	}
+
+	actions
+	{
+		Set Global Variable(WINNER, Random Value In Array(All Living Players(All Teams)));
+		Kill(Global Variable(JUDGE), Global Variable(WINNER));
+		Set Global Variable(WINNER, Null);
+		Set Global Variable(JUDGE, Null);
+	}
+}
+
 rule("All Player Setup")
 {
 	event
@@ -204,6 +228,9 @@ rule("Judge Setup")
 			All Teams)), Null, Null), Eye Position(Player Closest To Reticle(Event Player, All Teams)), 2, Do Not Clip,
 			Visible To Position and String, White, Default Visibility);
 		Set Player Variable(Event Player, contestSelectEffectId, Last Text ID);
+		Stop Chasing Global Variable(judgeTimer);
+		Set Global Variable(judgeTimer, Global Variable(JUDGE_TIME_MAX));
+		Chase Global Variable At Rate(judgeTimer, 0, 1, Destination and Rate);
 	}
 }
 
@@ -390,5 +417,29 @@ rule("=== Testing Help: addikit ===")
 	event
 	{
 		Ongoing - Global;
+	}
+}
+
+rule("Dummy Bots Play")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Event Player == Global Variable(JUDGE);
+	}
+
+	actions
+	{
+		Wait(2, Ignore Condition);
+		Set Facing(Event Player, Subtract(Position Of(Random Value In Array(All Living Players(All Teams))), Position Of(Event Player)),
+			To World);
+		Press Button(Event Player, Primary Fire);
 	}
 }
