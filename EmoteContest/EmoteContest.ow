@@ -20,6 +20,8 @@ rule("Game Setup")
 
 	actions
 	{
+		Disable Built-In Game Mode Announcer;
+		Disable Built-In Game Mode Music;
 		Disable Built-In Game Mode Scoring;
 		Set Global Variable(JUDGE, Null);
 		Set Global Variable(JUDGE_POSITION, Vector(13.970, 12.270, -81.440));
