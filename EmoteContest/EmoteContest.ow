@@ -253,10 +253,15 @@ rule("Judge selects winner")
 		Small Message(Event Player, Custom String("{0} is not emoting!", Hero Of(Global Variable(WINNER)), Null, Null));
 		Abort;
 		Modify Player Score(Global Variable(WINNER), 1);
+		Create Effect(All Players(All Teams), Light Shaft, White, Global Variable(WINNER), 1.500, None);
+		Create Effect(All Players(All Teams), Sparkles, White, Global Variable(WINNER), 2, None);
+		Create Effect(All Players(All Teams), Sparkles Sound, White, Global Variable(WINNER), 20, None);
+		Wait(1, Ignore Condition);
 		Kill(Global Variable(WINNER), Global Variable(JUDGE));
 		Kill(Global Variable(JUDGE), Global Variable(WINNER));
 		Set Global Variable(WINNER, Null);
 		Set Global Variable(JUDGE, Null);
+		Destroy All Effects;
 	}
 }
 
