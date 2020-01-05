@@ -503,6 +503,7 @@ rule("Dummy Bots Play")
 		Set Facing(Event Player, Subtract(Position Of(Random Value In Array(All Living Players(All Teams))), Position Of(Event Player)),
 			To World);
 		Press Button(Event Player, Primary Fire);
+		Loop If Condition Is True;
 	}
 }
 
