@@ -228,6 +228,7 @@ rule("Judge Setup")
 		Teleport(Event Player, Global Variable(JUDGE_POSITION));
 		Set Facing(Event Player, Direction Towards(Eye Position(Event Player), Global Variable(STAGE_CENTER)), To World);
 		Set Status(Event Player, Null, Rooted, 9999);
+		Destroy In-World Text(Player Variable(Event Player, contestSelectEffectId));
 		Create In-World Text(Global Variable(JUDGE), Custom String("~~ {0} ~~", Hero Of(Player Closest To Reticle(Event Player,
 			All Teams)), Null, Null), Eye Position(Player Closest To Reticle(Event Player, All Teams)), 2, Do Not Clip,
 			Visible To Position and String, White, Default Visibility);
@@ -235,6 +236,8 @@ rule("Judge Setup")
 		Stop Chasing Global Variable(judgeTimer);
 		Set Global Variable(judgeTimer, Global Variable(JUDGE_TIME_MAX));
 		Chase Global Variable At Rate(judgeTimer, 0, 1, Destination and Rate);
+		Set Global Variable(emoteTimer, 0);
+		Set Global Variable(WINNER, Null);
 	}
 }
 
@@ -279,6 +282,7 @@ rule("Judge selects winner (Part 1)")
 
 	actions
 	{
+		Set Global Variable(emoteTimer, 0);
 		Set Global Variable(judgeTimer, Global Variable(JUDGE_TIME_MAX));
 		Set Global Variable(WINNER, Player Closest To Reticle(Event Player, All Teams));
 		Abort If(Compare(Global Variable(WINNER), ==, Null));
@@ -300,7 +304,7 @@ rule("Judge selects winner (Part 1)")
 	}
 }
 
-disabled rule("Winner Emote Display")
+rule("Winner Emote Display")
 {
 	event
 	{
@@ -310,14 +314,15 @@ disabled rule("Winner Emote Display")
 	conditions
 	{
 		Global Variable(WINNER) != Null;
+		Global Variable(emoteTimer) > 0;
 	}
 
 	actions
 	{
 		Start Camera(All Players(All Teams), Add(Eye Position(Global Variable(WINNER)), Multiply(Facing Direction Of(Global Variable(
 			WINNER)), 2)), Eye Position(Global Variable(WINNER)), 0);
-		disabled Wait(0.250, Ignore Condition);
-		disabled Loop If Condition Is True;
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
 	}
 }
 
@@ -526,6 +531,27 @@ rule("Winner Dies")
 	event
 	{
 		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player == Global Variable(WINNER);
+	}
+
+	actions
+	{
+		Set Global Variable(WINNER, Null);
+		Set Global Variable(emoteTimer, 0);
+	}
+}
+
+rule("Winner leaves")
+{
+	event
+	{
+		Player Left Match;
 		All;
 		All;
 	}
