@@ -17,6 +17,19 @@ variables
 		6: roadhogEatRadius
 }
 
+rule("Game Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Disable Built-In Game Mode Scoring;
+	}
+}
+
 rule("Game Setup (REIN POINTS)")
 {
 	event
@@ -407,12 +420,12 @@ rule("Roadhog - Spawns in")
 
 	actions
 	{
-		Set Player Variable(Event Player, roadhogEatRadius, 0);
-		disabled Wait(1, Ignore Condition);
-		disabled Destroy Effect(Player Variable(Event Player, roadhogEffectId));
-		disabled Create Effect(All Players(All Teams), Sphere, Red, Event Player, Player Variable(Event Player, roadhogEatRadius),
+		Set Player Variable(Event Player, roadhogEatRadius, 1);
+		Wait(1, Ignore Condition);
+		Destroy Effect(Player Variable(Event Player, roadhogEffectId));
+		Create Effect(All Players(All Teams), Sphere, Red, Event Player, Player Variable(Event Player, roadhogEatRadius),
 			Position and Radius);
-		disabled Set Player Variable(Event Player, roadhogEffectId, Last Created Entity);
+		Set Player Variable(Event Player, roadhogEffectId, Last Created Entity);
 	}
 }
 
@@ -459,13 +472,14 @@ rule("Roadhog - Deals damage (eats players points)")
 		Kill(Victim, Attacker);
 		Modify Player Score(Attacker, Score Of(Victim));
 		Set Player Score(Victim, 0);
-		Set Player Variable(Event Player, roadhogEatRadius, Score Of(Event Player));
+		Set Player Variable(Attacker, roadhogEatRadius, Score Of(Attacker));
 		disabled Skip If(Compare(Player Variable(Event Player, roadhogEffectId), !=, Null), 4);
-		Skip If(Compare(Player Variable(Event Player, roadhogEatRadius), !=, 1), 3);
-		Destroy Effect(Player Variable(Event Player, roadhogEffectId));
-		Create Effect(All Players(All Teams), Sphere, Red, Event Player, Player Variable(Event Player, roadhogEatRadius),
+		disabled Wait(0.250, Ignore Condition);
+		disabled Skip If(Compare(Player Variable(Event Player, roadhogEatRadius), !=, 1), 3);
+		disabled Destroy Effect(Player Variable(Event Player, roadhogEffectId));
+		disabled Create Effect(All Players(All Teams), Sphere, Red, Event Player, Player Variable(Event Player, roadhogEatRadius),
 			Position and Radius);
-		Set Player Variable(Event Player, roadhogEffectId, Last Created Entity);
+		disabled Set Player Variable(Event Player, roadhogEffectId, Last Created Entity);
 	}
 }
 
@@ -516,7 +530,22 @@ rule("Roadhog dies")
 		Kill(Victim, Attacker);
 		Modify Player Score(Attacker, Score Of(Victim));
 		Set Player Score(Victim, 0);
-		Set Player Variable(Event Player, roadhogEatRadius, Score Of(Event Player));
-		Destroy Effect(Player Variable(Event Player, roadhogEffectId));
+		Set Player Variable(Victim, roadhogEatRadius, 1);
+		Destroy Effect(Player Variable(Victim, roadhogEffectId));
+	}
+}
+
+rule("Player gets point when kill other player")
+{
+	event
+	{
+		Player Dealt Final Blow;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Modify Player Score(Event Player, 1);
 	}
 }
