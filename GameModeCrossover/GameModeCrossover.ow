@@ -12,6 +12,7 @@ variables
 		1: reinPayloadPos
 		2: reinPayloadEffectId
 		3: reinPayloadPointIndex
+		4: reinPayloadFlagEffectId
 }
 
 rule("Game Setup (REIN POINTS)")
@@ -131,6 +132,10 @@ rule("Rein - Spawn payload")
 		Create Effect(All Players(All Teams), Sphere, White, Add(Player Variable(Event Player, reinPayloadPos), Global Variable(
 			REIN_PAYLOAD_GROUND_OFFSET)), Global Variable(REIN_PAYLOAD_RADIUS), Position and Radius);
 		Set Player Variable(Event Player, reinPayloadEffectId, Last Created Entity);
+		Destroy Effect(Player Variable(Event Player, reinPayloadFlagEffectId));
+		Create Icon(Event Player, Add(Player Variable(Event Player, reinPayloadPos), Global Variable(REIN_PAYLOAD_GROUND_OFFSET)), Flag,
+			Visible To and Position, Green, True);
+		Set Player Variable(Event Player, reinPayloadFlagEffectId, Last Created Entity);
 	}
 }
 
