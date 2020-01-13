@@ -297,3 +297,27 @@ rule("Rein - Payload moves to prev point when Rein is not near")
 		Modify Player Variable(Event Player, reinPayloadPointIndex, Subtract, 1);
 	}
 }
+
+rule("Rein switch off")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != Hero(Reinhardt);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Destroy Effect(Player Variable(Event Player, reinPayloadEffectId));
+		Destroy Icon(Player Variable(Event Player, reinPayloadFlagEffectId));
+		Set Player Variable(Event Player, reinPayloadPos, Null);
+		Set Player Variable(Event Player, reinPayloadPointIndex, 0);
+	}
+}
