@@ -205,8 +205,8 @@ rule("Rein - Payload only moves when Rein is near")
 		Distance Between(Position Of(Event Player), Player Variable(Event Player, reinPayloadPos)) <= Global Variable(
 			REIN_PAYLOAD_CONTEST_RADIUS);
 		Count Of(Filtered Array(Players Within Radius(Add(Player Variable(Event Player, reinPayloadPos), Global Variable(
-			REIN_PAYLOAD_GROUND_OFFSET)), Global Variable(REIN_PAYLOAD_CONTEST_RADIUS), All Teams, Surfaces And All Barriers), Compare(
-			Current Array Element, !=, Event Player))) == 0;
+			REIN_PAYLOAD_GROUND_OFFSET)), Global Variable(REIN_PAYLOAD_CONTEST_RADIUS), All Teams, Surfaces And All Barriers), And(Compare(
+			Current Array Element, !=, Event Player), Compare(Is Alive(Current Array Element), ==, True)))) == 0;
 	}
 
 	actions
