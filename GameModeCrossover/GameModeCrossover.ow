@@ -262,7 +262,8 @@ rule("Rein - Payload moves backward when Rein is not near")
 	{
 		Stop Chasing Player Variable(Event Player, reinPayloadPos);
 		Chase Player Variable At Rate(Event Player, reinPayloadPos, Value In Array(Global Variable(REIN_PAYLOAD_POINTS), Subtract(
-			Player Variable(Event Player, reinPayloadPointIndex), 1)), Global Variable(REIN_PAYLOAD_MOVESPEED), Destination and Rate);
+			Player Variable(Event Player, reinPayloadPointIndex), 1)), Multiply(Global Variable(REIN_PAYLOAD_MOVESPEED), 0.250),
+			Destination and Rate);
 	}
 }
 
