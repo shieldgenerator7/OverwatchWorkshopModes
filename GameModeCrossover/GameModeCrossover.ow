@@ -107,6 +107,72 @@ rule("Ana - Sees enemy")
 	}
 }
 
+rule("Moira - Spawns in")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Moira;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Moira);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Disallow Button(Event Player, Ultimate);
+	}
+}
+
+rule("Moira - Switches off")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != Hero(Moira);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Allow Button(Event Player, Ultimate);
+	}
+}
+
+rule("Moira - Ultimate: Teleport all players to her")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Moira;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Moira);
+		Is Alive(Event Player) == True;
+		Is Button Held(Event Player, Ultimate) == True;
+	}
+
+	actions
+	{
+		Set Ultimate Charge(Event Player, 0);
+		Teleport(All Living Players(All Teams), Position Of(Event Player));
+		Damage(All Living Players(All Teams), Event Player, 1);
+	}
+}
+
 rule("Rein - Spawn payload")
 {
 	event
@@ -319,71 +385,5 @@ rule("Rein switch off")
 		Destroy Icon(Player Variable(Event Player, reinPayloadFlagEffectId));
 		Set Player Variable(Event Player, reinPayloadPos, Null);
 		Set Player Variable(Event Player, reinPayloadPointIndex, 0);
-	}
-}
-
-rule("Moira - Spawns in")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		Moira;
-	}
-
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Moira);
-		Is Alive(Event Player) == True;
-	}
-
-	actions
-	{
-		Disallow Button(Event Player, Ultimate);
-	}
-}
-
-rule("Moira - Switches off")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		All;
-	}
-
-	conditions
-	{
-		Hero Of(Event Player) != Hero(Moira);
-		Is Alive(Event Player) == True;
-	}
-
-	actions
-	{
-		Allow Button(Event Player, Ultimate);
-	}
-}
-
-rule("Moira - Ultimate: Teleport all players to her")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		Moira;
-	}
-
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Moira);
-		Is Alive(Event Player) == True;
-		Is Button Held(Event Player, Ultimate) == True;
-	}
-
-	actions
-	{
-		Set Ultimate Charge(Event Player, 0);
-		Teleport(All Living Players(All Teams), Position Of(Event Player));
-		Damage(All Living Players(All Teams), Event Player, 1);
 	}
 }
