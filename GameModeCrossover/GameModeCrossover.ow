@@ -1,14 +1,57 @@
 variables
 {
+	global:
+		0: REIN_PAYLOAD_POINTS
+		1: REIN_PAYLOAD_RADIUS
+		2: REIN_PAYLOAD_GROUND_OFFSET
+		3: REIN_PAYLOAD_MOVESPEED
+
 	player:
 		0: target
+		1: reinPayloadPos
+		2: reinPayloadEffectId
+		3: reinPayloadPointIndex
 }
 
-rule("Game Setup")
+rule("Game Setup (REIN POINTS)")
 {
 	event
 	{
 		Ongoing - Global;
+	}
+
+	actions
+	{
+		Set Global Variable(REIN_PAYLOAD_RADIUS, 1);
+		Set Global Variable(REIN_PAYLOAD_GROUND_OFFSET, 1.500);
+		Set Global Variable(REIN_PAYLOAD_MOVESPEED, 2);
+		Set Global Variable(REIN_PAYLOAD_POINTS, Empty Array);
+		Modify Global Variable(REIN_PAYLOAD_POINTS, Append To Array, Vector(193.080, 9, 112.911));
+		Modify Global Variable(REIN_PAYLOAD_POINTS, Append To Array, Vector(193.398, 8, 103.589));
+		Modify Global Variable(REIN_PAYLOAD_POINTS, Append To Array, Vector(219.554, 6, 103.333));
+		Modify Global Variable(REIN_PAYLOAD_POINTS, Append To Array, Vector(219.036, 2, 91.455));
+		Modify Global Variable(REIN_PAYLOAD_POINTS, Append To Array, Vector(218.391, 1, 81.491));
+		Modify Global Variable(REIN_PAYLOAD_POINTS, Append To Array, Vector(186.954, 1, 81.111));
+		Modify Global Variable(REIN_PAYLOAD_POINTS, Append To Array, Vector(187.221, 1, 92.878));
+		Modify Global Variable(REIN_PAYLOAD_POINTS, Append To Array, Vector(176.442, 5, 92.730));
+		Modify Global Variable(REIN_PAYLOAD_POINTS, Append To Array, Vector(176.894, 5, 76.660));
+		Modify Global Variable(REIN_PAYLOAD_POINTS, Append To Array, Vector(182.837, 6, 75.966));
+		Modify Global Variable(REIN_PAYLOAD_POINTS, Append To Array, Vector(183.261, 8, 64.856));
+		Modify Global Variable(REIN_PAYLOAD_POINTS, Append To Array, Vector(193.289, 8, 63.571));
+		Modify Global Variable(REIN_PAYLOAD_POINTS, Append To Array, Vector(203.293, 8.001, 58.252));
+	}
+}
+
+rule("Instant Start")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Set Match Time(0);
 	}
 }
 
@@ -58,5 +101,81 @@ rule("Ana - Sees enemy")
 		Damage(Player Variable(Event Player, target), Event Player, 20);
 		Wait(0.100, Ignore Condition);
 		Loop If Condition Is True;
+	}
+}
+
+rule("Rein - Spawn payload")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Is Alive(Event Player) == True;
+		Player Variable(Event Player, reinPayloadPos) == Null;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Value In Array(Global Variable(REIN_PAYLOAD_POINTS), 0));
+		Set Player Variable(Event Player, reinPayloadPos, Value In Array(Global Variable(REIN_PAYLOAD_POINTS), 0));
+		Set Player Variable(Event Player, reinPayloadPointIndex, 0);
+		Destroy Effect(Player Variable(Event Player, reinPayloadPos));
+		Create Effect(All Players(All Teams), Sphere, White, Add(Player Variable(Event Player, reinPayloadPos), Multiply(Up,
+			Global Variable(REIN_PAYLOAD_GROUND_OFFSET))), Global Variable(REIN_PAYLOAD_RADIUS), Position and Radius);
+		Set Player Variable(Event Player, reinPayloadEffectId, Last Created Entity);
+	}
+}
+
+rule("==TEST==Rein lay payload points")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Host Player == True;
+		Is Button Held(Event Player, Crouch) == True;
+		Hero Of(Event Player) == Hero(Reinhardt);
+	}
+
+	actions
+	{
+		Modify Global Variable(REIN_PAYLOAD_POINTS, Append To Array, Position Of(Event Player));
+	}
+}
+
+rule("Rein - Payload mvoes to next point")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Is Alive(Event Player) == True;
+		Player Variable(Event Player, reinPayloadPos) == Value In Array(Global Variable(REIN_PAYLOAD_POINTS), Player Variable(Event Player,
+			reinPayloadPointIndex));
+	}
+
+	actions
+	{
+		Stop Chasing Player Variable(Event Player, reinPayloadPos);
+		Modify Player Variable(Event Player, reinPayloadPointIndex, Add, 1);
+		Chase Player Variable At Rate(Event Player, reinPayloadPos, Value In Array(Global Variable(REIN_PAYLOAD_POINTS), Player Variable(
+			Event Player, reinPayloadPointIndex)), Global Variable(REIN_PAYLOAD_MOVESPEED), Destination and Rate);
 	}
 }
