@@ -154,7 +154,7 @@ rule("==TEST==Rein lay payload points")
 	}
 }
 
-rule("Rein - Payload mvoes to next point")
+rule("Rein - Payload moves to next point (and kill everyone if reaches destination)")
 {
 	event
 	{
@@ -175,6 +175,13 @@ rule("Rein - Payload mvoes to next point")
 	{
 		Stop Chasing Player Variable(Event Player, reinPayloadPos);
 		Modify Player Variable(Event Player, reinPayloadPointIndex, Add, 1);
+		Chase Player Variable At Rate(Event Player, reinPayloadPos, Value In Array(Global Variable(REIN_PAYLOAD_POINTS), Player Variable(
+			Event Player, reinPayloadPointIndex)), Global Variable(REIN_PAYLOAD_MOVESPEED), Destination and Rate);
+		Abort If(Compare(Player Variable(Event Player, reinPayloadPointIndex), <, Count Of(Global Variable(REIN_PAYLOAD_POINTS))));
+		Damage(Filtered Array(All Players(All Teams), Compare(Current Array Element, !=, Event Player)), Event Player, 1000);
+		Set Player Variable(Event Player, reinPayloadPos, Value In Array(Global Variable(REIN_PAYLOAD_POINTS), 0));
+		Set Player Variable(Event Player, reinPayloadPointIndex, 1);
+		Stop Chasing Player Variable(Event Player, reinPayloadPos);
 		Chase Player Variable At Rate(Event Player, reinPayloadPos, Value In Array(Global Variable(REIN_PAYLOAD_POINTS), Player Variable(
 			Event Player, reinPayloadPointIndex)), Global Variable(REIN_PAYLOAD_MOVESPEED), Destination and Rate);
 	}
