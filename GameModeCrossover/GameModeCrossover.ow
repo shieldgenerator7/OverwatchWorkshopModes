@@ -1,0 +1,62 @@
+variables
+{
+	player:
+		0: target
+}
+
+rule("Game Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("==TEST==SPAWN BOTS==")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Host Player == True;
+		Is Button Held(Event Player, Interact) == True;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Random Value In Array(All Heroes), All Teams, -1.000, Nearest Walkable Position(Ray Cast Hit Position(
+			Eye Position(Event Player), Add(Eye Position(Event Player), Multiply(Facing Direction Of(Event Player), 100)), All Players(
+			All Teams), Event Player, True)), Multiply(Facing Direction Of(Event Player), -1.000));
+	}
+}
+
+rule("Ana - Sees enemy")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Ana;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Ana);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, target, Player Closest To Reticle(Event Player, All Teams));
+		Skip If(Compare(Is In Line of Sight(Eye Position(Event Player), Eye Position(Player Variable(Event Player, target)),
+			All Barriers Block LOS), ==, False), 1);
+		Damage(Player Variable(Event Player, target), Event Player, 20);
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
