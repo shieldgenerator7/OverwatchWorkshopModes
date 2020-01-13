@@ -96,6 +96,30 @@ rule("==TEST==SPAWN BOTS==")
 	}
 }
 
+rule("Ana - Spawns in")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Ana;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Ana);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+        Small Message(Event Player, Custom String("{0} Ana is playing Hide & Seek:", Hero Icon String(Hero Of(Event Player)), Null, Null));
+        Small Message(Event Player, Custom String("{0} Look at enemies to kill them, and keep out of sight.", Hero Icon String(Hero Of(Event Player)), Null, Null));
+        Wait(3, Ignore Condition);
+        Big Message(Event Player, Custom String("READY OR NOT, HERE I COME!", Null, Null, Null));
+	}
+}
+
 rule("Ana - Sees enemy")
 {
 	event
@@ -140,6 +164,10 @@ rule("Moira - Spawns in")
 	actions
 	{
 		Disallow Button(Event Player, Ultimate);
+        Small Message(Event Player, Custom String("{0} Moira is playing Tiny OW:", Hero Icon String(Hero Of(Event Player)), Null, Null));
+        Small Message(Event Player, Custom String("{0} Fast cooldowns, your ultimate teleports everyone to you.", Hero Icon String(Hero Of(Event Player)), Null, Null));
+        Wait(3, Ignore Condition);
+        Big Message(Event Player, Custom String("FIND A TINY ROOM AND ULT!", Null, Null, Null));
 	}
 }
 
@@ -450,6 +478,10 @@ rule("Roadhog - Spawns in")
 		Create Effect(All Players(All Teams), Sphere, Red, Event Player, Player Variable(Event Player, roadhogEatRadius),
 			Position and Radius);
 		Set Player Variable(Event Player, roadhogEffectId, Last Created Entity);
+        Small Message(Event Player, Custom String("{0} Roadhog is playing Agar.io:", Hero Icon String(Hero Of(Event Player)), Null, Null));
+        Small Message(Event Player, Custom String("{0} Hook enemies to grow your player-eating sphere.", Hero Icon String(Hero Of(Event Player)), Null, Null));
+        Wait(3, Ignore Condition);
+        Big Message(Event Player, Custom String("OM NOM NOM!", Null, Null, Null));
 	}
 }
 
