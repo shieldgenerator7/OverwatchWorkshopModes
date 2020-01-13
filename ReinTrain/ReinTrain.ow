@@ -27,6 +27,7 @@ rule("Game Setup")
 		Set Global Variable(CAR_POS_UPDATE_WAIT, 0.050);
 		Set Global Variable(CAR_POS_COUNT, 100);
 		Create Dummy Bot(Hero(Brigitte), Team 1, -1.000, Objective Position(1), Vector(1, 0, 0));
+		Create Dummy Bot(Hero(Reinhardt), Team 1, -1.000, Objective Position(1), Vector(1, 0, 0));
 	}
 }
 
