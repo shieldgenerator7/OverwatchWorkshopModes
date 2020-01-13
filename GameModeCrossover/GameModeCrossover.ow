@@ -201,6 +201,30 @@ rule("Rein - Spawn payload")
 	{
 		Hero Of(Event Player) == Hero(Reinhardt);
 		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+        Small Message(Event Player, Custom String("{0} Reinhardt is playing Escort:", Hero Icon String(Hero Of(Event Player)), Null, Null));
+        Small Message(Event Player, Custom String("{0} Escort the payload to  score.", Hero Icon String(Hero Of(Event Player)), Null, Null));
+        Wait(3, Ignore Condition);
+        Big Message(Event Player, Custom String("ESCORT THE PAYLOAD!", Null, Null, Null));
+	}
+}
+
+rule("Rein - Spawn payload")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Is Alive(Event Player) == True;
 		Player Variable(Event Player, reinPayloadPos) == Null;
 	}
 
