@@ -1,20 +1,24 @@
 variables
 {
 	global:
-		0: REIN_PAYLOAD_POINTS
-		1: REIN_PAYLOAD_RADIUS
-		2: REIN_PAYLOAD_GROUND_OFFSET
-		3: REIN_PAYLOAD_MOVESPEED
-		4: REIN_PAYLOAD_CONTEST_RADIUS
+		0: BAP_LAVA_GROWTH_SPEED
+        1: REIN_PAYLOAD_POINTS
+		2: REIN_PAYLOAD_RADIUS
+		3: REIN_PAYLOAD_GROUND_OFFSET
+		4: REIN_PAYLOAD_MOVESPEED
+		5: REIN_PAYLOAD_CONTEST_RADIUS
 
 	player:
 		0: target
-		1: reinPayloadPos
-		2: reinPayloadEffectId
-		3: reinPayloadPointIndex
-		4: reinPayloadFlagEffectId
-		5: roadhogEffectId
-		6: roadhogEatRadius
+        1: bapLavaPos
+        2: bapLavaRadius
+        3: bapLavaEffectId
+		4: reinPayloadPos
+		5: reinPayloadEffectId
+		6: reinPayloadPointIndex
+		7: reinPayloadFlagEffectId
+		8: roadhogEffectId
+		9: roadhogEatRadius
 }
 
 rule("Game Setup")
@@ -28,6 +32,19 @@ rule("Game Setup")
 	{
 		Disable Built-In Game Mode Scoring;
 	}
+}
+
+rule("Game Setup (BAP)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Set Global Variable(BAP_LAVA_GROWTH_SPEED, 1);
+    }
 }
 
 rule("Game Setup (REIN POINTS)")
@@ -147,6 +164,94 @@ rule("Ana - Sees enemy")
 }
 
 //
+// Baptiste
+//
+// Hero Settings:
+// Damage Dealt: 10%
+// Heal burst Cooldown: 50%
+// Ultimate: Disabled
+// Melee Knockback: 500%
+//
+rule("Baptiste - Spawns in")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Baptiste;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Baptiste);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+        Small Message(Event Player, Custom String("{0} Baptiste is playing Rising Flood:", Hero Icon String(Hero Of(Event Player)), Null, Null));
+        Small Message(Event Player, Custom String("{0} The floor is lava, and if it's not, it soon will be.", Hero Icon String(Hero Of(Event Player)), Null, Null));
+        Wait(3, Ignore Condition);
+        Big Message(Event Player, Custom String("RUN FOR THE HILLS!", Null, Null, Null));
+		Set Player Variable(Event Player, bapLavaPos, Add(Position Of(Event Player),Multiply(Up,-110)));
+		Set Player Variable(Event Player, bapLavaRadius, 100);
+		Destroy Effect(Player Variable(Event Player, bapLavaEffectId));
+		Create Effect(All Players(All Teams), Sphere, Red, Player Variable(Event Player, bapLavaPos), Player Variable(Event Player, bapLavaRadius), Position and Radius);
+		Set Player Variable(Event Player, bapLavaEffectId, Last Created Entity);
+        Stop Chasing Player Variable(Event Player, bapLavaRadius);
+		Chase Player Variable At Rate(Event Player, bapLavaRadius, 1000, Global Variable(BAP_LAVA_GROWTH_SPEED), Destination and Rate);
+	}
+}
+
+rule("Baptiste dies")
+{
+	event
+	{
+		Player Died;
+		All;
+		Baptiste;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Baptiste);
+	}
+
+	actions
+	{
+		Destroy Effect(Player Variable(Victim, bapLavaEffectId));
+        Set Player Variable(Event Player, bapLavaRadius, 1);
+	}
+}
+
+rule("Baptiste - Lava Burns Players")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Baptiste;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Baptiste);
+		Is Alive(Event Player) == True;
+		Count Of(Players Within Radius(Player Variable(Event Player, bapLavaPos), Player Variable(Event Player, bapLavaRadius), All Teams,
+			Surfaces And All Barriers)) > 0;
+	}
+
+	actions
+	{
+		Damage(Filtered Array(Players Within Radius(Player Variable(Event Player, bapLavaPos), Player Variable(Event Player, bapLavaRadius), All Teams,
+			Surfaces And All Barriers), Compare(Is Alive(Current Array Element), ==,
+			True)), Event Player, 2);
+		Wait(0.1, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+//
 // Genji
 //
 // Hero Settings:
@@ -251,7 +356,7 @@ rule("Moira - Ultimate: Teleport all players to her")
 	}
 }
 
-rule("Rein - Spawn payload")
+rule("Rein - Spawn in")
 {
 	event
 	{
