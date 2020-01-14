@@ -22,6 +22,7 @@ variables
 		9: roadhogEffectId
 		10: roadhogEatRadius
 		11: zenPeaceEffectId
+		12: meiHUDTextId
 }
 
 rule("Game Setup")
@@ -1043,6 +1044,11 @@ rule("Mei - Spawns in")
 			Event Player)), Null, Null));
 		Wait(3, Ignore Condition);
 		Big Message(Event Player, Custom String("FREEZE!", Null, Null, Null));
+		Destroy HUD Text(Player Variable(Event Player, meiHUDTextId));
+		Create HUD Text(Event Player, Custom String("FROZEN: {0} / 5", Count Of(Filtered Array(All Living Players(All Teams), Compare(
+			Has Status(Current Array Element, Frozen), ==, True))), Null, Null), Null, Null, Left, 0, White, White, White, String,
+			Default Visibility);
+		Set Player Variable(Event Player, meiHUDTextId, Last Text ID);
 	}
 }
 
@@ -1063,7 +1069,6 @@ rule("Mei - deals damage to freeze")
 
 	actions
 	{
-		Wait(0.250, Ignore Condition);
 		Set Status(Victim, Attacker, Frozen, 9999);
 	}
 }
@@ -1079,6 +1084,7 @@ rule("Mei - Frozen enemies unfreeze when damaged")
 
 	conditions
 	{
+		Hero Of(Attacker) != Hero(Mei);
 		Is Alive(Event Player) == True;
 		Has Status(Event Player, Frozen) == True;
 	}
@@ -1107,9 +1113,13 @@ rule("Mei - deals massive damage when get 5 frozen enemies")
 
 	actions
 	{
-		Wait(0.500, Ignore Condition);
-		Damage(Filtered Array(All Living Players(All Teams), Compare(Has Status(Current Array Element, Frozen), ==, True)), Event Player,
-			1000);
+		Wait(0.250, Ignore Condition);
+		Set Player Variable(Event Player, target, Filtered Array(All Living Players(All Teams), Compare(Has Status(Current Array Element,
+			Frozen), ==, True)));
+		Damage(Player Variable(Event Player, target), Event Player, 10000);
+		Wait(1, Ignore Condition);
+		Clear Status(Player Variable(Event Player, target), Frozen);
+		Set Player Variable(Event Player, target, Null);
 	}
 }
 
@@ -1122,13 +1132,28 @@ rule("Mei - Frozen enemy unfreezes when dead")
 		All;
 	}
 
+	actions
+	{
+		Clear Status(Event Player, Frozen);
+	}
+}
+
+rule("Mei dies")
+{
+	event
+	{
+		Player Died;
+		All;
+		Mei;
+	}
+
 	conditions
 	{
-		Has Status(Event Player, Frozen) == True;
+		Hero Of(Event Player) == Hero(Mei);
 	}
 
 	actions
 	{
-		Clear Status(Event Player, Frozen);
+		Destroy HUD Text(Player Variable(Event Player, meiHUDTextId));
 	}
 }
