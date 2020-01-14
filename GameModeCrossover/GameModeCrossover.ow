@@ -1432,3 +1432,50 @@ rule("Reaper heals reaper")
 		Heal(Victim, Attacker, Multiply(Event Damage, 2));
 	}
 }
+
+rule("Sombra - Spawns in")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Sombra;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Sombra);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Small Message(Event Player, Custom String("{0} Sombra is playing Spy:", Hero Icon String(Hero Of(Event Player)), Null, Null));
+		Small Message(Event Player, Custom String("{0} You get points for watching players die.", Hero Icon String(Hero Of(Event Player)),
+			Null, Null));
+		Wait(3, Ignore Condition);
+		Big Message(Event Player, Custom String("HACK THE PLANET!", Null, Null, Null));
+	}
+}
+
+rule("Sombra - watches player die")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Hero Being Played(Hero(Sombra), All Teams) == True;
+	}
+
+	actions
+	{
+		Modify Player Score(Filtered Array(Players On Hero(Hero(Sombra), All Teams), And(Compare(Is In View Angle(Current Array Element,
+			Eye Position(Event Player), 70), ==, True), Compare(Is In Line of Sight(Eye Position(Current Array Element), Eye Position(
+			Event Player), Barriers Do Not Block LOS), ==, True))), 1);
+	}
+}
