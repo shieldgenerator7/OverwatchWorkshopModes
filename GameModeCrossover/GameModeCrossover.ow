@@ -2,26 +2,26 @@ variables
 {
 	global:
 		0: BAP_LAVA_GROWTH_SPEED
-        1: REIN_PAYLOAD_POINTS
+		1: REIN_PAYLOAD_POINTS
 		2: REIN_PAYLOAD_RADIUS
 		3: REIN_PAYLOAD_GROUND_OFFSET
 		4: REIN_PAYLOAD_MOVESPEED
 		5: REIN_PAYLOAD_CONTEST_RADIUS
-        6: ZEN_PEACE_RADIUS
+		6: ZEN_PEACE_RADIUS
 
 	player:
 		0: target
-        1: bapLavaPos
-        2: bapLavaRadius
-        3: bapLavaEffectId
-        4: mercyKiller
+		1: bapLavaPos
+		2: bapLavaRadius
+		3: bapLavaEffectId
+		4: mercyKiller
 		5: reinPayloadPos
 		6: reinPayloadEffectId
 		7: reinPayloadPointIndex
 		8: reinPayloadFlagEffectId
 		9: roadhogEffectId
 		10: roadhogEatRadius
-        11: zenPeaceEffectId
+		11: zenPeaceEffectId
 }
 
 rule("Game Setup")
@@ -37,6 +37,34 @@ rule("Game Setup")
 	}
 }
 
+rule("Player gets point when kill other player")
+{
+	event
+	{
+		Player Dealt Final Blow;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Modify Player Score(Event Player, 1);
+	}
+}
+
+rule("Instant Start")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Set Match Time(0);
+	}
+}
+
 rule("Game Setup (BAP, ZEN)")
 {
 	event
@@ -48,7 +76,7 @@ rule("Game Setup (BAP, ZEN)")
 	{
 		Set Global Variable(BAP_LAVA_GROWTH_SPEED, 1);
 		Set Global Variable(ZEN_PEACE_RADIUS, 10);
-    }
+	}
 }
 
 rule("Game Setup (REIN POINTS)")
@@ -78,19 +106,6 @@ rule("Game Setup (REIN POINTS)")
 		Modify Global Variable(REIN_PAYLOAD_POINTS, Append To Array, Vector(183.261, 8, 64.856));
 		Modify Global Variable(REIN_PAYLOAD_POINTS, Append To Array, Vector(193.289, 8, 63.571));
 		Modify Global Variable(REIN_PAYLOAD_POINTS, Append To Array, Vector(203.293, 8.001, 58.252));
-	}
-}
-
-rule("Instant Start")
-{
-	event
-	{
-		Ongoing - Global;
-	}
-
-	actions
-	{
-		Set Match Time(0);
 	}
 }
 
@@ -134,10 +149,11 @@ rule("Ana - Spawns in")
 
 	actions
 	{
-        Small Message(Event Player, Custom String("{0} Ana is playing Hide & Seek:", Hero Icon String(Hero Of(Event Player)), Null, Null));
-        Small Message(Event Player, Custom String("{0} Look at enemies to kill them, and keep out of sight.", Hero Icon String(Hero Of(Event Player)), Null, Null));
-        Wait(3, Ignore Condition);
-        Big Message(Event Player, Custom String("READY OR NOT, HERE I COME!", Null, Null, Null));
+		Small Message(Event Player, Custom String("{0} Ana is playing Hide & Seek:", Hero Icon String(Hero Of(Event Player)), Null, Null));
+		Small Message(Event Player, Custom String("{0} Look at enemies to kill them, and keep out of sight.", Hero Icon String(Hero Of(
+			Event Player)), Null, Null));
+		Wait(3, Ignore Condition);
+		Big Message(Event Player, Custom String("READY OR NOT, HERE I COME!", Null, Null, Null));
 	}
 }
 
@@ -193,16 +209,19 @@ rule("Baptiste - Spawns in")
 
 	actions
 	{
-        Small Message(Event Player, Custom String("{0} Baptiste is playing Rising Flood:", Hero Icon String(Hero Of(Event Player)), Null, Null));
-        Small Message(Event Player, Custom String("{0} The floor is lava, and if it's not, it soon will be.", Hero Icon String(Hero Of(Event Player)), Null, Null));
-        Wait(3, Ignore Condition);
-        Big Message(Event Player, Custom String("RUN FOR THE HILLS!", Null, Null, Null));
-		Set Player Variable(Event Player, bapLavaPos, Add(Position Of(Event Player),Multiply(Up,-110)));
+		Small Message(Event Player, Custom String("{0} Baptiste is playing Rising Flood:", Hero Icon String(Hero Of(Event Player)), Null,
+			Null));
+		Small Message(Event Player, Custom String("{0} The floor is lava, and if it's not, it soon will be.", Hero Icon String(Hero Of(
+			Event Player)), Null, Null));
+		Wait(3, Ignore Condition);
+		Big Message(Event Player, Custom String("RUN FOR THE HILLS!", Null, Null, Null));
+		Set Player Variable(Event Player, bapLavaPos, Add(Position Of(Event Player), Multiply(Up, -110.000)));
 		Set Player Variable(Event Player, bapLavaRadius, 100);
 		Destroy Effect(Player Variable(Event Player, bapLavaEffectId));
-		Create Effect(All Players(All Teams), Sphere, Red, Player Variable(Event Player, bapLavaPos), Player Variable(Event Player, bapLavaRadius), Position and Radius);
+		Create Effect(All Players(All Teams), Sphere, Red, Player Variable(Event Player, bapLavaPos), Player Variable(Event Player,
+			bapLavaRadius), Position and Radius);
 		Set Player Variable(Event Player, bapLavaEffectId, Last Created Entity);
-        Stop Chasing Player Variable(Event Player, bapLavaRadius);
+		Stop Chasing Player Variable(Event Player, bapLavaRadius);
 		Chase Player Variable At Rate(Event Player, bapLavaRadius, 1000, Global Variable(BAP_LAVA_GROWTH_SPEED), Destination and Rate);
 	}
 }
@@ -224,7 +243,7 @@ rule("Baptiste dies")
 	actions
 	{
 		Destroy Effect(Player Variable(Victim, bapLavaEffectId));
-        Set Player Variable(Event Player, bapLavaRadius, 1);
+		Set Player Variable(Event Player, bapLavaRadius, 1);
 	}
 }
 
@@ -247,10 +266,9 @@ rule("Baptiste - Lava Burns Players")
 
 	actions
 	{
-		Damage(Filtered Array(Players Within Radius(Player Variable(Event Player, bapLavaPos), Player Variable(Event Player, bapLavaRadius), All Teams, 
-            Off), Compare(Is Alive(Current Array Element), ==,
-			True)), Event Player, 2);
-		Wait(0.1, Ignore Condition);
+		Damage(Filtered Array(Players Within Radius(Player Variable(Event Player, bapLavaPos), Player Variable(Event Player,
+			bapLavaRadius), All Teams, Off), Compare(Is Alive(Current Array Element), ==, True)), Event Player, 2);
+		Wait(0.100, Ignore Condition);
 		Loop If Condition Is True;
 	}
 }
@@ -283,10 +301,12 @@ rule("Genji - Spawns in")
 
 	actions
 	{
-        Small Message(Event Player, Custom String("{0} Genji is playing One in the Chamber:", Hero Icon String(Hero Of(Event Player)), Null, Null));
-        Small Message(Event Player, Custom String("{0} Your dash can instakill, but you only get one.", Hero Icon String(Hero Of(Event Player)), Null, Null));
-        Wait(3, Ignore Condition);
-        Big Message(Event Player, Custom String("YOU LOOK *DASHING* TODAY!", Null, Null, Null));
+		Small Message(Event Player, Custom String("{0} Genji is playing One in the Chamber:", Hero Icon String(Hero Of(Event Player)),
+			Null, Null));
+		Small Message(Event Player, Custom String("{0} Your dash can instakill, but you only get one.", Hero Icon String(Hero Of(
+			Event Player)), Null, Null));
+		Wait(3, Ignore Condition);
+		Big Message(Event Player, Custom String("YOU LOOK *DASHING* TODAY!", Null, Null, Null));
 	}
 }
 
@@ -320,10 +340,12 @@ rule("Mercy - Spawns in")
 
 	actions
 	{
-        Small Message(Event Player, Custom String("{0} Mercy is playing Mercy Boxing:", Hero Icon String(Hero Of(Event Player)), Null, Null));
-        Small Message(Event Player, Custom String("{0} You pack a powerful punch and can rez yourself.", Hero Icon String(Hero Of(Event Player)), Null, Null));
-        Wait(3, Ignore Condition);
-        Big Message(Event Player, Custom String("ROUND {0}: FIGHT!", Score Of(Event Player), Null, Null));
+		Small Message(Event Player, Custom String("{0} Mercy is playing Mercy Boxing:", Hero Icon String(Hero Of(Event Player)), Null,
+			Null));
+		Small Message(Event Player, Custom String("{0} You pack a powerful punch and can rez yourself.", Hero Icon String(Hero Of(
+			Event Player)), Null, Null));
+		Wait(3, Ignore Condition);
+		Big Message(Event Player, Custom String("ROUND {0}: FIGHT!", Score Of(Event Player), Null, Null));
 	}
 }
 
@@ -344,7 +366,7 @@ rule("Mercy dies")
 	actions
 	{
 		Big Message(Event Player, Custom String("REZ YOURSELF!", Null, Null, Null));
-        Set Player Variable(Event Player, mercyKiller, Attacker);
+		Set Player Variable(Event Player, mercyKiller, Attacker);
 	}
 }
 
@@ -361,15 +383,15 @@ rule("Mercy - Rezzes herself")
 	{
 		Is Button Held(Event Player, Ability 2) == True;
 		Hero Of(Event Player) == Hero(Mercy);
-        Is Alive(Event Player) == False;
+		Is Alive(Event Player) == False;
 	}
 
 	actions
 	{
 		Resurrect(Event Player);
-        Skip If(Compare(Player Variable(Event Player, mercyKiller),==,Null),1);
-        Modify Player Score(Player Variable(Event Player, mercyKiller), -1);
-        Set Player Variable(Event Player, mercyKiller, Null);
+		Skip If(Compare(Player Variable(Event Player, mercyKiller), ==, Null), 1);
+		Modify Player Score(Player Variable(Event Player, mercyKiller), -1.000);
+		Set Player Variable(Event Player, mercyKiller, Null);
 	}
 }
 
@@ -391,10 +413,11 @@ rule("Moira - Spawns in")
 	actions
 	{
 		Disallow Button(Event Player, Ultimate);
-        Small Message(Event Player, Custom String("{0} Moira is playing Tiny OW:", Hero Icon String(Hero Of(Event Player)), Null, Null));
-        Small Message(Event Player, Custom String("{0} Fast cooldowns, your ultimate teleports everyone to you.", Hero Icon String(Hero Of(Event Player)), Null, Null));
-        Wait(3, Ignore Condition);
-        Big Message(Event Player, Custom String("FIND A TINY ROOM AND ULT!", Null, Null, Null));
+		Small Message(Event Player, Custom String("{0} Moira is playing Tiny OW:", Hero Icon String(Hero Of(Event Player)), Null, Null));
+		Small Message(Event Player, Custom String("{0} Fast cooldowns, your ultimate teleports everyone to you.", Hero Icon String(Hero Of(
+			Event Player)), Null, Null));
+		Wait(3, Ignore Condition);
+		Big Message(Event Player, Custom String("FIND A TINY ROOM AND ULT!", Null, Null, Null));
 	}
 }
 
@@ -460,10 +483,12 @@ rule("Rein - Spawn in")
 
 	actions
 	{
-        Small Message(Event Player, Custom String("{0} Reinhardt is playing Escort:", Hero Icon String(Hero Of(Event Player)), Null, Null));
-        Small Message(Event Player, Custom String("{0} Escort the payload to  score.", Hero Icon String(Hero Of(Event Player)), Null, Null));
-        Wait(3, Ignore Condition);
-        Big Message(Event Player, Custom String("ESCORT THE PAYLOAD!", Null, Null, Null));
+		Small Message(Event Player, Custom String("{0} Reinhardt is playing Escort:", Hero Icon String(Hero Of(Event Player)), Null,
+			Null));
+		Small Message(Event Player, Custom String("{0} Escort the payload to  score.", Hero Icon String(Hero Of(Event Player)), Null,
+			Null));
+		Wait(3, Ignore Condition);
+		Big Message(Event Player, Custom String("ESCORT THE PAYLOAD!", Null, Null, Null));
 	}
 }
 
@@ -705,10 +730,11 @@ rule("Roadhog - Spawns in")
 		Create Effect(All Players(All Teams), Sphere, Red, Event Player, Player Variable(Event Player, roadhogEatRadius),
 			Position and Radius);
 		Set Player Variable(Event Player, roadhogEffectId, Last Created Entity);
-        Small Message(Event Player, Custom String("{0} Roadhog is playing Agar.io:", Hero Icon String(Hero Of(Event Player)), Null, Null));
-        Small Message(Event Player, Custom String("{0} Hook enemies to grow your player-eating sphere.", Hero Icon String(Hero Of(Event Player)), Null, Null));
-        Wait(3, Ignore Condition);
-        Big Message(Event Player, Custom String("OM NOM NOM!", Null, Null, Null));
+		Small Message(Event Player, Custom String("{0} Roadhog is playing Agar.io:", Hero Icon String(Hero Of(Event Player)), Null, Null));
+		Small Message(Event Player, Custom String("{0} Hook enemies to grow your player-eating sphere.", Hero Icon String(Hero Of(
+			Event Player)), Null, Null));
+		Wait(3, Ignore Condition);
+		Big Message(Event Player, Custom String("OM NOM NOM!", Null, Null, Null));
 	}
 }
 
@@ -845,10 +871,12 @@ rule("Sigma - Spawns in")
 
 	actions
 	{
-        Small Message(Event Player, Custom String("{0} Sigma is playing Boss Battle:", Hero Icon String(Hero Of(Event Player)), Null, Null));
-        Small Message(Event Player, Custom String("{0} You are hard to kill, but you fall hard when you do.", Hero Icon String(Hero Of(Event Player)), Null, Null));
-        Wait(3, Ignore Condition);
-        Big Message(Event Player, Custom String("THE UNIVERSE SINGS TO ME!", Null, Null, Null));
+		Small Message(Event Player, Custom String("{0} Sigma is playing Boss Battle:", Hero Icon String(Hero Of(Event Player)), Null,
+			Null));
+		Small Message(Event Player, Custom String("{0} You are hard to kill, but you fall hard when you do.", Hero Icon String(Hero Of(
+			Event Player)), Null, Null));
+		Wait(3, Ignore Condition);
+		Big Message(Event Player, Custom String("THE UNIVERSE SINGS TO ME!", Null, Null, Null));
 	}
 }
 
@@ -868,7 +896,7 @@ rule("Sigma dies -> lose 5 points")
 
 	actions
 	{
-		Modify Player Score(Event Player, -5);
+		Modify Player Score(Event Player, -5.000);
 	}
 }
 
@@ -900,10 +928,34 @@ rule("Widowmaker - Spawns in")
 
 	actions
 	{
-        Small Message(Event Player, Custom String("{0} Widowmaker is playing Widow HeadShot Only:", Hero Icon String(Hero Of(Event Player)), Null, Null));
-        Small Message(Event Player, Custom String("{0} You can only be headshot, and you only deal damage with headshots.", Hero Icon String(Hero Of(Event Player)), Null, Null));
-        Wait(3, Ignore Condition);
-        Big Message(Event Player, Custom String("BOOM! HEADSHOT!", Null, Null, Null));
+		Small Message(Event Player, Custom String("{0} Widowmaker is playing Widow HeadShot Only:", Hero Icon String(Hero Of(
+			Event Player)), Null, Null));
+		Small Message(Event Player, Custom String("{0} You can only be headshot, and you only deal damage with headshots.",
+			Hero Icon String(Hero Of(Event Player)), Null, Null));
+		Wait(3, Ignore Condition);
+		Big Message(Event Player, Custom String("BOOM! HEADSHOT!", Null, Null, Null));
+	}
+}
+
+rule("Widow - Hit non-headshot = heal enemy")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		Widowmaker;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Widowmaker);
+		Is Alive(Event Player) == True;
+		Event Was Critical Hit == False;
+	}
+
+	actions
+	{
+		Heal(Victim, Attacker, Event Damage);
 	}
 }
 
@@ -930,10 +982,12 @@ rule("Zenyatta - Spawns in")
 
 	actions
 	{
-        Small Message(Event Player, Custom String("{0} Zenyatta is playing Chill+Kill:", Hero Icon String(Hero Of(Event Player)), Null, Null));
-        Small Message(Event Player, Custom String("{0} Emote to create a chill zone.", Hero Icon String(Hero Of(Event Player)), Null, Null));
-        Wait(3, Ignore Condition);
-        Big Message(Event Player, Custom String("we are in harmony", Null, Null, Null));
+		Small Message(Event Player, Custom String("{0} Zenyatta is playing Chill+Kill:", Hero Icon String(Hero Of(Event Player)), Null,
+			Null));
+		Small Message(Event Player, Custom String("{0} Emote to create a chill zone.", Hero Icon String(Hero Of(Event Player)), Null,
+			Null));
+		Wait(3, Ignore Condition);
+		Big Message(Event Player, Custom String("we are in harmony", Null, Null, Null));
 	}
 }
 
@@ -949,14 +1003,15 @@ rule("Zenyatta - Peace zone reflects damage")
 	conditions
 	{
 		Is Alive(Event Player) == True;
-        Is True For Any(Players Within Radius(Position Of(Event Player), Global Variable(ZEN_PEACE_RADIUS), All Teams, Off), 
-        AND(COMPARE(Is Communicating Any Emote(Current Array ELement),==,True),COMPARE(Hero Of(Current Array ELement),==,Hero(Zenyatta)))) == True;
+		Is True For Any(Players Within Radius(Position Of(Event Player), Global Variable(ZEN_PEACE_RADIUS), All Teams, Off), And(Compare(
+			Is Communicating Any Emote(Current Array Element), ==, True), Compare(Hero Of(Current Array Element), ==, Hero(Zenyatta))))
+			== True;
 	}
 
 	actions
 	{
-        Damage(Attacker,Victim,Event Damage);
-        Heal(Victim,Attacker,Event Damage);
+		Damage(Attacker, Victim, Event Damage);
+		Heal(Victim, Attacker, Event Damage);
 	}
 }
 
@@ -973,14 +1028,13 @@ rule("Zenyatta - Emotes to start peace zone")
 	{
 		Hero Of(Event Player) == Hero(Zenyatta);
 		Is Alive(Event Player) == True;
-        Is Communicating Any Emote(Event Player) == True;
+		Is Communicating Any Emote(Event Player) == True;
 	}
 
 	actions
 	{
-        Destroy Effect(Player Variable(Event Player, zenPeaceEffectId));
-        Create Effect(All Players(All Teams), Ring, Yellow, Event Player, Global Variable(ZEN_PEACE_RADIUS),
-			Position and Radius);
+		Destroy Effect(Player Variable(Event Player, zenPeaceEffectId));
+		Create Effect(All Players(All Teams), Ring, Yellow, Event Player, Global Variable(ZEN_PEACE_RADIUS), Position and Radius);
 		Set Player Variable(Event Player, zenPeaceEffectId, Last Created Entity);
 	}
 }
@@ -997,26 +1051,11 @@ rule("Zenyatta - Stop emoting, stop peace zone")
 	conditions
 	{
 		Hero Of(Event Player) == Hero(Zenyatta);
-        Is Communicating Any Emote(Event Player) == False;
+		Is Communicating Any Emote(Event Player) == False;
 	}
 
 	actions
 	{
-        Destroy Effect(Player Variable(Event Player, zenPeaceEffectId));
-	}
-}
-
-rule("Player gets point when kill other player")
-{
-	event
-	{
-		Player Dealt Final Blow;
-		All;
-		All;
-	}
-
-	actions
-	{
-		Modify Player Score(Event Player, 1);
+		Destroy Effect(Player Variable(Event Player, zenPeaceEffectId));
 	}
 }
