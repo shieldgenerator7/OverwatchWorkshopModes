@@ -1264,11 +1264,52 @@ rule("==TEST==BOTS==PRIMARY FIRE")
 
 	actions
 	{
-		Start Facing(Event Player, Subtract(Position Of(Player Closest To Reticle(Event Player, All Teams)), Position Of(Event Player)),
-			100, To World, Direction and Turn Rate);
 		Press Button(Event Player, Primary Fire);
 		Wait(0.100, Ignore Condition);
 		Loop If Condition Is True;
+	}
+}
+
+rule("==TEST==BOTS==LOOK FOR TARGET")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Start Facing(Event Player, Subtract(Position Of(Player Closest To Reticle(Event Player, All Teams)), Position Of(Event Player)),
+			10, To World, Direction and Turn Rate);
+	}
+}
+
+rule("==BOTS==SHOOT BACK==")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Start Facing(Event Player, Subtract(Position Of(Attacker), Position Of(Event Player)), 10, To World, Direction and Turn Rate);
 	}
 }
 
