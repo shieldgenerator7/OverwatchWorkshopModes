@@ -361,7 +361,7 @@ rule("Mercy - Rezzes herself")
 	{
 		Is Button Held(Event Player, Ability 2) == True;
 		Hero Of(Event Player) == Hero(Mercy);
-        Is Alive(Event Player) == False
+        Is Alive(Event Player) == False;
 	}
 
 	actions
@@ -950,7 +950,7 @@ rule("Zenyatta - Peace zone reflects damage")
 	{
 		Is Alive(Event Player) == True;
         Is True For Any(Players Within Radius(Position Of(Event Player), Global Variable(ZEN_PEACE_RADIUS), All Teams, Off), 
-        AND(COMPARE(Is Communicating Any Emote(Current Array ELement),==,True),COMPARE(Hero Of(Current Array ELement),==,Hero(Zenyatta)))) == True
+        AND(COMPARE(Is Communicating Any Emote(Current Array ELement),==,True),COMPARE(Hero Of(Current Array ELement),==,Hero(Zenyatta)))) == True;
 	}
 
 	actions
@@ -973,13 +973,13 @@ rule("Zenyatta - Emotes to start peace zone")
 	{
 		Hero Of(Event Player) == Hero(Zenyatta);
 		Is Alive(Event Player) == True;
-        Is Communicating Any Emote(Event Player) == True
+        Is Communicating Any Emote(Event Player) == True;
 	}
 
 	actions
 	{
         Destroy Effect(Player Variable(Event Player, zenPeaceEffectId));
-        Create Effect(All Players(All Teams), Ring, Gold, Event Player, Global Variable(ZEN_PEACE_RADIUS),
+        Create Effect(All Players(All Teams), Ring, Yellow, Event Player, Global Variable(ZEN_PEACE_RADIUS),
 			Position and Radius);
 		Set Player Variable(Event Player, zenPeaceEffectId, Last Created Entity);
 	}
@@ -997,7 +997,7 @@ rule("Zenyatta - Stop emoting, stop peace zone")
 	conditions
 	{
 		Hero Of(Event Player) == Hero(Zenyatta);
-        Is Communicating Any Emote(Event Player) == False
+        Is Communicating Any Emote(Event Player) == False;
 	}
 
 	actions
