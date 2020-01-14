@@ -1020,3 +1020,115 @@ rule("Zenyatta - Stop emoting, stop peace zone")
 		Destroy Effect(Player Variable(Event Player, zenPeaceEffectId));
 	}
 }
+
+rule("Mei - Spawns in")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mei;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Mei);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Small Message(Event Player, Custom String("{0} Mei is playing Freeze Tag:", Hero Icon String(Hero Of(Event Player)), Null, Null));
+		Small Message(Event Player, Custom String("{0} Punch to freeze enemies, freeze 5 enemies to kill.", Hero Icon String(Hero Of(
+			Event Player)), Null, Null));
+		Wait(3, Ignore Condition);
+		Big Message(Event Player, Custom String("FREEZE!", Null, Null, Null));
+	}
+}
+
+rule("Mei - deals damage to freeze")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		Mei;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Mei);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Wait(0.250, Ignore Condition);
+		Set Status(Victim, Attacker, Frozen, 9999);
+	}
+}
+
+rule("Mei - Frozen enemies unfreeze when damaged")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Has Status(Event Player, Frozen) == True;
+	}
+
+	actions
+	{
+		Clear Status(Event Player, Frozen);
+	}
+}
+
+rule("Mei - deals massive damage when get 5 frozen enemies")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		Mei;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Mei);
+		Is Alive(Event Player) == True;
+		Count Of(Filtered Array(All Living Players(All Teams), Compare(Has Status(Current Array Element, Frozen), ==, True))) >= 4;
+	}
+
+	actions
+	{
+		Wait(0.500, Ignore Condition);
+		Damage(Filtered Array(All Living Players(All Teams), Compare(Has Status(Current Array Element, Frozen), ==, True)), Event Player,
+			1000);
+	}
+}
+
+rule("Mei - Frozen enemy unfreezes when dead")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Has Status(Event Player, Frozen) == True;
+	}
+
+	actions
+	{
+		Clear Status(Event Player, Frozen);
+	}
+}
