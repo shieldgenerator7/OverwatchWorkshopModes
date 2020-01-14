@@ -7,6 +7,7 @@ variables
 		3: REIN_PAYLOAD_GROUND_OFFSET
 		4: REIN_PAYLOAD_MOVESPEED
 		5: REIN_PAYLOAD_CONTEST_RADIUS
+        6: ZEN_PEACE_RADIUS
 
 	player:
 		0: target
@@ -20,6 +21,7 @@ variables
 		8: reinPayloadFlagEffectId
 		9: roadhogEffectId
 		10: roadhogEatRadius
+        11: zenPeaceEffectId
 }
 
 rule("Game Setup")
@@ -35,7 +37,7 @@ rule("Game Setup")
 	}
 }
 
-rule("Game Setup (BAP)")
+rule("Game Setup (BAP, ZEN)")
 {
 	event
 	{
@@ -45,6 +47,7 @@ rule("Game Setup (BAP)")
 	actions
 	{
 		Set Global Variable(BAP_LAVA_GROWTH_SPEED, 1);
+		Set Global Variable(ZEN_PEACE_RADIUS, 10);
     }
 }
 
@@ -244,8 +247,8 @@ rule("Baptiste - Lava Burns Players")
 
 	actions
 	{
-		Damage(Filtered Array(Players Within Radius(Player Variable(Event Player, bapLavaPos), Player Variable(Event Player, bapLavaRadius), All Teams,
-			Surfaces And All Barriers), Compare(Is Alive(Current Array Element), ==,
+		Damage(Filtered Array(Players Within Radius(Player Variable(Event Player, bapLavaPos), Player Variable(Event Player, bapLavaRadius), All Teams, 
+            Off), Compare(Is Alive(Current Array Element), ==,
 			True)), Event Player, 2);
 		Wait(0.1, Ignore Condition);
 		Loop If Condition Is True;
@@ -901,6 +904,105 @@ rule("Widowmaker - Spawns in")
         Small Message(Event Player, Custom String("{0} You can only be headshot, and you only deal damage with headshots.", Hero Icon String(Hero Of(Event Player)), Null, Null));
         Wait(3, Ignore Condition);
         Big Message(Event Player, Custom String("BOOM! HEADSHOT!", Null, Null, Null));
+	}
+}
+
+//
+// Zenyatta
+//
+// Hero Settings:
+// Ultimate - 200% charge rate
+//
+rule("Zenyatta - Spawns in")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Zenyatta;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Zenyatta);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+        Small Message(Event Player, Custom String("{0} Zenyatta is playing Chill+Kill:", Hero Icon String(Hero Of(Event Player)), Null, Null));
+        Small Message(Event Player, Custom String("{0} Emote to create a chill zone.", Hero Icon String(Hero Of(Event Player)), Null, Null));
+        Wait(3, Ignore Condition);
+        Big Message(Event Player, Custom String("we are in harmony", Null, Null, Null));
+	}
+}
+
+rule("Zenyatta - Peace zone reflects damage")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+        Is True For Any(Players Within Radius(Position Of(Event Player), Global Variable(ZEN_PEACE_RADIUS), All Teams, Off), 
+        AND(COMPARE(Is Communicating Any Emote(Current Array ELement),==,True),COMPARE(Hero Of(Current Array ELement),==,Hero(Zenyatta)))) == True
+	}
+
+	actions
+	{
+        Damage(Attacker,Victim,Event Damage);
+        Heal(Victim,Attacker,Event Damage);
+	}
+}
+
+rule("Zenyatta - Emotes to start peace zone")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Zenyatta;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Zenyatta);
+		Is Alive(Event Player) == True;
+        Is Communicating Any Emote(Event Player) == True
+	}
+
+	actions
+	{
+        Destroy Effect(Player Variable(Event Player, zenPeaceEffectId));
+        Create Effect(All Players(All Teams), Ring, Gold, Event Player, Global Variable(ZEN_PEACE_RADIUS),
+			Position and Radius);
+		Set Player Variable(Event Player, zenPeaceEffectId, Last Created Entity);
+	}
+}
+
+rule("Zenyatta - Stop emoting, stop peace zone")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Zenyatta;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Zenyatta);
+        Is Communicating Any Emote(Event Player) == False
+	}
+
+	actions
+	{
+        Destroy Effect(Player Variable(Event Player, zenPeaceEffectId));
 	}
 }
 
