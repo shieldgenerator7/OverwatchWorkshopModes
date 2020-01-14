@@ -613,7 +613,6 @@ rule("Roadhog dies")
 	conditions
 	{
 		Hero Of(Event Player) == Hero(Roadhog);
-		Is Alive(Event Player) == True;
 	}
 
 	actions
@@ -623,6 +622,61 @@ rule("Roadhog dies")
 		Set Player Score(Victim, 0);
 		Set Player Variable(Victim, roadhogEatRadius, 1);
 		Destroy Effect(Player Variable(Victim, roadhogEffectId));
+	}
+}
+
+//
+// Sigma
+//
+// Hero Settings:
+// Damage Dealt: 200%
+// Acretion Cooldown: 75%
+// DM Ability: 75%
+// Ultimate Charge: 125%
+// Health: 500%
+// Healing Received: 10%
+//
+rule("Sigma - Spawns in")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Sigma;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Sigma);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+        Small Message(Event Player, Custom String("{0} Sigma is playing Boss Battle:", Hero Icon String(Hero Of(Event Player)), Null, Null));
+        Small Message(Event Player, Custom String("{0} You are hard to kill, but you fall hard when you do.", Hero Icon String(Hero Of(Event Player)), Null, Null));
+        Wait(3, Ignore Condition);
+        Big Message(Event Player, Custom String("THE UNIVERSE SINGS TO ME!", Null, Null, Null));
+	}
+}
+
+rule("Sigma dies -> lose 5 points")
+{
+	event
+	{
+		Player Died;
+		All;
+		Sigma;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Sigma);
+	}
+
+	actions
+	{
+		Modify Player Score(Event Player, -5);
 	}
 }
 
