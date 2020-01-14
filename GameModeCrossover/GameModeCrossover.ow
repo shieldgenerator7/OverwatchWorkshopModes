@@ -74,7 +74,7 @@ rule("Game Setup (BAP, ZEN)")
 
 	actions
 	{
-		Set Global Variable(BAP_LAVA_GROWTH_SPEED, 1);
+		Set Global Variable(BAP_LAVA_GROWTH_SPEED, 0.100);
 		Set Global Variable(ZEN_PEACE_RADIUS, 10);
 	}
 }
@@ -206,7 +206,7 @@ rule("Baptiste - Spawns in")
 			Event Player)), Null, Null));
 		Wait(3, Ignore Condition);
 		Big Message(Event Player, Custom String("RUN FOR THE HILLS!", Null, Null, Null));
-		Set Player Variable(Event Player, bapLavaPos, Add(Position Of(Event Player), Multiply(Up, -110.000)));
+		Set Player Variable(Event Player, bapLavaPos, Add(Position Of(Event Player), Multiply(Up, -101.000)));
 		Set Player Variable(Event Player, bapLavaRadius, 100);
 		Destroy Effect(Player Variable(Event Player, bapLavaEffectId));
 		Create Effect(All Players(All Teams), Sphere, Red, Player Variable(Event Player, bapLavaPos), Player Variable(Event Player,
@@ -258,7 +258,7 @@ rule("Baptiste - Lava Burns Players")
 	actions
 	{
 		Damage(Filtered Array(Players Within Radius(Player Variable(Event Player, bapLavaPos), Player Variable(Event Player,
-			bapLavaRadius), All Teams, Off), Compare(Is Alive(Current Array Element), ==, True)), Event Player, 2);
+			bapLavaRadius), All Teams, Off), Compare(Is Alive(Current Array Element), ==, True)), Event Player, 20);
 		Wait(0.100, Ignore Condition);
 		Loop If Condition Is True;
 	}
@@ -287,6 +287,28 @@ rule("Genji - Spawns in")
 			Event Player)), Null, Null));
 		Wait(3, Ignore Condition);
 		Big Message(Event Player, Custom String("YOU LOOK *DASHING* TODAY!", Null, Null, Null));
+	}
+}
+
+rule("Genji - deals double damage (actually just an extra 100)")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		Genji;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Genji);
+		Is Alive(Event Player) == True;
+		Event Damage > 100;
+	}
+
+	actions
+	{
+		Damage(Victim, Attacker, 20);
 	}
 }
 
