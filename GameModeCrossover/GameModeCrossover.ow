@@ -1001,27 +1001,6 @@ rule("Zenyatta - Emotes to start peace zone")
 	}
 }
 
-rule("Zenyatta - Stop emoting, stop peace zone")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		Zenyatta;
-	}
-
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Zenyatta);
-		Is Communicating Any Emote(Event Player) == False;
-	}
-
-	actions
-	{
-		Destroy Effect(Player Variable(Event Player, zenPeaceEffectId));
-	}
-}
-
 rule("Mei - Spawns in")
 {
 	event
@@ -1049,6 +1028,27 @@ rule("Mei - Spawns in")
 			Has Status(Current Array Element, Frozen), ==, True))), Null, Null), Null, Null, Left, 0, White, White, White, String,
 			Default Visibility);
 		Set Player Variable(Event Player, meiHUDTextId, Last Text ID);
+	}
+}
+
+rule("Zenyatta - Stop emoting, stop peace zone")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Zenyatta;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Zenyatta);
+		Is Communicating Any Emote(Event Player) == False;
+	}
+
+	actions
+	{
+		Destroy Effect(Player Variable(Event Player, zenPeaceEffectId));
 	}
 }
 
@@ -1155,5 +1155,88 @@ rule("Mei dies")
 	actions
 	{
 		Destroy HUD Text(Player Variable(Event Player, meiHUDTextId));
+	}
+}
+
+rule("Soldier - Spawns in")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Soldier: 76);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Small Message(Event Player, Custom String("{0} Soldier is playing Infection:", Hero Icon String(Hero Of(Event Player)), Null,
+			Null));
+		Small Message(Event Player, Custom String("{0} Enemies you kill become Soldier, and you become what kills you.", Hero Icon String(
+			Hero Of(Event Player)), Null, Null));
+		Wait(3, Ignore Condition);
+		Big Message(Event Player, Custom String("WE'RE ALL SOLDIERS NOW!", Null, Null, Null));
+	}
+}
+
+rule("Soldier - Earns kill - force victim to soldier")
+{
+	event
+	{
+		Player Dealt Final Blow;
+		All;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Soldier: 76);
+	}
+
+	actions
+	{
+		Wait(0.250, Ignore Condition);
+		Start Forcing Player To Be Hero(Victim, Hero(Soldier: 76));
+	}
+}
+
+rule("Soldier died - swap to killer's hero")
+{
+	event
+	{
+		Player Died;
+		All;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Soldier: 76);
+	}
+
+	actions
+	{
+		Wait(0.250, Ignore Condition);
+		Start Forcing Player To Be Hero(Victim, Hero Of(Attacker));
+	}
+}
+
+rule("Soldier - Player died - Stop forcing hero")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Stop Forcing Player To Be Hero(Event Player);
 	}
 }
