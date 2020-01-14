@@ -1001,6 +1001,27 @@ rule("Zenyatta - Emotes to start peace zone")
 	}
 }
 
+rule("Zenyatta - Stop emoting, stop peace zone")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Zenyatta;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Zenyatta);
+		Is Communicating Any Emote(Event Player) == False;
+	}
+
+	actions
+	{
+		Destroy Effect(Player Variable(Event Player, zenPeaceEffectId));
+	}
+}
+
 rule("Mei - Spawns in")
 {
 	event
@@ -1028,27 +1049,6 @@ rule("Mei - Spawns in")
 			Has Status(Current Array Element, Frozen), ==, True))), Null, Null), Null, Null, Left, 0, White, White, White, String,
 			Default Visibility);
 		Set Player Variable(Event Player, meiHUDTextId, Last Text ID);
-	}
-}
-
-rule("Zenyatta - Stop emoting, stop peace zone")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		Zenyatta;
-	}
-
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Zenyatta);
-		Is Communicating Any Emote(Event Player) == False;
-	}
-
-	actions
-	{
-		Destroy Effect(Player Variable(Event Player, zenPeaceEffectId));
 	}
 }
 
