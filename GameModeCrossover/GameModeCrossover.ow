@@ -23,6 +23,7 @@ variables
 		10: roadhogEatRadius
 		11: zenPeaceEffectId
 		12: meiHUDTextId
+		13: reaperPowerLevel
 }
 
 rule("Game Setup")
@@ -1235,6 +1236,11 @@ rule("Soldier - Player died - Stop forcing hero")
 		All;
 	}
 
+	conditions
+	{
+		Hero Of(Event Player) != Hero(Reaper);
+	}
+
 	actions
 	{
 		Stop Forcing Player To Be Hero(Event Player);
@@ -1286,5 +1292,102 @@ rule("==BOTS==REINHARDT==")
 	{
 		Start Throttle In Direction(Event Player, Subtract(Player Variable(Event Player, reinPayloadPos), Position Of(Event Player)), 2,
 			To World, Replace existing throttle, Direction and Magnitude);
+	}
+}
+
+rule("Reaper - Spawns in")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reaper;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reaper);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Small Message(Event Player, Custom String("{0} Reaper is playing Zombies:", Hero Icon String(Hero Of(Event Player)), Null, Null));
+		Small Message(Event Player, Custom String("{0} You get more powerful each time you get killed.", Hero Icon String(Hero Of(
+			Event Player)), Null, Null));
+		Wait(3, Ignore Condition);
+		Big Message(Event Player, Custom String("BRAINS!", Null, Null, Null));
+		Start Forcing Player To Be Hero(Event Player, Hero(Reaper));
+		Skip If(Compare(Player Variable(Event Player, reaperPowerLevel), >, 0), 1);
+		Set Player Variable(Event Player, reaperPowerLevel, 1);
+		Set Max Health(Event Player, Multiply(Player Variable(Event Player, reaperPowerLevel), 15));
+		Set Damage Dealt(Event Player, Multiply(Player Variable(Event Player, reaperPowerLevel), 15));
+	}
+}
+
+rule("Reaper dies")
+{
+	event
+	{
+		Player Died;
+		All;
+		Reaper;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reaper);
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, reaperPowerLevel, Add, 2);
+		Set Max Health(Event Player, 100);
+		Set Damage Dealt(Event Player, 100);
+	}
+}
+
+rule("Reaper got a kill - stop forcing hero, make new zombie")
+{
+	event
+	{
+		Player Dealt Final Blow;
+		All;
+		Reaper;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reaper);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Stop Forcing Player To Be Hero(Event Player);
+		Skip If(Compare(Hero Of(Victim), ==, Hero(Reaper)), 1);
+		Start Forcing Player To Be Hero(Victim, Hero(Reaper));
+	}
+}
+
+rule("Reaper heals reaper")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		Reaper;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reaper);
+		Is Alive(Event Player) == True;
+		Hero Of(Victim) == Hero(Reaper);
+	}
+
+	actions
+	{
+		Heal(Victim, Attacker, Multiply(Event Damage, 2));
 	}
 }
