@@ -1,0 +1,84 @@
+//
+//
+// =============
+//
+// Hero Settings
+//
+// =============
+//
+//
+
+
+
+
+//
+// Baptiste
+//
+// Hero Settings:
+// Damage Dealt: 10%
+// Heal burst Cooldown: 50%
+// Ultimate: Disabled
+// Melee Knockback: 500%
+//
+
+
+//
+// Genji
+//
+// Hero Settings:
+// Primary Fire - Disabled
+// Secondary Fire - Disabled
+// Deflect - Disabled
+// Dash Cooldown - 500%
+// Ultimate - Disabled
+// Damage Dealt - 500%
+//
+
+
+//
+// Mercy
+//
+// Hero Settings:
+// Primary Fire - Disabled
+// Secondary Fire - Disabled
+// Guardian Angel - Disabled
+// Rez Cooldown - 25%
+// Ultimate Charge - 200%
+// Health - 10%
+// Healing Dealt - 500%
+// Damage Dealt - 500%
+//
+
+
+//
+// Sigma
+//
+// Hero Settings:
+// Damage Dealt: 200%
+// Acretion Cooldown: 75%
+// DM Ability: 75%
+// Ultimate Charge: 125%
+// Health: 500%
+// Healing Received: 10%
+//
+
+
+//
+// Widowmaker
+//
+// Hero Settings:
+// Unscoped fire - Disabled
+// Venom Mine - Disabled
+// Grappling Hook Cooldown - 10%
+// Ultimate - 200% charge rate
+// Melee - Disabled
+// Receive Headshots Only - Enabled
+//
+
+
+//
+// Zenyatta
+//
+// Hero Settings:
+// Ultimate - 200% charge rate
+//

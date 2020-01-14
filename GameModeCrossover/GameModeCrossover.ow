@@ -183,15 +183,6 @@ rule("Ana - Sees enemy")
 	}
 }
 
-//
-// Baptiste
-//
-// Hero Settings:
-// Damage Dealt: 10%
-// Heal burst Cooldown: 50%
-// Ultimate: Disabled
-// Melee Knockback: 500%
-//
 rule("Baptiste - Spawns in")
 {
 	event
@@ -273,17 +264,6 @@ rule("Baptiste - Lava Burns Players")
 	}
 }
 
-//
-// Genji
-//
-// Hero Settings:
-// Primary Fire - Disabled
-// Secondary Fire - Disabled
-// Deflect - Disabled
-// Dash Cooldown - 500%
-// Ultimate - Disabled
-// Damage Dealt - 500%
-//
 rule("Genji - Spawns in")
 {
 	event
@@ -310,19 +290,6 @@ rule("Genji - Spawns in")
 	}
 }
 
-//
-// Mercy
-//
-// Hero Settings:
-// Primary Fire - Disabled
-// Secondary Fire - Disabled
-// Guardian Angel - Disabled
-// Rez Cooldown - 25%
-// Ultimate Charge - 200%
-// Health - 10%
-// Healing Dealt - 500%
-// Damage Dealt - 500%
-//
 rule("Mercy - Spawns in")
 {
 	event
@@ -843,17 +810,6 @@ rule("Roadhog dies")
 	}
 }
 
-//
-// Sigma
-//
-// Hero Settings:
-// Damage Dealt: 200%
-// Acretion Cooldown: 75%
-// DM Ability: 75%
-// Ultimate Charge: 125%
-// Health: 500%
-// Healing Received: 10%
-//
 rule("Sigma - Spawns in")
 {
 	event
@@ -900,17 +856,6 @@ rule("Sigma dies -> lose 5 points")
 	}
 }
 
-//
-// Widowmaker
-//
-// Hero Settings:
-// Unscoped fire - Disabled
-// Venom Mine - Disabled
-// Grappling Hook Cooldown - 10%
-// Ultimate - 200% charge rate
-// Melee - Disabled
-// Receive Headshots Only - Enabled
-//
 rule("Widowmaker - Spawns in")
 {
 	event
@@ -959,12 +904,6 @@ rule("Widow - Hit non-headshot = heal enemy")
 	}
 }
 
-//
-// Zenyatta
-//
-// Hero Settings:
-// Ultimate - 200% charge rate
-//
 rule("Zenyatta - Spawns in")
 {
 	event
