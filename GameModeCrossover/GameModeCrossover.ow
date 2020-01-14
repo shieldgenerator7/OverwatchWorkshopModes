@@ -626,6 +626,41 @@ rule("Roadhog dies")
 	}
 }
 
+//
+// Widowmaker
+//
+// Hero Settings:
+// Unscoped fire - Disabled
+// Venom Mine - Disabled
+// Grappling Hook Cooldown - 10%
+// Ultimate - 200% charge rate
+// Melee - Disabled
+// Receive Headshots Only - Enabled
+//
+rule("Widowmaker - Spawns in")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Widowmaker;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Widowmaker);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+        Small Message(Event Player, Custom String("{0} Widowmaker is playing Widow HeadShot Only:", Hero Icon String(Hero Of(Event Player)), Null, Null));
+        Small Message(Event Player, Custom String("{0} You can only be headshot, and you only deal damage with headshots.", Hero Icon String(Hero Of(Event Player)), Null, Null));
+        Wait(3, Ignore Condition);
+        Big Message(Event Player, Custom String("BOOM! HEADSHOT!", Null, Null, Null));
+	}
+}
+
 rule("Player gets point when kill other player")
 {
 	event
