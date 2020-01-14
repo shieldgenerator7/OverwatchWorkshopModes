@@ -1240,3 +1240,51 @@ rule("Soldier - Player died - Stop forcing hero")
 		Stop Forcing Player To Be Hero(Event Player);
 	}
 }
+
+rule("==TEST==BOTS==PRIMARY FIRE")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Start Facing(Event Player, Subtract(Position Of(Player Closest To Reticle(Event Player, All Teams)), Position Of(Event Player)),
+			100, To World, Direction and Turn Rate);
+		Press Button(Event Player, Primary Fire);
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("==BOTS==REINHARDT==")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Start Throttle In Direction(Event Player, Subtract(Player Variable(Event Player, reinPayloadPos), Position Of(Event Player)), 2,
+			To World, Replace existing throttle, Direction and Magnitude);
+	}
+}
