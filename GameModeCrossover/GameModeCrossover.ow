@@ -24,6 +24,7 @@ variables
 		11: zenPeaceEffectId
 		12: meiHUDTextId
 		13: reaperPowerLevel
+		14: winstonMeatEffectId
 }
 
 rule("Game Setup")
@@ -1477,5 +1478,126 @@ rule("Sombra - watches player die")
 		Modify Player Score(Filtered Array(Players On Hero(Hero(Sombra), All Teams), And(Compare(Is In View Angle(Current Array Element,
 			Eye Position(Event Player), 70), ==, True), Compare(Is In Line of Sight(Eye Position(Current Array Element), Eye Position(
 			Event Player), Barriers Do Not Block LOS), ==, True))), 1);
+	}
+}
+
+rule("Winston - Spawns in")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Winston;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Winston);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Small Message(Event Player, Custom String("{0} Winston is playing Yeti Hunt:", Hero Icon String(Hero Of(Event Player)), Null,
+			Null));
+		Small Message(Event Player, Custom String("{0} Eat meat to deal tons of damage with your ult.", Hero Icon String(Hero Of(
+			Event Player)), Null, Null));
+		Wait(3, Ignore Condition);
+		Big Message(Event Player, Custom String("GO PRIMAL!", Null, Null, Null));
+	}
+}
+
+rule("Winston - player dies and becomes meat")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Hero Being Played(Hero(Winston), All Teams) == True;
+	}
+
+	actions
+	{
+		Destroy Effect(Player Variable(Event Player, winstonMeatEffectId));
+		Create Effect(All Players(All Teams), Sphere, Red, Add(Position Of(Event Player), Up), 1, Position and Radius);
+		Set Player Variable(Event Player, winstonMeatEffectId, Last Created Entity);
+	}
+}
+
+rule("Winston - collects meat")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == False;
+		Player Variable(Event Player, winstonMeatEffectId) != Null;
+		Is Hero Being Played(Hero(Winston), All Teams) == True;
+		Is True For Any(Players On Hero(Hero(Winston), All Teams), Compare(Distance Between(Position Of(Current Array Element),
+			Position Of(Event Player)), <=, 3)) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, target, First Of(Filtered Array(Players On Hero(Hero(Winston), All Teams), Compare(
+			Distance Between(Position Of(Current Array Element), Position Of(Event Player)), <=, 3))));
+		Set Ultimate Charge(Player Variable(Event Player, target), Add(Ultimate Charge Percent(Player Variable(Event Player, target)),
+			25));
+		Destroy Effect(Player Variable(Event Player, winstonMeatEffectId));
+		Set Player Variable(Event Player, winstonMeatEffectId, Null);
+	}
+}
+
+rule("Winston Ults")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Winston;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Winston);
+		Is Alive(Event Player) == True;
+		Is Using Ultimate(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Damage Dealt(Event Player, 500);
+	}
+}
+
+rule("Winston Ults Ends")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Winston;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Winston);
+		Is Alive(Event Player) == True;
+		Is Using Ultimate(Event Player) == False;
+	}
+
+	actions
+	{
+		Set Damage Dealt(Event Player, 10);
 	}
 }
