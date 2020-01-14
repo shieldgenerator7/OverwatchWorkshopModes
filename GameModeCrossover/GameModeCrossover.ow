@@ -146,6 +146,41 @@ rule("Ana - Sees enemy")
 	}
 }
 
+//
+// Genji
+//
+// Hero Settings:
+// Primary Fire - Disabled
+// Secondary Fire - Disabled
+// Deflect - Disabled
+// Dash Cooldown - 500%
+// Ultimate - Disabled
+// Damage Dealt - 500%
+//
+rule("Genji - Spawns in")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Genji;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Genji);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+        Small Message(Event Player, Custom String("{0} Genji is playing One in the Chamber:", Hero Icon String(Hero Of(Event Player)), Null, Null));
+        Small Message(Event Player, Custom String("{0} Your dash can instakill, but you only get one.", Hero Icon String(Hero Of(Event Player)), Null, Null));
+        Wait(3, Ignore Condition);
+        Big Message(Event Player, Custom String("YOU LOOK *DASHING* TODAY!", Null, Null, Null));
+	}
+}
+
 rule("Moira - Spawns in")
 {
 	event
