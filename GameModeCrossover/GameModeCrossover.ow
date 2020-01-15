@@ -55,6 +55,25 @@ rule("Player gets point when kill other player")
 	}
 }
 
+rule("Player loses point when kills themselves")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+    conditions{
+        Or(Compare(Attacker, ==, Victim),Compare(Attacker, ==, Null)) == True;
+    }
+
+	actions
+	{
+		Modify Player Score(Event Player, -1);
+	}
+}
+
 rule("Instant Start")
 {
 	event
