@@ -477,6 +477,103 @@ rule("Moira - Ultimate: Teleport all players to her")
 	}
 }
 
+rule("Reaper - Spawns in")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reaper;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reaper);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Small Message(Event Player, Custom String("{0} Reaper is playing Zombies:", Hero Icon String(Hero Of(Event Player)), Null, Null));
+		Small Message(Event Player, Custom String("{0} You get more powerful each time you get killed.", Hero Icon String(Hero Of(
+			Event Player)), Null, Null));
+		Wait(3, Ignore Condition);
+		Big Message(Event Player, Custom String("BRAINS!", Null, Null, Null));
+		Start Forcing Player To Be Hero(Event Player, Hero(Reaper));
+		Skip If(Compare(Player Variable(Event Player, reaperPowerLevel), >, 0), 1);
+		Set Player Variable(Event Player, reaperPowerLevel, 1);
+		Set Max Health(Event Player, Multiply(Player Variable(Event Player, reaperPowerLevel), 15));
+		Set Damage Dealt(Event Player, Multiply(Player Variable(Event Player, reaperPowerLevel), 15));
+	}
+}
+
+rule("Reaper dies")
+{
+	event
+	{
+		Player Died;
+		All;
+		Reaper;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reaper);
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, reaperPowerLevel, Add, 2);
+		Set Max Health(Event Player, 100);
+		Set Damage Dealt(Event Player, 100);
+	}
+}
+
+rule("Reaper got a kill - stop forcing hero, make new zombie")
+{
+	event
+	{
+		Player Dealt Final Blow;
+		All;
+		Reaper;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reaper);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Stop Forcing Player To Be Hero(Event Player);
+		Skip If(Compare(Hero Of(Victim), ==, Hero(Reaper)), 1);
+		Start Forcing Player To Be Hero(Victim, Hero(Reaper));
+	}
+}
+
+rule("Reaper heals reaper")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		Reaper;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reaper);
+		Is Alive(Event Player) == True;
+		Hero Of(Victim) == Hero(Reaper);
+	}
+
+	actions
+	{
+		Heal(Victim, Attacker, Multiply(Event Damage, 2));
+	}
+}
+
 rule("Rein - Spawn in")
 {
 	event
@@ -897,6 +994,53 @@ rule("Sigma dies -> lose 5 points")
 	actions
 	{
 		Modify Player Score(Event Player, -5.000);
+	}
+}
+
+rule("Sombra - Spawns in")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Sombra;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Sombra);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Small Message(Event Player, Custom String("{0} Sombra is playing Spy:", Hero Icon String(Hero Of(Event Player)), Null, Null));
+		Small Message(Event Player, Custom String("{0} You get points for watching players die.", Hero Icon String(Hero Of(Event Player)),
+			Null, Null));
+		Wait(3, Ignore Condition);
+		Big Message(Event Player, Custom String("HACK THE PLANET!", Null, Null, Null));
+	}
+}
+
+rule("Sombra - watches player die")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Hero Being Played(Hero(Sombra), All Teams) == True;
+	}
+
+	actions
+	{
+		Modify Player Score(Filtered Array(Players On Hero(Hero(Sombra), All Teams), And(Compare(Is In View Angle(Current Array Element,
+			Eye Position(Event Player), 70), ==, True), Compare(Is In Line of Sight(Eye Position(Current Array Element), Eye Position(
+			Event Player), Barriers Do Not Block LOS), ==, True))), 1);
 	}
 }
 
@@ -1477,147 +1621,7 @@ rule("==BOTS==REINHARDT==")
 	}
 }
 
-rule("Reaper - Spawns in")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		Reaper;
-	}
 
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Reaper);
-		Is Alive(Event Player) == True;
-	}
 
-	actions
-	{
-		Small Message(Event Player, Custom String("{0} Reaper is playing Zombies:", Hero Icon String(Hero Of(Event Player)), Null, Null));
-		Small Message(Event Player, Custom String("{0} You get more powerful each time you get killed.", Hero Icon String(Hero Of(
-			Event Player)), Null, Null));
-		Wait(3, Ignore Condition);
-		Big Message(Event Player, Custom String("BRAINS!", Null, Null, Null));
-		Start Forcing Player To Be Hero(Event Player, Hero(Reaper));
-		Skip If(Compare(Player Variable(Event Player, reaperPowerLevel), >, 0), 1);
-		Set Player Variable(Event Player, reaperPowerLevel, 1);
-		Set Max Health(Event Player, Multiply(Player Variable(Event Player, reaperPowerLevel), 15));
-		Set Damage Dealt(Event Player, Multiply(Player Variable(Event Player, reaperPowerLevel), 15));
-	}
-}
 
-rule("Reaper dies")
-{
-	event
-	{
-		Player Died;
-		All;
-		Reaper;
-	}
-
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Reaper);
-	}
-
-	actions
-	{
-		Modify Player Variable(Event Player, reaperPowerLevel, Add, 2);
-		Set Max Health(Event Player, 100);
-		Set Damage Dealt(Event Player, 100);
-	}
-}
-
-rule("Reaper got a kill - stop forcing hero, make new zombie")
-{
-	event
-	{
-		Player Dealt Final Blow;
-		All;
-		Reaper;
-	}
-
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Reaper);
-		Is Alive(Event Player) == True;
-	}
-
-	actions
-	{
-		Stop Forcing Player To Be Hero(Event Player);
-		Skip If(Compare(Hero Of(Victim), ==, Hero(Reaper)), 1);
-		Start Forcing Player To Be Hero(Victim, Hero(Reaper));
-	}
-}
-
-rule("Reaper heals reaper")
-{
-	event
-	{
-		Player Dealt Damage;
-		All;
-		Reaper;
-	}
-
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Reaper);
-		Is Alive(Event Player) == True;
-		Hero Of(Victim) == Hero(Reaper);
-	}
-
-	actions
-	{
-		Heal(Victim, Attacker, Multiply(Event Damage, 2));
-	}
-}
-
-rule("Sombra - Spawns in")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		Sombra;
-	}
-
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Sombra);
-		Is Alive(Event Player) == True;
-	}
-
-	actions
-	{
-		Small Message(Event Player, Custom String("{0} Sombra is playing Spy:", Hero Icon String(Hero Of(Event Player)), Null, Null));
-		Small Message(Event Player, Custom String("{0} You get points for watching players die.", Hero Icon String(Hero Of(Event Player)),
-			Null, Null));
-		Wait(3, Ignore Condition);
-		Big Message(Event Player, Custom String("HACK THE PLANET!", Null, Null, Null));
-	}
-}
-
-rule("Sombra - watches player die")
-{
-	event
-	{
-		Player Died;
-		All;
-		All;
-	}
-
-	conditions
-	{
-		Is Hero Being Played(Hero(Sombra), All Teams) == True;
-	}
-
-	actions
-	{
-		Modify Player Score(Filtered Array(Players On Hero(Hero(Sombra), All Teams), And(Compare(Is In View Angle(Current Array Element,
-			Eye Position(Event Player), 70), ==, True), Compare(Is In Line of Sight(Eye Position(Current Array Element), Eye Position(
-			Event Player), Barriers Do Not Block LOS), ==, True))), 1);
-	}
-}
 
