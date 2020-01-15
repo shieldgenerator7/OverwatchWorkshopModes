@@ -334,6 +334,142 @@ rule("Genji - deals double damage (actually just an extra 100)")
 	}
 }
 
+rule("Mei - Spawns in")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mei;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Mei);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Small Message(Event Player, Custom String("{0} Mei is playing Freeze Tag:", Hero Icon String(Hero Of(Event Player)), Null, Null));
+		Small Message(Event Player, Custom String("{0} Punch to freeze enemies, freeze 5 enemies to kill.", Hero Icon String(Hero Of(
+			Event Player)), Null, Null));
+		Wait(3, Ignore Condition);
+		Big Message(Event Player, Custom String("FREEZE!", Null, Null, Null));
+		Destroy HUD Text(Player Variable(Event Player, meiHUDTextId));
+		Create HUD Text(Event Player, Custom String("FROZEN: {0} / 5", Count Of(Filtered Array(All Living Players(All Teams), Compare(
+			Has Status(Current Array Element, Frozen), ==, True))), Null, Null), Null, Null, Left, 0, White, White, White, String,
+			Default Visibility);
+		Set Player Variable(Event Player, meiHUDTextId, Last Text ID);
+	}
+}
+
+rule("Mei - deals damage to freeze")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		Mei;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Mei);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Status(Victim, Attacker, Frozen, 9999);
+	}
+}
+
+rule("Mei - Frozen enemies unfreeze when damaged")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Attacker) != Hero(Mei);
+		Is Alive(Event Player) == True;
+		Has Status(Event Player, Frozen) == True;
+	}
+
+	actions
+	{
+		Clear Status(Event Player, Frozen);
+	}
+}
+
+rule("Mei - deals massive damage when get 5 frozen enemies")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		Mei;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Mei);
+		Is Alive(Event Player) == True;
+		Count Of(Filtered Array(All Living Players(All Teams), Compare(Has Status(Current Array Element, Frozen), ==, True))) >= 4;
+	}
+
+	actions
+	{
+		Wait(0.250, Ignore Condition);
+		Set Player Variable(Event Player, target, Filtered Array(All Living Players(All Teams), Compare(Has Status(Current Array Element,
+			Frozen), ==, True)));
+		Damage(Player Variable(Event Player, target), Event Player, 10000);
+		Wait(1, Ignore Condition);
+		Clear Status(Player Variable(Event Player, target), Frozen);
+		Set Player Variable(Event Player, target, Null);
+	}
+}
+
+rule("Mei - Frozen enemy unfreezes when dead")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Clear Status(Event Player, Frozen);
+	}
+}
+
+rule("Mei dies")
+{
+	event
+	{
+		Player Died;
+		All;
+		Mei;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Mei);
+	}
+
+	actions
+	{
+		Destroy HUD Text(Player Variable(Event Player, meiHUDTextId));
+	}
+}
+
 rule("Mercy - Spawns in")
 {
 	event
@@ -1308,141 +1444,7 @@ rule("Zenyatta - Stop emoting, stop peace zone")
 	}
 }
 
-rule("Mei - Spawns in")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		Mei;
-	}
 
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Mei);
-		Is Alive(Event Player) == True;
-	}
-
-	actions
-	{
-		Small Message(Event Player, Custom String("{0} Mei is playing Freeze Tag:", Hero Icon String(Hero Of(Event Player)), Null, Null));
-		Small Message(Event Player, Custom String("{0} Punch to freeze enemies, freeze 5 enemies to kill.", Hero Icon String(Hero Of(
-			Event Player)), Null, Null));
-		Wait(3, Ignore Condition);
-		Big Message(Event Player, Custom String("FREEZE!", Null, Null, Null));
-		Destroy HUD Text(Player Variable(Event Player, meiHUDTextId));
-		Create HUD Text(Event Player, Custom String("FROZEN: {0} / 5", Count Of(Filtered Array(All Living Players(All Teams), Compare(
-			Has Status(Current Array Element, Frozen), ==, True))), Null, Null), Null, Null, Left, 0, White, White, White, String,
-			Default Visibility);
-		Set Player Variable(Event Player, meiHUDTextId, Last Text ID);
-	}
-}
-
-rule("Mei - deals damage to freeze")
-{
-	event
-	{
-		Player Dealt Damage;
-		All;
-		Mei;
-	}
-
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Mei);
-		Is Alive(Event Player) == True;
-	}
-
-	actions
-	{
-		Set Status(Victim, Attacker, Frozen, 9999);
-	}
-}
-
-rule("Mei - Frozen enemies unfreeze when damaged")
-{
-	event
-	{
-		Player Took Damage;
-		All;
-		All;
-	}
-
-	conditions
-	{
-		Hero Of(Attacker) != Hero(Mei);
-		Is Alive(Event Player) == True;
-		Has Status(Event Player, Frozen) == True;
-	}
-
-	actions
-	{
-		Clear Status(Event Player, Frozen);
-	}
-}
-
-rule("Mei - deals massive damage when get 5 frozen enemies")
-{
-	event
-	{
-		Player Dealt Damage;
-		All;
-		Mei;
-	}
-
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Mei);
-		Is Alive(Event Player) == True;
-		Count Of(Filtered Array(All Living Players(All Teams), Compare(Has Status(Current Array Element, Frozen), ==, True))) >= 4;
-	}
-
-	actions
-	{
-		Wait(0.250, Ignore Condition);
-		Set Player Variable(Event Player, target, Filtered Array(All Living Players(All Teams), Compare(Has Status(Current Array Element,
-			Frozen), ==, True)));
-		Damage(Player Variable(Event Player, target), Event Player, 10000);
-		Wait(1, Ignore Condition);
-		Clear Status(Player Variable(Event Player, target), Frozen);
-		Set Player Variable(Event Player, target, Null);
-	}
-}
-
-rule("Mei - Frozen enemy unfreezes when dead")
-{
-	event
-	{
-		Player Died;
-		All;
-		All;
-	}
-
-	actions
-	{
-		Clear Status(Event Player, Frozen);
-	}
-}
-
-rule("Mei dies")
-{
-	event
-	{
-		Player Died;
-		All;
-		Mei;
-	}
-
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Mei);
-	}
-
-	actions
-	{
-		Destroy HUD Text(Player Variable(Event Player, meiHUDTextId));
-	}
-}
 
 rule("Soldier - Spawns in")
 {
