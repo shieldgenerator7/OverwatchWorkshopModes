@@ -1133,6 +1133,94 @@ rule("Sigma dies -> lose 5 points")
 	}
 }
 
+rule("Soldier - Spawns in")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Soldier: 76);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Small Message(Event Player, Custom String("{0} Soldier is playing Infection:", Hero Icon String(Hero Of(Event Player)), Null,
+			Null));
+		Small Message(Event Player, Custom String("{0} Enemies you kill become Soldier, and you become what kills you.", Hero Icon String(
+			Hero Of(Event Player)), Null, Null));
+		Wait(3, Ignore Condition);
+		Big Message(Event Player, Custom String("WE'RE ALL SOLDIERS NOW!", Null, Null, Null));
+	}
+}
+
+rule("Soldier - Earns kill - force victim to soldier")
+{
+	event
+	{
+		Player Dealt Final Blow;
+		All;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Soldier: 76);
+	}
+
+	actions
+	{
+		Wait(0.250, Ignore Condition);
+		Start Forcing Player To Be Hero(Victim, Hero(Soldier: 76));
+	}
+}
+
+rule("Soldier died - swap to killer's hero")
+{
+	event
+	{
+		Player Died;
+		All;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Soldier: 76);
+	}
+
+	actions
+	{
+		Wait(0.250, Ignore Condition);
+		Start Forcing Player To Be Hero(Victim, Hero Of(Attacker));
+	}
+}
+
+rule("Soldier - Player died - Stop forcing hero")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != Hero(Reaper);
+	}
+
+	actions
+	{
+		Stop Forcing Player To Be Hero(Event Player);
+	}
+}
+
 rule("Sombra - Spawns in")
 {
 	event
@@ -1441,96 +1529,6 @@ rule("Zenyatta - Stop emoting, stop peace zone")
 	actions
 	{
 		Destroy Effect(Player Variable(Event Player, zenPeaceEffectId));
-	}
-}
-
-
-
-rule("Soldier - Spawns in")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		Soldier: 76;
-	}
-
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Soldier: 76);
-		Is Alive(Event Player) == True;
-	}
-
-	actions
-	{
-		Small Message(Event Player, Custom String("{0} Soldier is playing Infection:", Hero Icon String(Hero Of(Event Player)), Null,
-			Null));
-		Small Message(Event Player, Custom String("{0} Enemies you kill become Soldier, and you become what kills you.", Hero Icon String(
-			Hero Of(Event Player)), Null, Null));
-		Wait(3, Ignore Condition);
-		Big Message(Event Player, Custom String("WE'RE ALL SOLDIERS NOW!", Null, Null, Null));
-	}
-}
-
-rule("Soldier - Earns kill - force victim to soldier")
-{
-	event
-	{
-		Player Dealt Final Blow;
-		All;
-		Soldier: 76;
-	}
-
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Soldier: 76);
-	}
-
-	actions
-	{
-		Wait(0.250, Ignore Condition);
-		Start Forcing Player To Be Hero(Victim, Hero(Soldier: 76));
-	}
-}
-
-rule("Soldier died - swap to killer's hero")
-{
-	event
-	{
-		Player Died;
-		All;
-		Soldier: 76;
-	}
-
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Soldier: 76);
-	}
-
-	actions
-	{
-		Wait(0.250, Ignore Condition);
-		Start Forcing Player To Be Hero(Victim, Hero Of(Attacker));
-	}
-}
-
-rule("Soldier - Player died - Stop forcing hero")
-{
-	event
-	{
-		Player Died;
-		All;
-		All;
-	}
-
-	conditions
-	{
-		Hero Of(Event Player) != Hero(Reaper);
-	}
-
-	actions
-	{
-		Stop Forcing Player To Be Hero(Event Player);
 	}
 }
 
