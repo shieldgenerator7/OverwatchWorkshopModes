@@ -1169,6 +1169,7 @@ rule("Roadhog - Deals damage (eats players points)")
 	{
 		Hero Of(Event Player) == Hero(Roadhog);
 		Is Alive(Event Player) == True;
+        Event Damage <= 50;
 	}
 
 	actions
@@ -1208,8 +1209,8 @@ rule("Roadhog - Eats players in range")
 	{
 		Damage(Filtered Array(Players Within Radius(Position Of(Event Player), Player Variable(Event Player, roadhogEatRadius), All Teams,
 			Surfaces And All Barriers), And(Compare(Current Array Element, !=, Event Player), Compare(Is Alive(Current Array Element), ==,
-			True))), Event Player, 1);
-		Wait(0.250, Ignore Condition);
+			True))), Event Player, 100);
+		Wait(0.1, Ignore Condition);
 		Loop If Condition Is True;
 	}
 }
