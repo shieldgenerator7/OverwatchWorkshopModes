@@ -2,6 +2,7 @@ variables
 {
 	global:
 		0: BAP_LAVA_GROWTH_SPEED
+        1: BRIG_RING_RADIUS
 		1: REIN_PAYLOAD_POINTS
 		2: REIN_PAYLOAD_RADIUS
 		3: REIN_PAYLOAD_GROUND_OFFSET
@@ -14,17 +15,20 @@ variables
 		1: bapLavaPos
 		2: bapLavaRadius
 		3: bapLavaEffectId
-		4: meiHUDTextId
-		5: mercyKiller
-		6: reaperPowerLevel
-		7: reinPayloadPos
-		8: reinPayloadEffectId
-		9: reinPayloadPointIndex
-		10: reinPayloadFlagEffectId
-		11: roadhogEffectId
-		12: roadhogEatRadius
-		13: winstonMeatEffectId
-		14: zenPeaceEffectId
+        4: brig1v1Target
+        5: brigRingPos
+        6: brigRingEffectId
+		7: meiHUDTextId
+		8: mercyKiller
+		9: reaperPowerLevel
+		10: reinPayloadPos
+		11: reinPayloadEffectId
+		12: reinPayloadPointIndex
+		13: reinPayloadFlagEffectId
+		14: roadhogEffectId
+		15: roadhogEatRadius
+		16: winstonMeatEffectId
+		17: zenPeaceEffectId
 }
 
 rule("Game Setup")
@@ -87,7 +91,7 @@ rule("Instant Start")
 	}
 }
 
-rule("Game Setup (BAP, ZEN)")
+rule("Game Setup (BAP, BRIG, ZEN)")
 {
 	event
 	{
@@ -97,6 +101,7 @@ rule("Game Setup (BAP, ZEN)")
 	actions
 	{
 		Set Global Variable(BAP_LAVA_GROWTH_SPEED, 0.100);
+		Set Global Variable(BRIG_RING_RADIUS, 10);
 		Set Global Variable(ZEN_PEACE_RADIUS, 10);
 	}
 }
@@ -283,6 +288,152 @@ rule("Baptiste - Lava Burns Players")
 			bapLavaRadius), All Teams, Off), Compare(Is Alive(Current Array Element), ==, True)), Event Player, 20);
 		Wait(0.100, Ignore Condition);
 		Loop If Condition Is True;
+	}
+}
+
+rule("Brigitte - Spawns in")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Brigitte;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Brigitte);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Small Message(Event Player, Custom String("{0} Brigitte is playing For Honor:", Hero Icon String(Hero Of(Event Player)), Null, Null));
+		Small Message(Event Player, Custom String("{0} Damage an enemy to lock them into a 1v1.", Hero Icon String(Hero Of(
+			Event Player)), Null, Null));
+		Wait(3, Ignore Condition);
+		Big Message(Event Player, Custom String("RALLY TO ME!", Null, Null, Null));
+        Set Player Variable(Event Player, brig1v1Target, Null);
+	}
+}
+
+rule("Brigitte - lock player into 1v1")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		Brigitte;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Brigitte);
+		Is Alive(Event Player) == True;
+        Player Variable(Event Player, brig1v1Target) == Null;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, brig1v1Target, Victim);
+        Set Player Variable(Event Player, brigRingPos, Position Of(Event Player));
+        Destroy Effect(Player Variable(Event Player, brigRingEffectId));
+		Create Effect(All Players(All Teams), Ring, White, Player Variable(Event Player, brigRingPos), Global Variable(BRIG_RING_RADIUS), None);
+		Set Player Variable(Event Player, brigRingEffectId, Last Created Entity);
+	}
+}
+
+rule("Brigitte - 1v1 target leaves ring")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Brigitte;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Brigitte);
+		Is Alive(Event Player) == True;
+        Player Variable(Event Player, brig1v1Target) != Null;
+        Distance Between(Player Variable(Event Player,brigRingPos),Position Of(Player Variable(Event Player, brig1v1Target))) > Global Variable(BRIG_RING_RADIUS);
+	}
+
+	actions
+	{
+        Damage(Player Variable(Event Player, brig1v1Target), Event Player, 1000);
+	}
+}
+
+rule("Brigitte - brig leaves ring during 1v1")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Brigitte;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Brigitte);
+		Is Alive(Event Player) == True;
+        Player Variable(Event Player, brig1v1Target) != Null;
+        Distance Between(Player Variable(Event Player,brigRingPos),Position Of(Event Player)) > Global Variable(BRIG_RING_RADIUS);
+	}
+
+	actions
+	{
+        Damage(Event Player, Player Variable(Event Player, brig1v1Target),1000);
+	}
+}
+
+rule("Brigitte - 1v1 target dies")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Brigitte;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Brigitte);
+        Player Variable(Event Player, brig1v1Target) != Null;
+        Is Alive(Player Variable(Event Player, brig1v1Target)) == False
+	}
+
+	actions
+	{
+        Modify Player Score(Event Player, 1);
+        Set Player Variable(Event Player, brig1v1Target, null);
+        Destroy Effect(Player Variable(Event Player, brigRingEffectId));
+	}
+}
+
+rule("Brigitte - brig dies during 1v1")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Brigitte;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Brigitte);
+        Player Variable(Event Player, brig1v1Target) != Null;
+        Is Alive(Event Player) == False
+	}
+
+	actions
+	{
+        Modify Player Score(Player Variable(Event Player, brig1v1Target), 1);
+        Set Player Variable(Event Player, brig1v1Target, null);
+        Destroy Effect(Player Variable(Event Player, brigRingEffectId));
 	}
 }
 
@@ -757,7 +908,7 @@ rule("Rein - Spawn payload")
 		Teleport(Event Player, Value In Array(Global Variable(REIN_PAYLOAD_POINTS), 0));
 		Set Player Variable(Event Player, reinPayloadPos, Value In Array(Global Variable(REIN_PAYLOAD_POINTS), 0));
 		Set Player Variable(Event Player, reinPayloadPointIndex, 0);
-		Destroy Effect(Player Variable(Event Player, reinPayloadPos));
+		Destroy Effect(Player Variable(Event Player, reinPayloadEffectId));
 		Create Effect(All Players(All Teams), Sphere, White, Add(Player Variable(Event Player, reinPayloadPos), Global Variable(
 			REIN_PAYLOAD_GROUND_OFFSET)), Global Variable(REIN_PAYLOAD_RADIUS), Position and Radius);
 		Set Player Variable(Event Player, reinPayloadEffectId, Last Created Entity);
