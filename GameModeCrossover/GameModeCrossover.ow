@@ -16,6 +16,9 @@ variables
 		12: HAMMOND_GOAL_RADIUS
 		13: ZEN_PEACE_RADIUS
 		14: editBastionPoints
+		15: BASTION_SPEED_BASE
+		16: BASTION_SPEED_BOOST
+		17: BASTION_SPEED_ULT
 
 	player:
 		0: target
@@ -42,6 +45,7 @@ variables
 		21: hammondGoalEffectId
 		22: hammondGoalPos
 		23: zenPeaceEffectId
+		24: bastionSpeed
 }
 
 rule("Game Setup")
@@ -340,7 +344,7 @@ rule("Bastion - Spawns in")
 		Set Player Variable(Event Player, index, 0);
 		Set Player Variable(Event Player, bastionTrackPointIndex, 1);
 		Press Button(Event Player, Ability 1);
-		Disallow Button(Event Player, Ability 1);
+		disabled Disallow Button(Event Player, Ability 1);
 		Teleport(Event Player, First Of(Global Variable(BASTION_TRACK_POINTS)));
 		Set Facing(Event Player, Subtract(Value In Array(Global Variable(BASTION_TRACK_POINTS), 1), Value In Array(Global Variable(
 			BASTION_TRACK_POINTS), 0)), To World);
@@ -354,7 +358,8 @@ rule("Bastion - Spawns in")
 		Big Message(Event Player, Custom String("SET...", Null, Null, Null));
 		Wait(1, Ignore Condition);
 		Big Message(Event Player, Custom String("GO!", Null, Null, Null));
-		Start Forcing Throttle(Event Player, 1, 1, 0, 0, 0, 0);
+		disabled Start Forcing Throttle(Event Player, 1, 1, 0, 0, 0, 0);
+		Set Player Variable(Event Player, bastionSpeed, Global Variable(BASTION_SPEED_BASE));
 	}
 }
 
@@ -376,7 +381,7 @@ rule("Bastion dies - stop forcing things")
 	actions
 	{
 		Allow Button(Event Player, Ability 1);
-		Stop Forcing Throttle(Event Player);
+		disabled Stop Forcing Throttle(Event Player);
 		Set Player Variable(Event Player, index, 0);
 		Set Player Variable(Event Player, bastionTrackPointIndex, 1);
 	}
@@ -402,11 +407,11 @@ rule("Bastion - Make track")
 	{
 		Destroy Effect(Value In Array(Player Variable(Event Player, bastionTrackEffectIds), Player Variable(Event Player, index)));
 		Skip If(Compare(Player Variable(Event Player, index), !=, Subtract(Count Of(Global Variable(BASTION_TRACK_POINTS)), 1)), 1);
-		Create Beam Effect(Event Player, Bad Beam, Value In Array(Global Variable(BASTION_TRACK_POINTS), Player Variable(Event Player,
-			index)), Value In Array(Global Variable(BASTION_TRACK_POINTS), 0), White, None);
+		Create Beam Effect(Event Player, Bad Beam, Value In Array(Global Variable(BASTION_TRACK_POINTS), 0), Value In Array(
+			Global Variable(BASTION_TRACK_POINTS), Player Variable(Event Player, index)), White, None);
 		Skip If(Compare(Player Variable(Event Player, index), ==, Subtract(Count Of(Global Variable(BASTION_TRACK_POINTS)), 1)), 1);
-		Create Beam Effect(Event Player, Bad Beam, Value In Array(Global Variable(BASTION_TRACK_POINTS), Player Variable(Event Player,
-			index)), Value In Array(Global Variable(BASTION_TRACK_POINTS), Add(Player Variable(Event Player, index), 1)), White, None);
+		Create Beam Effect(Event Player, Bad Beam, Value In Array(Global Variable(BASTION_TRACK_POINTS), Add(Player Variable(Event Player,
+			index), 1)), Value In Array(Global Variable(BASTION_TRACK_POINTS), Player Variable(Event Player, index)), White, None);
 		Set Player Variable At Index(Event Player, bastionTrackEffectIds, Player Variable(Event Player, index), Last Created Entity);
 		Modify Player Variable(Event Player, index, Add, 1);
 		Wait(0.200, Ignore Condition);
@@ -469,11 +474,15 @@ rule("Bastion - press LMB to go")
 
 	actions
 	{
-		Start Forcing Throttle(Event Player, 1, 1, 0, 0, 0, 0);
+		disabled Start Forcing Throttle(Event Player, 1, 1, 0, 0, 0, 0);
+		Apply Impulse(Event Player, Vector(X Component Of(Facing Direction Of(Event Player)), 0, Z Component Of(Facing Direction Of(
+			Event Player))), Player Variable(Event Player, bastionSpeed), To World, Cancel Contrary Motion);
+		Wait(0.020, Ignore Condition);
+		Loop If Condition Is True;
 	}
 }
 
-rule("Bastion - unpress LMB to stop")
+disabled rule("Bastion - unpress LMB to stop")
 {
 	event
 	{
@@ -515,11 +524,11 @@ rule("Bastion - press SHIFT to speed boost")
 
 	actions
 	{
-		Set Move Speed(Event Player, 200);
+		Set Player Variable(Event Player, bastionSpeed, Global Variable(BASTION_SPEED_BOOST));
 		Set Ultimate Charge(Event Player, Add(Ultimate Charge Percent(Event Player), -1.000));
 		Wait(0.100, Ignore Condition);
 		Loop If Condition Is True;
-		Set Move Speed(Event Player, 100);
+		Set Player Variable(Event Player, bastionSpeed, Global Variable(BASTION_SPEED_BASE));
 	}
 }
 
@@ -542,7 +551,7 @@ rule("Bastion - start ULT")
 
 	actions
 	{
-		Set Move Speed(Event Player, 500);
+		Set Player Variable(Event Player, bastionSpeed, Global Variable(BASTION_SPEED_ULT));
 		Teleport(Event Player, Value In Array(Global Variable(BASTION_TRACK_POINTS), Player Variable(Event Player,
 			bastionTrackPointIndex)));
 	}
@@ -588,13 +597,15 @@ rule("Bastion - ult ended")
 		Hero Of(Event Player) == Hero(Bastion);
 		Is Alive(Event Player) == True;
 		Is Using Ultimate(Event Player) == False;
+		Player Variable(Event Player, bastionSpeed) == Global Variable(BASTION_SPEED_ULT);
 	}
 
 	actions
 	{
-		Allow Button(Event Player, Ability 1);
-		Press Button(Event Player, Ability 1);
-		Disallow Button(Event Player, Ability 1);
+		disabled Allow Button(Event Player, Ability 1);
+		disabled Press Button(Event Player, Ability 1);
+		disabled Disallow Button(Event Player, Ability 1);
+		Set Player Variable(Event Player, bastionSpeed, Global Variable(BASTION_SPEED_BASE));
 	}
 }
 
@@ -2444,6 +2455,9 @@ rule("Game Setup (BASTION)")
 
 	actions
 	{
+		Set Global Variable(BASTION_SPEED_BASE, 8);
+		Set Global Variable(BASTION_SPEED_BOOST, 12);
+		Set Global Variable(BASTION_SPEED_ULT, 20);
 		Set Global Variable(BASTION_TRACK_POINTS, Empty Array);
 		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(191.086, 8, 63.952));
 		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(196.174, 7.999, 63.207));
