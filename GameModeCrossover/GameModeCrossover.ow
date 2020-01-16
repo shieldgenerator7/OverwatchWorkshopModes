@@ -336,7 +336,7 @@ rule("Bastion - Spawns in")
 	{
 		Hero Of(Event Player) == Hero(Bastion);
 		Is Alive(Event Player) == True;
-		Count Of(Global Variable(BASTION_TRACK_POINTS)) > 0;
+		disabled Count Of(Global Variable(BASTION_TRACK_POINTS)) > 0;
 	}
 
 	actions
@@ -369,7 +369,7 @@ rule("Bastion - Spawns in, put into turret form")
 	{
 		Hero Of(Event Player) == Hero(Bastion);
 		Is Alive(Event Player) == True;
-		Count Of(Global Variable(BASTION_TRACK_POINTS)) > 0;
+		disabled Count Of(Global Variable(BASTION_TRACK_POINTS)) > 0;
 	}
 
 	actions
@@ -377,9 +377,9 @@ rule("Bastion - Spawns in, put into turret form")
 		Set Player Variable(Event Player, index, 0);
 		Set Player Variable(Event Player, bastionTrackPointIndex, 1);
 		Teleport(Event Player, First Of(Global Variable(BASTION_TRACK_POINTS)));
+		Wait(1, Ignore Condition);
 		Set Facing(Event Player, Subtract(Value In Array(Global Variable(BASTION_TRACK_POINTS), 1), Value In Array(Global Variable(
 			BASTION_TRACK_POINTS), 0)), To World);
-		Wait(1, Ignore Condition);
 		Press Button(Event Player, Ability 1);
 		Wait(1, Ignore Condition);
 		Disallow Button(Event Player, Ability 1);
@@ -456,7 +456,7 @@ rule("Bastion - reaches check point")
 		Hero Of(Event Player) == Hero(Bastion);
 		Is Alive(Event Player) == True;
 		Distance Between(Position Of(Event Player), Value In Array(Global Variable(BASTION_TRACK_POINTS), Player Variable(Event Player,
-			bastionTrackPointIndex))) <= 3;
+			bastionTrackPointIndex))) <= 5;
 	}
 
 	actions
@@ -479,7 +479,7 @@ rule("Bastion - reaches check point")
 	}
 }
 
-rule("Bastion - press LMB to go")
+rule("Bastion - goes forward automatically")
 {
 	event
 	{
@@ -492,7 +492,8 @@ rule("Bastion - press LMB to go")
 	{
 		Hero Of(Event Player) == Hero(Bastion);
 		Is Alive(Event Player) == True;
-		Is Button Held(Event Player, Primary Fire) == True;
+		disabled Is Button Held(Event Player, Primary Fire) == True;
+		Player Variable(Event Player, bastionSpeed) > 0;
 	}
 
 	actions
@@ -543,6 +544,7 @@ rule("Bastion - press SHIFT to speed boost")
 		Is Button Held(Event Player, Ability 1) == True;
 		Ultimate Charge Percent(Event Player) > 0;
 		Is Using Ultimate(Event Player) == False;
+		Player Variable(Event Player, bastionSpeed) > 0;
 	}
 
 	actions
@@ -568,8 +570,9 @@ rule("Bastion - start ULT")
 	{
 		Hero Of(Event Player) == Hero(Bastion);
 		Is Alive(Event Player) == True;
-		Is Button Held(Event Player, Ultimate) == True;
-		Ultimate Charge Percent(Event Player) == 100;
+		disabled Is Button Held(Event Player, Ultimate) == True;
+		disabled Ultimate Charge Percent(Event Player) == 100;
+		Is Using Ultimate(Event Player) == True;
 	}
 
 	actions
@@ -600,7 +603,8 @@ rule("Bastion - ULTING AT WARP SPEED")
 	{
 		Set Facing(Event Player, Subtract(Value In Array(Global Variable(BASTION_TRACK_POINTS), Player Variable(Event Player,
 			bastionTrackPointIndex)), Position Of(Event Player)), To World);
-		Damage(Players Within Radius(Position Of(Event Player), 3, All Teams, Surfaces And All Barriers), Event Player, 100);
+		Damage(Filtered Array(Players Within Radius(Position Of(Event Player), 3, All Teams, Surfaces And All Barriers), Compare(
+			Current Array Element, !=, Event Player)), Event Player, 100);
 		Wait(0.010, Ignore Condition);
 		Loop If Condition Is True;
 	}
@@ -625,9 +629,12 @@ rule("Bastion - ult ended")
 
 	actions
 	{
-		disabled Allow Button(Event Player, Ability 1);
-		disabled Press Button(Event Player, Ability 1);
-		disabled Disallow Button(Event Player, Ability 1);
+		Set Player Variable(Event Player, bastionSpeed, 0);
+		Allow Button(Event Player, Ability 1);
+		Wait(0.100, Ignore Condition);
+		Press Button(Event Player, Ability 1);
+		Wait(0.100, Ignore Condition);
+		Disallow Button(Event Player, Ability 1);
 		Set Player Variable(Event Player, bastionSpeed, Global Variable(BASTION_SPEED_BASE));
 	}
 }
@@ -2479,8 +2486,8 @@ rule("Game Setup (BASTION)")
 	actions
 	{
 		Set Global Variable(BASTION_SPEED_BASE, 8);
-		Set Global Variable(BASTION_SPEED_BOOST, 12);
-		Set Global Variable(BASTION_SPEED_ULT, 20);
+		Set Global Variable(BASTION_SPEED_BOOST, 15);
+		Set Global Variable(BASTION_SPEED_ULT, 25);
 		Set Global Variable(BASTION_TRACK_POINTS, Empty Array);
 		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(191.086, 8, 63.952));
 		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(196.174, 7.999, 63.207));
@@ -2632,5 +2639,54 @@ rule("==TEST==Pharah==Detect point")
 	{
 		Set Player Variable(Event Player, target, Position Of(Event Player));
 		Small Message(Event Player, Custom String("{0}", Position Of(Event Player), Null, Null));
+	}
+}
+
+rule("Bastion - teleport to next point if too far away")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Bastion);
+		Is Alive(Event Player) == True;
+		Distance Between(Position Of(Event Player), Value In Array(Global Variable(BASTION_TRACK_POINTS), Player Variable(Event Player,
+			bastionTrackPointIndex))) >= 20;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Value In Array(Global Variable(BASTION_TRACK_POINTS), Player Variable(Event Player,
+			bastionTrackPointIndex)));
+	}
+}
+
+rule("Bastion - teleport to next point during ult if too far away")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Bastion);
+		Is Alive(Event Player) == True;
+		Distance Between(Position Of(Event Player), Value In Array(Global Variable(BASTION_TRACK_POINTS), Player Variable(Event Player,
+			bastionTrackPointIndex))) >= 10;
+		Is Using Ultimate(Event Player) == True;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Value In Array(Global Variable(BASTION_TRACK_POINTS), Player Variable(Event Player,
+			bastionTrackPointIndex)));
 	}
 }
