@@ -9,6 +9,7 @@ variables
 		5: REIN_PAYLOAD_MOVESPEED
 		6: REIN_PAYLOAD_CONTEST_RADIUS
 		7: ZEN_PEACE_RADIUS
+        8: HAMMOND_GOAL_RADIUS
 
 	player:
 		0: target
@@ -30,6 +31,8 @@ variables
 		16: winstonMeatEffectId
 		17: zenPeaceEffectId
 		18: hammondLastDamager
+        19: hammondGoalEffectId
+        20: hammondGoalPos
 }
 
 rule("Game Setup")
@@ -1803,6 +1806,32 @@ rule("Hammond - Spawns in")
 	}
 }
 
+rule("Hammond - Create goal")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Wrecking Ball;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Wrecking Ball);
+		Is Alive(Event Player) == True;
+        Player Variable(Event Player, hammondGoalEffectId) == Null;
+	}
+
+	actions
+	{
+        Set Player Variable(Event Player, target, Farthest Player From(Event Player, All Teams));
+        Set Player Variable(Event Player, hammondGoalPos, Player Variable(Event Player, target));
+		Create Effect(All Players(All Teams), Ring, Green, Player Variable(Event Player, hammondGoalPos), Global Variable(HAMMOND_GOAL_RADIUS), None);
+		Set Player Variable(Event Player, hammondGoalEffectId, Last Created Entity);
+        Big Message(Player Variable(Event Player, target),Custom String("STOP {0}{1} FROM SCORING!", Hero Icon String(Hero(Wrecking Ball)), Event Player, Null));
+    }
+}
+
 rule("Hammond - Hit by enemy fire")
 {
 	event
@@ -1844,7 +1873,8 @@ rule("Hammond - dies (gives point to last damager) (and remove kill self penalty
 	actions
 	{
 		Modify Player Score(Player Variable(Event Player, hammondLastDamager), 1);
-		Modify Player Score(Event Player, 1);
+		Modify Player Score(Event Player, 1);        
+        Destroy Effect(Player Variable(Event Player, hammondGoalEffectId));
 	}
 }
 
@@ -1861,11 +1891,12 @@ rule("Hammond scores")
 	{
 		Hero Of(Event Player) == Hero(Wrecking Ball);
 		Is Alive(Event Player) == True;
-		Distance Between(Position Of(Event Player), First Of(Global Variable(REIN_PAYLOAD_POINTS))) <= 3;
+		Distance Between(Position Of(Event Player), Player Variable(Event Player, hammondGoalPos)) <= Global Variable(HAMMOND_GOAL_RADIUS);
 	}
 
 	actions
 	{
+        Destroy Effect(Player Variable(Event Player, hammondGoalEffectId));
 		Damage(Filtered Array(All Players(All Teams), Compare(Current Array Element, !=, Event Player)), Event Player, 1000);
 		Big Message(All Players(All Teams), Custom String("{0} {1} SCORED!", Hero Icon String(Hero(Wrecking Ball)), Event Player, Null));
 	}
