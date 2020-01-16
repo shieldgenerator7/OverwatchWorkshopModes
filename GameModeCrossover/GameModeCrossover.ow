@@ -398,7 +398,6 @@ rule("Bastion dies - stop forcing things")
 	conditions
 	{
 		Hero Of(Event Player) == Hero(Bastion);
-		Is Alive(Event Player) == True;
 	}
 
 	actions
@@ -476,6 +475,8 @@ rule("Bastion - reaches check point")
 		Modify Player Variable(Event Player, bastionTrackPointIndex, Add, 1);
 		Skip If(Compare(Player Variable(Event Player, bastionTrackPointIndex), !=, Count Of(Global Variable(BASTION_TRACK_POINTS))), 1);
 		Set Player Variable(Event Player, bastionTrackPointIndex, 0);
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
 	}
 }
 
@@ -2373,7 +2374,7 @@ rule("==BOTS==REINHARDT==")
 	}
 }
 
-disabled rule("==TEST==Bastion lay track points start")
+rule("==TEST==Bastion lay track points start")
 {
 	event
 	{
@@ -2448,7 +2449,31 @@ disabled rule("==TEST== Bastion lay track points (Line of Sight)")
 	}
 }
 
-disabled rule("==TEST==Bastion lay track points end")
+rule("==TEST==Bastion lay track point (manual)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Host Player == True;
+		Is Button Held(Event Player, Crouch) == True;
+		Hero Of(Event Player) == Hero(Bastion);
+		Global Variable(editBastionPoints) == True;
+	}
+
+	actions
+	{
+		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Position Of(Event Player));
+		Small Message(Event Player, Custom String("NEW TRACK POS (Manual): {0}", Position Of(Event Player), Null, Null));
+	}
+}
+
+rule("==TEST==Bastion lay track points end")
 {
 	event
 	{
@@ -2571,7 +2596,6 @@ rule("Game Setup (BASTION)")
 		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(181.178, 8, 56.111));
 		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(181.263, 8, 56.134));
 		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(183.249, 8.002, 60.830));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(186.753, 8, 64.530));
 	}
 }
 
@@ -2688,5 +2712,31 @@ rule("Bastion - teleport to next point during ult if too far away")
 	{
 		Teleport(Event Player, Value In Array(Global Variable(BASTION_TRACK_POINTS), Player Variable(Event Player,
 			bastionTrackPointIndex)));
+	}
+}
+
+rule("Bastion - Erase track")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Bastion;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Bastion);
+		Is Alive(Event Player) == False;
+		Player Variable(Event Player, index) == 0;
+	}
+
+	actions
+	{
+		Destroy Effect(Value In Array(Player Variable(Event Player, bastionTrackEffectIds), 0));
+		Modify Player Variable(Event Player, bastionTrackEffectIds, Remove From Array By Index, 0);
+		Abort If(Compare(Count Of(Player Variable(Event Player, bastionTrackEffectIds)), ==, 0));
+		Wait(0.200, Ignore Condition);
+		Loop;
 	}
 }
