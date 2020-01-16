@@ -1,16 +1,20 @@
 variables
 {
 	global:
-		0: BAP_LAVA_GROWTH_SPEED
-        1: BASTION_TRACK_POINTS
-		2: BRIG_RING_RADIUS
-		3: REIN_PAYLOAD_POINTS
-		4: REIN_PAYLOAD_RADIUS
-		5: REIN_PAYLOAD_GROUND_OFFSET
-		6: REIN_PAYLOAD_MOVESPEED
-		7: REIN_PAYLOAD_CONTEST_RADIUS
-        8: HAMMOND_GOAL_RADIUS
-		9: ZEN_PEACE_RADIUS
+		0: target
+        1: BAP_LAVA_GROWTH_SPEED
+        2: BASTION_TRACK_POINTS
+		3: BRIG_RING_RADIUS
+        4: ORISA_OBJECTIVE_RADIUS
+        5: orisaObjectivePos
+        6: orisaObjectiveEffectId
+		7: REIN_PAYLOAD_POINTS
+		8: REIN_PAYLOAD_RADIUS
+		9: REIN_PAYLOAD_GROUND_OFFSET
+		10: REIN_PAYLOAD_MOVESPEED
+		11: REIN_PAYLOAD_CONTEST_RADIUS
+        12: HAMMOND_GOAL_RADIUS
+		13: ZEN_PEACE_RADIUS
 
 	player:
 		0: target
@@ -113,6 +117,19 @@ rule("Game Setup (BAP, BRIG, HAM, ZEN)")
 		Set Global Variable(BRIG_RING_RADIUS, 10);
 		Set Global Variable(HAMMOND_GOAL_RADIUS, 3);
 		Set Global Variable(ZEN_PEACE_RADIUS, 10);
+	}
+}
+
+rule("Game Setup (ORISA)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Set Global Variable(ORISA_OBJECTIVE_RADIUS, 5);
 	}
 }
 
@@ -1040,6 +1057,106 @@ rule("Moira - Ultimate: Teleport all players to her")
 		Teleport(All Living Players(All Teams), Position Of(Event Player));
 		Damage(All Living Players(All Teams), Event Player, 1);
 	}
+}
+
+rule("Orisa - Spawns in")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Orisa;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Orisa);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Small Message(Event Player, Custom String("{0} Orisa is playing Assault:", Hero Icon String(Hero Of(Event Player)), Null, Null));
+		Small Message(Event Player, Custom String("{0} Ult to set the objective, then defend it.", Hero Icon String(Hero Of(
+			Event Player)), Null, Null));
+		Wait(3, Ignore Condition);
+		Big Message(Event Player, Custom String("DEFEND THE OBJECTIVE!", Null, Null, Null));
+	}
+}
+
+rule("Orisa - Ults = set objective position")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Orisa;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Orisa);
+		Is Alive(Event Player) == True;
+        Is Using Ultimate(Event Player) == True;
+	}
+
+	actions
+	{
+        Set Global Variable(orisaObjectivePos, Position Of (Event Player));
+        
+        Skip If (Compare(Global Variable(orisaObjectiveEffectId),==,Null),1);
+		Big Message(Players On Hero(Orisa), Custom String("{0}{1} Moved the objective!", Hero Icon String(Hero(Orisa)), Event Player, Null));
+
+        Skip If (Compare(Global Variable(orisaObjectiveEffectId),!=,Null),3);
+        Create Effect(All Players(All Teams), Ring, Red, Global Variable(orisaObjectivePos), Global Variable(ORISA_OBJECTIVE_RADIUS), Position And Radius);
+        Set Global Variable(orisaObjectiveEffectId, Last Created Entity);
+		Big Message(Players On Hero(Orisa), Custom String("{0} Objective Set!", Hero Icon String(Hero(Orisa)), Null, Null));
+    }
+}
+
+rule("Orisa all switched off - destroy objective")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+        Is Hero Being Played(Hero(Orisa)) == False;
+	}
+
+	actions
+	{
+        Destroy Effect(Global Variable(orisaObjectiveEffectId));
+        Set Global Variable(orisaObjectiveEffectId, Null);
+    }
+}
+
+rule("Orisa - solo on obejctive = points")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+        Is Hero Being Played(Hero(Orisa)) == True;
+        Count Of (Players Within Radius(Global Variable(orisaObjectivePos),Global Variable(ORISA_OBJECTIVE_RADIUS), All Teams, Surfaces And All Barriers)) == 1;
+	}
+
+	actions
+	{
+        Wait(5, Abort When False);
+        Set Global Variable(target, First Of(Players Within Radius(Global Variable(orisaObjectivePos),Global Variable(ORISA_OBJECTIVE_RADIUS), All Teams, Surfaces And All Barriers)));
+        Modify Player Score(Global Variable(target),1);
+        Skip If (Compare(Hero Of(Global Variable(target)),==,Hero(Orisa)),1);
+		Big Message(Global Variable(target), Custom String("Objective Capture +1", Null, Null, Null));
+        Skip If (Compare(Hero Of(Global Variable(target)),!=,Hero(Orisa)),1);
+		Big Message(Global Variable(target), Custom String("Objective Defense +1", Null, Null, Null));
+        Loop If Condition Is True;
+    }
 }
 
 rule("Reaper - Spawns in")
