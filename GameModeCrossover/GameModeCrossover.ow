@@ -1826,7 +1826,7 @@ rule("Hammond - Hit by enemy fire")
 	}
 }
 
-rule("Hammond - dies (gives point to last damager)")
+rule("Hammond - dies (gives point to last damager) (and remove kill self penalty)")
 {
 	event
 	{
@@ -1838,11 +1838,13 @@ rule("Hammond - dies (gives point to last damager)")
 	conditions
 	{
 		Hero Of(Event Player) == Hero(Wrecking Ball);
+		Player Variable(Event Player, hammondLastDamager) != Null;
 	}
 
 	actions
 	{
 		Modify Player Score(Player Variable(Event Player, hammondLastDamager), 1);
+		Modify Player Score(Event Player, 1);
 	}
 }
 
