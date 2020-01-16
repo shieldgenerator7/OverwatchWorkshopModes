@@ -341,13 +341,7 @@ rule("Bastion - Spawns in")
 
 	actions
 	{
-		Set Player Variable(Event Player, index, 0);
-		Set Player Variable(Event Player, bastionTrackPointIndex, 1);
-		Press Button(Event Player, Ability 1);
-		disabled Disallow Button(Event Player, Ability 1);
-		Teleport(Event Player, First Of(Global Variable(BASTION_TRACK_POINTS)));
-		Set Facing(Event Player, Subtract(Value In Array(Global Variable(BASTION_TRACK_POINTS), 1), Value In Array(Global Variable(
-			BASTION_TRACK_POINTS), 0)), To World);
+		Set Player Variable(Event Player, bastionSpeed, 0);
 		Small Message(Event Player, Custom String("{0} Bastion is playing Race Kart:", Hero Icon String(Hero Of(Event Player)), Null,
 			Null));
 		Small Message(Event Player, Custom String("{0} Complete the laps to earn points.", Hero Icon String(Hero Of(Event Player)), Null,
@@ -358,8 +352,37 @@ rule("Bastion - Spawns in")
 		Big Message(Event Player, Custom String("SET...", Null, Null, Null));
 		Wait(1, Ignore Condition);
 		Big Message(Event Player, Custom String("GO!", Null, Null, Null));
-		disabled Start Forcing Throttle(Event Player, 1, 1, 0, 0, 0, 0);
 		Set Player Variable(Event Player, bastionSpeed, Global Variable(BASTION_SPEED_BASE));
+	}
+}
+
+rule("Bastion - Spawns in, put into turret form")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Bastion;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Bastion);
+		Is Alive(Event Player) == True;
+		Count Of(Global Variable(BASTION_TRACK_POINTS)) > 0;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, index, 0);
+		Set Player Variable(Event Player, bastionTrackPointIndex, 1);
+		Teleport(Event Player, First Of(Global Variable(BASTION_TRACK_POINTS)));
+		Set Facing(Event Player, Subtract(Value In Array(Global Variable(BASTION_TRACK_POINTS), 1), Value In Array(Global Variable(
+			BASTION_TRACK_POINTS), 0)), To World);
+		Wait(1, Ignore Condition);
+		Press Button(Event Player, Ability 1);
+		Wait(1, Ignore Condition);
+		Disallow Button(Event Player, Ability 1);
 	}
 }
 
