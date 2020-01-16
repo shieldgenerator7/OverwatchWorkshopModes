@@ -2,37 +2,41 @@ variables
 {
 	global:
 		0: BAP_LAVA_GROWTH_SPEED
-		1: BRIG_RING_RADIUS
-		2: REIN_PAYLOAD_POINTS
-		3: REIN_PAYLOAD_RADIUS
-		4: REIN_PAYLOAD_GROUND_OFFSET
-		5: REIN_PAYLOAD_MOVESPEED
-		6: REIN_PAYLOAD_CONTEST_RADIUS
-        7: HAMMOND_GOAL_RADIUS
-		8: ZEN_PEACE_RADIUS
+        1: BASTION_TRACK_POINTS
+		2: BRIG_RING_RADIUS
+		3: REIN_PAYLOAD_POINTS
+		4: REIN_PAYLOAD_RADIUS
+		5: REIN_PAYLOAD_GROUND_OFFSET
+		6: REIN_PAYLOAD_MOVESPEED
+		7: REIN_PAYLOAD_CONTEST_RADIUS
+        8: HAMMOND_GOAL_RADIUS
+		9: ZEN_PEACE_RADIUS
 
 	player:
 		0: target
-		1: bapLavaPos
-		2: bapLavaRadius
-		3: bapLavaEffectId
-		4: brig1v1Target
-		5: brigRingPos
-		6: brigRingEffectId
-		7: meiHUDTextId
-		8: mercyKiller
-		9: reaperPowerLevel
-		10: reinPayloadPos
-		11: reinPayloadEffectId
-		12: reinPayloadPointIndex
-		13: reinPayloadFlagEffectId
-		14: roadhogEffectId
-		15: roadhogEatRadius
-		16: winstonMeatEffectId        
-		17: hammondLastDamager
-        18: hammondGoalEffectId
-        19: hammondGoalPos
-		20: zenPeaceEffectId
+        1: index
+		2: bapLavaPos
+		3: bapLavaRadius
+		4: bapLavaEffectId
+        5: bastionTrackEffectIds
+        6: bastionTrackPointIndex
+		7: brig1v1Target
+		8: brigRingPos
+		9: brigRingEffectId
+		10: meiHUDTextId
+		11: mercyKiller
+		12: reaperPowerLevel
+		13: reinPayloadPos
+		14: reinPayloadEffectId
+		15: reinPayloadPointIndex
+		16: reinPayloadFlagEffectId
+		17: roadhogEffectId
+		18: roadhogEatRadius
+		19: winstonMeatEffectId        
+		20: hammondLastDamager
+        21: hammondGoalEffectId
+        22: hammondGoalPos
+		23: zenPeaceEffectId
 }
 
 rule("Game Setup")
@@ -295,6 +299,271 @@ rule("Baptiste - Lava Burns Players")
 		Wait(0.100, Ignore Condition);
 		Loop If Condition Is True;
 	}
+}
+
+rule("Bastion - Spawns in")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Bastion;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Bastion);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+        Set Player Variable(Event Player, index, 0);
+        Set Player Variable(Event Player, bastionTrackPointIndex, 1);
+        Press Button(Event Player, Ability 1);
+        Disallow Button(Event Player, Ability 1);
+        Teleport(Event Player, First Of (Global Variable(BASTION_TRACK_POINTS)));
+        Set Facing(Event Player, Subtract(Value In Array(Global Variable(BASTION_TRACK_POINTS),1),Value In Array(Global Variable(BASTION_TRACK_POINTS),0)), To World);
+		Small Message(Event Player, Custom String("{0} Bastion is playing Race Kart:", Hero Icon String(Hero Of(Event Player)), Null, Null));
+		Small Message(Event Player, Custom String("{0} Complete the laps to earn points.", Hero Icon String(Hero Of(
+			Event Player)), Null, Null));
+		Wait(3, Ignore Condition);
+		Big Message(Event Player, Custom String("READY...", Null, Null, Null));
+		Wait(1, Ignore Condition);
+		Big Message(Event Player, Custom String("SET...", Null, Null, Null));
+		Wait(1, Ignore Condition);
+		Big Message(Event Player, Custom String("GO!", Null, Null, Null));
+        Start Forcing Throttle(Event Player, 1, 1, 0, 0, 0, 0);
+	}
+}
+
+rule(Bastion dies - stop forcing things){
+    event{
+        Player Died;
+        All;
+        Bastion;
+    }
+    conditions
+	{
+		Hero Of(Event Player) == Hero(Bastion);
+		Is Alive(Event Player) == True;
+	}
+    actions{
+        Allow Button(Event Player, Ability 1);
+        Stop Forcing Throttle(Event Player);
+        Set Player Variable(Event Player, index, 0);
+        Set Player Variable(Event Player, bastionTrackPointIndex, 1);
+    }
+}
+
+rule("Bastion - Make track")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Bastion;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Bastion);
+		Is Alive(Event Player) == True;
+        Player Variable(Event Player, index) < Count Of(Global Variable(BASTION_TRACK_POINTS));
+	}
+
+	actions
+	{
+        Destroy Effect(Event Player, Value In Array(Player Variable(Event Player, bastionTrackEffectIds),Player Variable(Event Player, index)));
+        Skip If(Compare(Player Variable(Event Player, index),!=,Subtract(Count Of(Global Variable(BASTION_TRACK_POINTS)),1)),1);
+        Create Beam Effect(Event Player, Bad Beam, Value In Array(Global Variable(BASTION_TRACK_POINTS), Player Variable(Event Player, index)), Value In Array(Global Variable(BASTION_TRACK_POINTS), Player Variable(Event Player, 0)), White,
+			None);
+        Skip If(Compare(Player Variable(Event Player, index),==,Subtract(Count Of(Global Variable(BASTION_TRACK_POINTS)),1)),1);
+        Create Beam Effect(Event Player, Bad Beam, Value In Array(Global Variable(BASTION_TRACK_POINTS), Player Variable(Event Player, index)), Value In Array(Global Variable(BASTION_TRACK_POINTS), Add(Player Variable(Event Player, index),1)), White,
+			None);
+        Set Player Variable At Index(Event Player, bastionTrackEffectIds, Player Variable(Event Player, index), Last Created Entity);
+        Modify Player Variable(Event Player, index, Add, 1);
+        Wait(0.2,Ignore Condition);
+        Loop If Condition Is True;
+    }
+}
+
+rule("Bastion - reaches check point")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Bastion;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Bastion);
+		Is Alive(Event Player) == True;
+        Distance Between(Position Of(Event Player), Value In Array(Global Variable(BASTION_TRACK_POINTS), Player Variable(Event Player, bastionTrackPointIndex))) <= 3;
+	}
+
+	actions
+	{
+        Set Ultimate Charge(Event Player, Add(Ultimate Charge(Event Player),1));
+        Skip If (Compare(Player Variable(Event Player, bastionTrackPointIndex), ==, 0),3);
+        Destroy Effect(Event Player, Value In Array(Player Variable(Event Player, bastionTrackEffectIds),Player Variable(Event Player, bastionTrackPointIndex)));
+        Create Beam Effect(Event Player, Bad Beam, Value In Array(Global Variable(BASTION_TRACK_POINTS), Player Variable(Event Player, bastionTrackPointIndex)), Value In Array(Global Variable(BASTION_TRACK_POINTS), Subtract(Player Variable(Event Player, bastionTrackPointIndex),1)), Green,
+			None);
+        Set Player Variable At Index(Event Player, bastionTrackEffectIds, Player Variable(Event Player, index), Last Created Entity);
+
+        
+        Skip If (Compare(Player Variable(Event Player, bastionTrackPointIndex), !=, 0),3);        
+        Set Player Variable(Event Player, index, 0);
+        Big Message(Event Player, Custom String("LAP COMPLETE!", Null, Null, Null));
+        Set Ultimate Charge(Event Player, Add(Ultimate Charge(Event Player),10));
+
+        Modify Player Variable(Event Player, bastionTrackPointIndex, Add, 1);
+
+        Skip If(Compare(Player Variable(Event Player, bastionTrackPointIndex),!=,Count Of(Global Variable(BASTION_TRACK_POINTS))),1);
+        Set Player Variable(Event Player, bastionTrackPointIndex, 0);
+        
+    }
+}
+
+rule("Bastion - press LMB to go")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Bastion;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Bastion);
+		Is Alive(Event Player) == True;
+        Is Button Held(Event Player, Primary Fire) == True;
+    }
+
+    actions{
+        Start Forcing Throttle(Event Player, 1, 1, 0, 0, 0, 0);
+    }
+}
+
+rule("Bastion - unpress LMB to stop")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Bastion;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Bastion);
+		Is Alive(Event Player) == True;
+        Is Button Held(Event Player, Primary Fire) == False;
+    }
+
+    actions{
+        Start Forcing Throttle(Event Player, 0, 0, 0, 0, 0, 0);
+    }
+}
+
+rule("Bastion - press SHIFT to speed boost")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Bastion;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Bastion);
+		Is Alive(Event Player) == True;
+        Is Button Held(Event Player, Ability 1) == True;
+        Ultimate Charge Percent(Event Player) > 0;
+        Is Using Ultimate(Event Player) == False;
+    }
+
+    actions{
+        Set Move Speed(Event Player, 200);
+        Set Ultimate Charge(Event Player, Add(Ultimate Charge(Event Player),-1));
+        Wait(0.1, Ignore Condition);
+        Loop If Condition Is True;
+        Set Move Speed(Event Player, 100);
+    }
+}
+
+rule("Bastion - start ULT")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Bastion;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Bastion);
+		Is Alive(Event Player) == True;
+        Is Button Held(Event Player, Ultimate) == True;
+        Ultimate Charge Percent(Event Player) = 100;
+    }
+
+    actions{
+        Set Move Speed(Event Player, 500);
+        Teleport(Event Player, Value In Array(Global Variable(BASTION_TRACK_POINTS), Player Variable(Event Player, bastionTrackPointIndex)));
+    }
+}
+
+rule("Bastion - ULTING AT WARP SPEED")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Bastion;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Bastion);
+		Is Alive(Event Player) == True;
+        Is Using Ultimate(Event Player) == True;
+    }
+
+    actions{
+        Set Facing(Event Player, Subtract(Value In Array(Global Variable(BASTION_TRACK_POINTS),Player Variable(Event Player,bastionTrackPointIndex)),Position Of(Event Player)), To World);
+        Damage(Players Within Radius(Position Of(Event Player),3,All Teams, Surfaces And All Barriers), Event Player, 100);
+        Wait(0.01, Ignore Condition);
+        Loop If Condition Is True;
+    }
+}
+
+rule("Bastion - ult ended")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Bastion;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Bastion);
+		Is Alive(Event Player) == True;
+        Is Using Ultimate(Event Player) == False;
+    }
+
+    actions{
+        Allow Button(Event Player, Ability 1);
+        Press Button(Event Player, Ability 1);
+        Disallow Button(Event Player, Ability 1);
+    }
 }
 
 rule("Brigitte - Spawns in")
