@@ -2382,7 +2382,7 @@ rule("==BOTS==REINHARDT==")
 	}
 }
 
-rule("==TEST==Bastion lay track points start")
+disabled rule("==TEST==Bastion lay track points start")
 {
 	event
 	{
@@ -2457,7 +2457,7 @@ disabled rule("==TEST== Bastion lay track points (Line of Sight)")
 	}
 }
 
-rule("==TEST==Bastion lay track point (manual)")
+disabled rule("==TEST==Bastion lay track point (manual)")
 {
 	event
 	{
@@ -2481,7 +2481,7 @@ rule("==TEST==Bastion lay track point (manual)")
 	}
 }
 
-rule("==TEST==Bastion lay track points end")
+disabled rule("==TEST==Bastion lay track points end")
 {
 	event
 	{
@@ -2549,7 +2549,7 @@ rule("Game Setup (BASTION)")
 	}
 }
 
-rule("==TEST==Bastion Speed Increase")
+disabled rule("==TEST==Bastion Speed Increase")
 {
 	event
 	{
@@ -2571,7 +2571,7 @@ rule("==TEST==Bastion Speed Increase")
 	}
 }
 
-rule("==TEST==Bastion Speed Decrease")
+disabled rule("==TEST==Bastion Speed Decrease")
 {
 	event
 	{
@@ -2593,7 +2593,7 @@ rule("==TEST==Bastion Speed Decrease")
 	}
 }
 
-rule("==TEST==Pharah==Detect point")
+disabled rule("==TEST==Pharah==Detect point")
 {
 	event
 	{
@@ -2616,7 +2616,7 @@ rule("==TEST==Pharah==Detect point")
 	}
 }
 
-rule("Bastion - teleport to next point if too far away")
+disabled rule("Bastion - teleport to next point if too far away")
 {
 	event
 	{
@@ -2643,7 +2643,7 @@ rule("Bastion - teleport to next point if too far away")
 	}
 }
 
-rule("Bastion - teleport to next point during ult if too far away")
+disabled rule("Bastion - teleport to next point during ult if too far away")
 {
 	event
 	{
@@ -2669,7 +2669,7 @@ rule("Bastion - teleport to next point during ult if too far away")
 	}
 }
 
-rule("Bastion - Erase track")
+disabled rule("Bastion - Erase track")
 {
 	event
 	{
