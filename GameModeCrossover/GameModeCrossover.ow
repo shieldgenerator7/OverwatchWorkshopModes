@@ -8,8 +8,8 @@ variables
 		4: REIN_PAYLOAD_GROUND_OFFSET
 		5: REIN_PAYLOAD_MOVESPEED
 		6: REIN_PAYLOAD_CONTEST_RADIUS
-		7: ZEN_PEACE_RADIUS
-        8: HAMMOND_GOAL_RADIUS
+        7: HAMMOND_GOAL_RADIUS
+		8: ZEN_PEACE_RADIUS
 
 	player:
 		0: target
@@ -28,11 +28,11 @@ variables
 		13: reinPayloadFlagEffectId
 		14: roadhogEffectId
 		15: roadhogEatRadius
-		16: winstonMeatEffectId
-		17: zenPeaceEffectId
-		18: hammondLastDamager
-        19: hammondGoalEffectId
-        20: hammondGoalPos
+		16: winstonMeatEffectId        
+		17: hammondLastDamager
+        18: hammondGoalEffectId
+        19: hammondGoalPos
+		20: zenPeaceEffectId
 }
 
 rule("Game Setup")
@@ -1597,6 +1597,150 @@ rule("Winston Ults Ends")
 	}
 }
 
+rule("Hammond - Spawns in")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Wrecking Ball;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Wrecking Ball);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Small Message(Event Player, Custom String("{0} Wrecking Ball is playing Lucio Ball:", Hero Icon String(Hero Of(Event Player)),
+			Null, Null));
+		Small Message(Event Player, Custom String("{0} Find the goal to score.", Hero Icon String(Hero Of(Event Player)), Null, Null));
+		Wait(3, Ignore Condition);
+		Big Message(Event Player, Custom String("BE THE BALL!", Null, Null, Null));
+	}
+}
+
+rule("Hammond - Create goal")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Wrecking Ball;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Wrecking Ball);
+		Is Alive(Event Player) == True;
+        Player Variable(Event Player, hammondGoalEffectId) == Null;
+	}
+
+	actions
+	{
+        Set Player Variable(Event Player, target, Farthest Player From(Event Player, All Teams));
+        Set Player Variable(Event Player, hammondGoalPos, Player Variable(Event Player, target));
+		Create Effect(All Players(All Teams), Ring, Green, Player Variable(Event Player, hammondGoalPos), Global Variable(HAMMOND_GOAL_RADIUS), None);
+		Set Player Variable(Event Player, hammondGoalEffectId, Last Created Entity);
+        Big Message(Player Variable(Event Player, target),Custom String("STOP {0}{1} FROM SCORING!", Hero Icon String(Hero(Wrecking Ball)), Event Player, Null));
+    }
+}
+
+rule("Hammond - Hit by enemy fire")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Wrecking Ball);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, hammondLastDamager, Attacker);
+		Apply Impulse(Event Player, Subtract(Position Of(Event Player), Position Of(Player Variable(Event Player, hammondLastDamager))),
+			20, To World, Cancel Contrary Motion);
+	}
+}
+
+rule("Hammond - dies (gives point to last damager) (and remove kill self penalty)")
+{
+	event
+	{
+		Player Died;
+		All;
+		Wrecking Ball;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Wrecking Ball);
+		Player Variable(Event Player, hammondLastDamager) != Null;
+	}
+
+	actions
+	{
+		Modify Player Score(Player Variable(Event Player, hammondLastDamager), 1);
+		Modify Player Score(Event Player, 1);        
+        Destroy Effect(Player Variable(Event Player, hammondGoalEffectId));
+	}
+}
+
+rule("Hammond scores")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Wrecking Ball;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Wrecking Ball);
+		Is Alive(Event Player) == True;
+		Distance Between(Position Of(Event Player), Player Variable(Event Player, hammondGoalPos)) <= Global Variable(HAMMOND_GOAL_RADIUS);
+	}
+
+	actions
+	{
+        Destroy Effect(Player Variable(Event Player, hammondGoalEffectId));
+		Damage(Filtered Array(All Players(All Teams), Compare(Current Array Element, !=, Event Player)), Event Player, 1000);
+		Big Message(All Players(All Teams), Custom String("{0} {1} SCORED!", Hero Icon String(Hero(Wrecking Ball)), Event Player, Null));
+	}
+}
+
+rule("Hammond Passive Heal")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Wrecking Ball;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Wrecking Ball);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Heal(Event Player, Event Player, 10);
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
 rule("Zenyatta - Spawns in")
 {
 	event
@@ -1781,146 +1925,3 @@ rule("==BOTS==REINHARDT==")
 	}
 }
 
-rule("Hammond - Spawns in")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		Wrecking Ball;
-	}
-
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Wrecking Ball);
-		Is Alive(Event Player) == True;
-	}
-
-	actions
-	{
-		Small Message(Event Player, Custom String("{0} Wrecking Ball is playing Lucio Ball:", Hero Icon String(Hero Of(Event Player)),
-			Null, Null));
-		Small Message(Event Player, Custom String("{0} Find the goal to score.", Hero Icon String(Hero Of(Event Player)), Null, Null));
-		Wait(3, Ignore Condition);
-		Big Message(Event Player, Custom String("BE THE BALL!", Null, Null, Null));
-	}
-}
-
-rule("Hammond - Create goal")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		Wrecking Ball;
-	}
-
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Wrecking Ball);
-		Is Alive(Event Player) == True;
-        Player Variable(Event Player, hammondGoalEffectId) == Null;
-	}
-
-	actions
-	{
-        Set Player Variable(Event Player, target, Farthest Player From(Event Player, All Teams));
-        Set Player Variable(Event Player, hammondGoalPos, Player Variable(Event Player, target));
-		Create Effect(All Players(All Teams), Ring, Green, Player Variable(Event Player, hammondGoalPos), Global Variable(HAMMOND_GOAL_RADIUS), None);
-		Set Player Variable(Event Player, hammondGoalEffectId, Last Created Entity);
-        Big Message(Player Variable(Event Player, target),Custom String("STOP {0}{1} FROM SCORING!", Hero Icon String(Hero(Wrecking Ball)), Event Player, Null));
-    }
-}
-
-rule("Hammond - Hit by enemy fire")
-{
-	event
-	{
-		Player Took Damage;
-		All;
-		All;
-	}
-
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Wrecking Ball);
-		Is Alive(Event Player) == True;
-	}
-
-	actions
-	{
-		Set Player Variable(Event Player, hammondLastDamager, Attacker);
-		Apply Impulse(Event Player, Subtract(Position Of(Event Player), Position Of(Player Variable(Event Player, hammondLastDamager))),
-			20, To World, Cancel Contrary Motion);
-	}
-}
-
-rule("Hammond - dies (gives point to last damager) (and remove kill self penalty)")
-{
-	event
-	{
-		Player Died;
-		All;
-		Wrecking Ball;
-	}
-
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Wrecking Ball);
-		Player Variable(Event Player, hammondLastDamager) != Null;
-	}
-
-	actions
-	{
-		Modify Player Score(Player Variable(Event Player, hammondLastDamager), 1);
-		Modify Player Score(Event Player, 1);        
-        Destroy Effect(Player Variable(Event Player, hammondGoalEffectId));
-	}
-}
-
-rule("Hammond scores")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		Wrecking Ball;
-	}
-
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Wrecking Ball);
-		Is Alive(Event Player) == True;
-		Distance Between(Position Of(Event Player), Player Variable(Event Player, hammondGoalPos)) <= Global Variable(HAMMOND_GOAL_RADIUS);
-	}
-
-	actions
-	{
-        Destroy Effect(Player Variable(Event Player, hammondGoalEffectId));
-		Damage(Filtered Array(All Players(All Teams), Compare(Current Array Element, !=, Event Player)), Event Player, 1000);
-		Big Message(All Players(All Teams), Custom String("{0} {1} SCORED!", Hero Icon String(Hero(Wrecking Ball)), Event Player, Null));
-	}
-}
-
-rule("Hammond Passive Heal")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		Wrecking Ball;
-	}
-
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Wrecking Ball);
-		Is Alive(Event Player) == True;
-	}
-
-	actions
-	{
-		Heal(Event Player, Event Player, 10);
-		Wait(0.100, Ignore Condition);
-		Loop If Condition Is True;
-	}
-}
