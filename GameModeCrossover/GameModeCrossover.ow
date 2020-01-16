@@ -2518,17 +2518,7 @@ rule("Game Setup (BASTION)")
 		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(227.510, 3.998, 109.458));
 		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(225.597, 5, 111.121));
 		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(225.142, 5, 111.388));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(222.061, 9.600, 111.912));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(220.742, 14.442, 111.845));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(218.896, 19.526, 111.714));
 		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(215.820, 23.604, 111.456));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(211.689, 20.510, 111.097));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(209.668, 15.704, 110.975));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(207.998, 10.409, 110.920));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(203.516, 7.999, 110.854));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(198.838, 9, 110.787));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(193.729, 9.002, 110.271));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(192.896, 8.818, 107.301));
 		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(192.716, 7.963, 105.676));
 		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(196.487, 7.999, 102.356));
 		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(201.497, 7.999, 102.154));
@@ -2619,5 +2609,28 @@ rule("==TEST==Bastion Speed Decrease")
 	actions
 	{
 		Modify Player Variable(Event Player, bastionSpeed, Subtract, 1);
+	}
+}
+
+rule("==TEST==Pharah==Detect point")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Pharah;
+	}
+
+	conditions
+	{
+		Host Player == True;
+		Is Button Held(Event Player, Primary Fire) == True;
+		Hero Of(Event Player) == Hero(Pharah);
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, target, Position Of(Event Player));
+		Small Message(Event Player, Custom String("{0}", Position Of(Event Player), Null, Null));
 	}
 }
