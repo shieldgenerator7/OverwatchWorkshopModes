@@ -2095,8 +2095,9 @@ rule("Hammond - Create goal")
 
 	actions
 	{
-		Set Player Variable(Event Player, target, Farthest Player From(Event Player, All Teams));
-		Set Player Variable(Event Player, hammondGoalPos, Player Variable(Event Player, target));
+		Set Player Variable(Event Player, target, Random Value In Array(Filtered Array(All Living Players(All Teams), Compare(
+			Current Array Element, !=, Event Player))));
+		Set Player Variable(Event Player, hammondGoalPos, Position Of(Player Variable(Event Player, target)));
 		Create Effect(All Players(All Teams), Ring, Green, Player Variable(Event Player, hammondGoalPos), Global Variable(
 			HAMMOND_GOAL_RADIUS), None);
 		Set Player Variable(Event Player, hammondGoalEffectId, Last Created Entity);
@@ -2148,6 +2149,7 @@ rule("Hammond - dies (gives point to last damager) (and remove kill self penalty
 		Modify Player Score(Player Variable(Event Player, hammondLastDamager), 1);
 		Modify Player Score(Event Player, 1);
 		Destroy Effect(Player Variable(Event Player, hammondGoalEffectId));
+		Set Player Variable(Event Player, hammondGoalEffectId, Null);
 	}
 }
 
@@ -2165,6 +2167,7 @@ rule("Hammond scores")
 		Hero Of(Event Player) == Hero(Wrecking Ball);
 		Is Alive(Event Player) == True;
 		Distance Between(Position Of(Event Player), Player Variable(Event Player, hammondGoalPos)) <= Global Variable(HAMMOND_GOAL_RADIUS);
+		Player Variable(Event Player, hammondGoalEffectId) != Null;
 	}
 
 	actions
