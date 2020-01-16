@@ -96,7 +96,7 @@ rule("Instant Start")
 	}
 }
 
-rule("Game Setup (BAP, BRIG, ZEN)")
+rule("Game Setup (BAP, BRIG, HAM, ZEN)")
 {
 	event
 	{
@@ -107,6 +107,7 @@ rule("Game Setup (BAP, BRIG, ZEN)")
 	{
 		Set Global Variable(BAP_LAVA_GROWTH_SPEED, 0.100);
 		Set Global Variable(BRIG_RING_RADIUS, 10);
+		Set Global Variable(HAMMOND_GOAL_RADIUS, 3);
 		Set Global Variable(ZEN_PEACE_RADIUS, 10);
 	}
 }
