@@ -2,22 +2,22 @@ variables
 {
 	global:
 		0: BAP_LAVA_GROWTH_SPEED
-        1: BRIG_RING_RADIUS
-		1: REIN_PAYLOAD_POINTS
-		2: REIN_PAYLOAD_RADIUS
-		3: REIN_PAYLOAD_GROUND_OFFSET
-		4: REIN_PAYLOAD_MOVESPEED
-		5: REIN_PAYLOAD_CONTEST_RADIUS
-		6: ZEN_PEACE_RADIUS
+		1: BRIG_RING_RADIUS
+		2: REIN_PAYLOAD_POINTS
+		3: REIN_PAYLOAD_RADIUS
+		4: REIN_PAYLOAD_GROUND_OFFSET
+		5: REIN_PAYLOAD_MOVESPEED
+		6: REIN_PAYLOAD_CONTEST_RADIUS
+		7: ZEN_PEACE_RADIUS
 
 	player:
 		0: target
 		1: bapLavaPos
 		2: bapLavaRadius
 		3: bapLavaEffectId
-        4: brig1v1Target
-        5: brigRingPos
-        6: brigRingEffectId
+		4: brig1v1Target
+		5: brigRingPos
+		6: brigRingEffectId
 		7: meiHUDTextId
 		8: mercyKiller
 		9: reaperPowerLevel
@@ -68,13 +68,14 @@ rule("Player loses point when kills themselves")
 		All;
 	}
 
-    conditions{
-        Or(Compare(Attacker, ==, Victim),Compare(Attacker, ==, Null)) == True;
-    }
+	conditions
+	{
+		Or(Compare(Attacker, ==, Victim), Compare(Attacker, ==, Null)) == True;
+	}
 
 	actions
 	{
-		Modify Player Score(Event Player, -1);
+		Modify Player Score(Event Player, -1.000);
 	}
 }
 
@@ -308,12 +309,13 @@ rule("Brigitte - Spawns in")
 
 	actions
 	{
-		Small Message(Event Player, Custom String("{0} Brigitte is playing For Honor:", Hero Icon String(Hero Of(Event Player)), Null, Null));
-		Small Message(Event Player, Custom String("{0} Damage an enemy to lock them into a 1v1.", Hero Icon String(Hero Of(
-			Event Player)), Null, Null));
+		Small Message(Event Player, Custom String("{0} Brigitte is playing For Honor:", Hero Icon String(Hero Of(Event Player)), Null,
+			Null));
+		Small Message(Event Player, Custom String("{0} Damage an enemy to lock them into a 1v1.", Hero Icon String(Hero Of(Event Player)),
+			Null, Null));
 		Wait(3, Ignore Condition);
 		Big Message(Event Player, Custom String("RALLY TO ME!", Null, Null, Null));
-        Set Player Variable(Event Player, brig1v1Target, Null);
+		Set Player Variable(Event Player, brig1v1Target, Null);
 	}
 }
 
@@ -330,15 +332,16 @@ rule("Brigitte - lock player into 1v1")
 	{
 		Hero Of(Event Player) == Hero(Brigitte);
 		Is Alive(Event Player) == True;
-        Player Variable(Event Player, brig1v1Target) == Null;
+		Player Variable(Event Player, brig1v1Target) == Null;
 	}
 
 	actions
 	{
 		Set Player Variable(Event Player, brig1v1Target, Victim);
-        Set Player Variable(Event Player, brigRingPos, Position Of(Event Player));
-        Destroy Effect(Player Variable(Event Player, brigRingEffectId));
-		Create Effect(All Players(All Teams), Ring, White, Player Variable(Event Player, brigRingPos), Global Variable(BRIG_RING_RADIUS), None);
+		Set Player Variable(Event Player, brigRingPos, Position Of(Event Player));
+		Destroy Effect(Player Variable(Event Player, brigRingEffectId));
+		Create Effect(All Players(All Teams), Ring, White, Player Variable(Event Player, brigRingPos), Global Variable(BRIG_RING_RADIUS),
+			None);
 		Set Player Variable(Event Player, brigRingEffectId, Last Created Entity);
 	}
 }
@@ -356,13 +359,14 @@ rule("Brigitte - 1v1 target leaves ring")
 	{
 		Hero Of(Event Player) == Hero(Brigitte);
 		Is Alive(Event Player) == True;
-        Player Variable(Event Player, brig1v1Target) != Null;
-        Distance Between(Player Variable(Event Player,brigRingPos),Position Of(Player Variable(Event Player, brig1v1Target))) > Global Variable(BRIG_RING_RADIUS);
+		Player Variable(Event Player, brig1v1Target) != Null;
+		Distance Between(Player Variable(Event Player, brigRingPos), Position Of(Player Variable(Event Player, brig1v1Target)))
+			> Global Variable(BRIG_RING_RADIUS);
 	}
 
 	actions
 	{
-        Damage(Player Variable(Event Player, brig1v1Target), Event Player, 1000);
+		Damage(Player Variable(Event Player, brig1v1Target), Event Player, 1000);
 	}
 }
 
@@ -379,13 +383,13 @@ rule("Brigitte - brig leaves ring during 1v1")
 	{
 		Hero Of(Event Player) == Hero(Brigitte);
 		Is Alive(Event Player) == True;
-        Player Variable(Event Player, brig1v1Target) != Null;
-        Distance Between(Player Variable(Event Player,brigRingPos),Position Of(Event Player)) > Global Variable(BRIG_RING_RADIUS);
+		Player Variable(Event Player, brig1v1Target) != Null;
+		Distance Between(Player Variable(Event Player, brigRingPos), Position Of(Event Player)) > Global Variable(BRIG_RING_RADIUS);
 	}
 
 	actions
 	{
-        Damage(Event Player, Player Variable(Event Player, brig1v1Target),1000);
+		Damage(Event Player, Player Variable(Event Player, brig1v1Target), 1000);
 	}
 }
 
@@ -401,15 +405,15 @@ rule("Brigitte - 1v1 target dies")
 	conditions
 	{
 		Hero Of(Event Player) == Hero(Brigitte);
-        Player Variable(Event Player, brig1v1Target) != Null;
-        Is Alive(Player Variable(Event Player, brig1v1Target)) == False
+		Player Variable(Event Player, brig1v1Target) != Null;
+		Is Alive(Player Variable(Event Player, brig1v1Target)) == False;
 	}
 
 	actions
 	{
-        Modify Player Score(Event Player, 1);
-        Set Player Variable(Event Player, brig1v1Target, null);
-        Destroy Effect(Player Variable(Event Player, brigRingEffectId));
+		Modify Player Score(Event Player, 1);
+		Set Player Variable(Event Player, brig1v1Target, Null);
+		Destroy Effect(Player Variable(Event Player, brigRingEffectId));
 	}
 }
 
@@ -425,15 +429,15 @@ rule("Brigitte - brig dies during 1v1")
 	conditions
 	{
 		Hero Of(Event Player) == Hero(Brigitte);
-        Player Variable(Event Player, brig1v1Target) != Null;
-        Is Alive(Event Player) == False
+		Player Variable(Event Player, brig1v1Target) != Null;
+		Is Alive(Event Player) == False;
 	}
 
 	actions
 	{
-        Modify Player Score(Player Variable(Event Player, brig1v1Target), 1);
-        Set Player Variable(Event Player, brig1v1Target, null);
-        Destroy Effect(Player Variable(Event Player, brigRingEffectId));
+		Modify Player Score(Player Variable(Event Player, brig1v1Target), 1);
+		Set Player Variable(Event Player, brig1v1Target, Null);
+		Destroy Effect(Player Variable(Event Player, brigRingEffectId));
 	}
 }
 
@@ -1169,7 +1173,7 @@ rule("Roadhog - Deals damage (eats players points)")
 	{
 		Hero Of(Event Player) == Hero(Roadhog);
 		Is Alive(Event Player) == True;
-        Event Damage <= 50;
+		Event Damage <= 50;
 	}
 
 	actions
@@ -1210,7 +1214,7 @@ rule("Roadhog - Eats players in range")
 		Damage(Filtered Array(Players Within Radius(Position Of(Event Player), Player Variable(Event Player, roadhogEatRadius), All Teams,
 			Surfaces And All Barriers), And(Compare(Current Array Element, !=, Event Player), Compare(Is Alive(Current Array Element), ==,
 			True))), Event Player, 100);
-		Wait(0.1, Ignore Condition);
+		Wait(0.100, Ignore Condition);
 		Loop If Condition Is True;
 	}
 }
@@ -1772,8 +1776,3 @@ rule("==BOTS==REINHARDT==")
 			To World, Replace existing throttle, Direction and Magnitude);
 	}
 }
-
-
-
-
-
