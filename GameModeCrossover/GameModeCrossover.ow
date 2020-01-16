@@ -15,6 +15,7 @@ variables
 		11: REIN_PAYLOAD_CONTEST_RADIUS
 		12: HAMMOND_GOAL_RADIUS
 		13: ZEN_PEACE_RADIUS
+		14: editBastionPoints
 
 	player:
 		0: target
@@ -331,6 +332,7 @@ rule("Bastion - Spawns in")
 	{
 		Hero Of(Event Player) == Hero(Bastion);
 		Is Alive(Event Player) == True;
+		Count Of(Global Variable(BASTION_TRACK_POINTS)) > 0;
 	}
 
 	actions
@@ -2328,6 +2330,111 @@ rule("==BOTS==REINHARDT==")
 		Start Throttle In Direction(Event Player, Subtract(Player Variable(Event Player, reinPayloadPos), Position Of(Event Player)), 2,
 			To World, Replace existing throttle, Direction and Magnitude);
 	}
+}
+
+disabled rule("==TEST==Bastion lay track points start")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Host Player == True;
+		Is Button Held(Event Player, Crouch) == True;
+		Hero Of(Event Player) == Hero(Bastion);
+		Global Variable(editBastionPoints) == False;
+	}
+
+	actions
+	{
+		Set Global Variable(editBastionPoints, True);
+		Set Global Variable(BASTION_TRACK_POINTS, Empty Array);
+		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Position Of(Event Player));
+		disabled Set Player Variable(Event Player, bastionTrackPointIndex, 0);
+		disabled Modify Global Variable(REIN_PAYLOAD_POINTS, Append To Array, Position Of(Event Player));
+	}
+}
+
+disabled rule("==TEST== Bastion lay track points (Distance)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Host Player == True;
+		Hero Of(Event Player) == Hero(Bastion);
+		Global Variable(editBastionPoints) == True;
+		Distance Between(Position Of(Event Player), Last Of(Global Variable(BASTION_TRACK_POINTS))) >= 5;
+	}
+
+	actions
+	{
+		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Position Of(Event Player));
+		Small Message(Event Player, Custom String("NEW TRACK POS (Distance): {0}", Position Of(Event Player), Null, Null));
+	}
+}
+
+disabled rule("==TEST== Bastion lay track points (Line of Sight)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Host Player == True;
+		Hero Of(Event Player) == Hero(Bastion);
+		Global Variable(editBastionPoints) == True;
+		Is In Line of Sight(Position Of(Event Player), Last Of(Global Variable(BASTION_TRACK_POINTS)), Barriers Do Not Block LOS) == False;
+	}
+
+	actions
+	{
+		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Position Of(Event Player));
+		Small Message(Event Player, Custom String("NEW TRACK POS (Los): {0}", Position Of(Event Player), Null, Null));
+	}
+}
+
+disabled rule("==TEST==Bastion lay track points end")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Host Player == True;
+		Is Button Held(Event Player, Ultimate) == True;
+		Hero Of(Event Player) == Hero(Bastion);
+		Global Variable(editBastionPoints) == True;
+		Count Of(Global Variable(BASTION_TRACK_POINTS)) > 1;
+	}
+
+	actions
+	{
+		Set Global Variable(editBastionPoints, False);
+		disabled Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Position Of(Event Player));
+		disabled Set Player Variable(Event Player, bastionTrackPointIndex, 0);
+		disabled Modify Global Variable(REIN_PAYLOAD_POINTS, Append To Array, Position Of(Event Player));
+		Kill(Event Player, Null);
+	}
+}
+
 rule("Game Setup (BASTION)")
 {
 	event
@@ -2431,5 +2538,49 @@ rule("Game Setup (BASTION)")
 		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(181.263, 8, 56.134));
 		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(183.249, 8.002, 60.830));
 		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(186.753, 8, 64.530));
+	}
+}
+
+rule("==TEST==Bastion Speed Increase")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Bastion;
+	}
+
+	conditions
+	{
+		Host Player == True;
+		Is Button Held(Event Player, Secondary Fire) == True;
+		Hero Of(Event Player) == Hero(Bastion);
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, bastionSpeed, Add, 1);
+	}
+}
+
+rule("==TEST==Bastion Speed Decrease")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Bastion;
+	}
+
+	conditions
+	{
+		Host Player == True;
+		Is Button Held(Event Player, Crouch) == True;
+		Hero Of(Event Player) == Hero(Bastion);
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, bastionSpeed, Subtract, 1);
 	}
 }
