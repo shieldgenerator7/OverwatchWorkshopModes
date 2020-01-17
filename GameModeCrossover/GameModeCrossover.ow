@@ -8,6 +8,8 @@ variables
 		4: BASTION_SPEED_BOOST
 		5: BASTION_SPEED_ULT
 		6: BRIG_RING_RADIUS
+        8: DOOM_ARENA_POS
+        9: DOOM_CAMERA_OFFSET
 		7: ORISA_OBJECTIVE_RADIUS
 		8: orisaObjectivePos
 		9: orisaObjectiveEffectId
@@ -32,6 +34,7 @@ variables
 		8: brig1v1Target
 		9: brigRingPos
 		10: brigRingEffectId
+        11: doom1v1Target
 		11: meiHUDTextId
 		12: mercyKiller
 		13: reaperPowerLevel
@@ -765,6 +768,147 @@ rule("Brigitte - brig dies during 1v1")
 		Set Player Variable(Event Player, brig1v1Target, Null);
 		Destroy Effect(Player Variable(Event Player, brigRingEffectId));
 	}
+}
+
+rule("Doomfist - Spawns in")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Doomfist;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Doomfist);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Small Message(Event Player, Custom String("{0} Doomfist is playing Mortal Kombat:", Hero Icon String(Hero Of(Event Player)), Null, Null));
+		Small Message(Event Player, Custom String("{0} Damage an enemy to take them to the 1v1 arena.", Hero Icon String(Hero Of(
+			Event Player)), Null, Null));
+		Wait(3, Ignore Condition);
+		Big Message(Event Player, Custom String("FATALITY!", Null, Null, Null));
+	}
+}
+
+rule("Doomfist - lock player into 1v1")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		Doomfist;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Doomfist);
+		Is Alive(Event Player) == True;
+		Player Variable(Event Player, doom1v1Target) == Null;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, doom1v1Target, Victim);
+        Teleport(Event Player, Global Variable(DOOM_ARENA_POS));
+        Teleport(Player Variable(Event Player,doom1v1Target), Global Variable(DOOM_ARENA_POS));
+		Start Camera(Event Player, Add(Divide(Add(Position Of(Event Player),Position Of(Player Variable(Event Player,doom1v1Target))),2),Global Variable(DOOM_CAMERA_OFFSET)),1);
+		Start Camera(Player Variable(Event Player,doom1v1Target), Add(Divide(Add(Position Of(Event Player),Position Of(Player Variable(Event Player,doom1v1Target))),2),Global Variable(DOOM_CAMERA_OFFSET)),1);
+        Start Forcing Throttle(Event Player,0,1,0,1,0,0);
+        Start Forcing Throttle(Player Variable(Event Player,doom1v1Target) ,0,1,0,1,0,0);
+        Heal(Event Player,Event Player,1000);
+        Heal(Player Variable(Event Player,doom1v1Target),Event Player,1000);
+	}
+}
+
+rule("Doomfist - 1v1 face each other")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Doomfist;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Doomfist);
+		Is Alive(Event Player) == True;
+		Player Variable(Event Player, doom1v1Target) != Null;
+        Is Alive(Player Variable(Event Player, doom1v1Target)) == True;
+        disabled Is On Ground(Player Variable(Event Player, doom1v1Target)) == True;
+	}
+
+	actions
+	{
+        Set Facing(Player Variable(Event Player, doom1v1Target), Subtract(Eye Position(Event Player),Eye Position(Player Variable(Event Player, doom1v1Target))),To World);
+        Set Facing(Event Player, Subtract(Eye Position(Player Variable(Event Player, doom1v1Target)),Eye Position(Event Player)),To World);
+        Wait(0.02, Ignore Condition);
+        Loop If Condition Is True;
+    }
+}
+
+rule("Doomfist - 1v1 target dies, give doom +4 (so 5 total for the kill)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Doomfist;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Doomfist);
+		Is Alive(Event Player) == True;
+		Player Variable(Event Player, doom1v1Target) != Null;
+        Is Alive(Player Variable(Event Player, doom1v1Target)) == False;
+	}
+
+	actions
+	{
+        Big Message(Event Player, Custom Message("FATALITY!", Null, Null, Null));
+        Big Message(Player Variable(Event Player, doom1v1Target), Custom Message("YOU LOSE!", Null, Null, Null));
+        Modify Player Score(Event Player, 4);
+        Stop Camera(Event Player);
+        Stop Camera(Player Variable(Event Player, doom1v1Target));
+        Stop Forcing Throttle(Event Player);
+        Stop Forcing Throttle(Player Variable(Event Player, doom1v1Target));
+        Set Player Variable(Event Player, doom1v1Target, Null);        
+    }
+}
+
+rule("Doomfist - doom dies, give 1v1 target +4 (so 5 total for the kill)")
+{
+	event
+	{
+		Player Died;
+		All;
+		Doomfist;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Doomfist);
+		Player Variable(Event Player, doom1v1Target) != Null;
+        Is Alive(Player Variable(Event Player, doom1v1Target)) == True;
+	}
+
+	actions
+	{
+        Big Message(Event Player, Custom Message("YOU LOSE!", Null, Null, Null));
+        Big Message(Player Variable(Event Player, doom1v1Target), Custom Message("FATALITY!", Null, Null, Null));
+        Modify Player Score(Player Variable(Event Player, doom1v1Target), 4);
+        Stop Camera(Event Player);
+        Stop Camera(Player Variable(Event Player, doom1v1Target));
+        Stop Forcing Throttle(Event Player);
+        Stop Forcing Throttle(Player Variable(Event Player, doom1v1Target));
+        Set Player Variable(Event Player, doom1v1Target, Null);
+    }
 }
 
 rule("Genji - Spawns in")
