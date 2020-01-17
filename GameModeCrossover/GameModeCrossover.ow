@@ -112,7 +112,7 @@ rule("Instant Start")
 	}
 }
 
-rule("Game Setup (BAP, BRIG, HAM, ZEN)")
+rule("Game Setup (BAP, BRIG, DOOM, HAM, ZEN)")
 {
 	event
 	{
@@ -123,6 +123,10 @@ rule("Game Setup (BAP, BRIG, HAM, ZEN)")
 	{
 		Set Global Variable(BAP_LAVA_GROWTH_SPEED, 0.100);
 		Set Global Variable(BRIG_RING_RADIUS, 10);
+		Set Global Variable(DOOM_ARENA_POS, Empty Array);
+		Modify Global Variable(DOOM_ARENA_POS, Append To Array, Vector(213.010, 16.500, 46.980));
+		Modify Global Variable(DOOM_ARENA_POS, Append To Array, Vector(199.030, 16.500, 47.020));
+		Set Global Variable(DOOM_CAMERA_OFFSET, Vector(-0.420, -4.620, -12.080));
 		Set Global Variable(HAMMOND_GOAL_RADIUS, 3);
 		Set Global Variable(ZEN_PEACE_RADIUS, 10);
 	}
@@ -815,14 +819,14 @@ rule("Doomfist - lock player into 1v1")
 	actions
 	{
 		Set Player Variable(Event Player, doom1v1Target, Victim);
-		Teleport(Event Player, Global Variable(DOOM_ARENA_POS));
-		Teleport(Player Variable(Event Player, doom1v1Target), Global Variable(DOOM_ARENA_POS));
+		Teleport(Event Player, Value In Array(Global Variable(DOOM_ARENA_POS), 0));
+		Teleport(Player Variable(Event Player, doom1v1Target), Value In Array(Global Variable(DOOM_ARENA_POS), 1));
 		Start Camera(Event Player, Add(Divide(Add(Position Of(Event Player), Position Of(Player Variable(Event Player, doom1v1Target))),
 			2), Global Variable(DOOM_CAMERA_OFFSET)), Divide(Add(Position Of(Event Player), Position Of(Player Variable(Event Player,
-			doom1v1Target))), 2), 1);
+			doom1v1Target))), 2), 100);
 		Start Camera(Player Variable(Event Player, doom1v1Target), Add(Divide(Add(Position Of(Event Player), Position Of(Player Variable(
 			Event Player, doom1v1Target))), 2), Global Variable(DOOM_CAMERA_OFFSET)), Divide(Add(Position Of(Event Player), Position Of(
-			Player Variable(Event Player, doom1v1Target))), 2), 1);
+			Player Variable(Event Player, doom1v1Target))), 2), 100);
 		Start Forcing Throttle(Event Player, 0, 1, 0, 1, 0, 0);
 		Start Forcing Throttle(Player Variable(Event Player, doom1v1Target), 0, 1, 0, 1, 0, 0);
 		Heal(Event Player, Event Player, 1000);
@@ -2672,7 +2676,7 @@ disabled rule("==TEST==Bastion Speed Decrease")
 	}
 }
 
-disabled rule("==TEST==Pharah==Detect point")
+rule("==TEST==Pharah==Detect point")
 {
 	event
 	{
