@@ -376,7 +376,6 @@ rule("Bastion - Spawns in")
 	{
 		Hero Of(Event Player) == Hero(Bastion);
 		Is Alive(Event Player) == True;
-		disabled Count Of(Global Variable(BASTION_TRACK_POINTS)) > 0;
 	}
 
 	actions
@@ -412,7 +411,6 @@ rule("Bastion - Spawns in, put into turret form")
 	{
 		Hero Of(Event Player) == Hero(Bastion);
 		Is Alive(Event Player) == True;
-		disabled Count Of(Global Variable(BASTION_TRACK_POINTS)) > 0;
 	}
 
 	actions
@@ -446,7 +444,6 @@ rule("Bastion dies - stop forcing things")
 	actions
 	{
 		Allow Button(Event Player, Ability 1);
-		disabled Stop Forcing Throttle(Event Player);
 		Set Player Variable(Event Player, index, 0);
 		Set Player Variable(Event Player, bastionTrackPointIndex, 1);
 		Destroy Icon(Player Variable(Event Player, bastionFlagId));
@@ -499,13 +496,12 @@ rule("Bastion - goes forward automatically")
 	{
 		Hero Of(Event Player) == Hero(Bastion);
 		Is Alive(Event Player) == True;
-		Is Button Held(Event Player, Primary Fire) == True;
+		disabled Is Button Held(Event Player, Primary Fire) == True;
 		Player Variable(Event Player, bastionSpeed) > 0;
 	}
 
 	actions
 	{
-		disabled Start Forcing Throttle(Event Player, 1, 1, 0, 0, 0, 0);
 		Apply Impulse(Event Player, Vector(X Component Of(Facing Direction Of(Event Player)), 0, Z Component Of(Facing Direction Of(
 			Event Player))), Player Variable(Event Player, bastionSpeed), To World, Cancel Contrary Motion);
 		Wait(0.020, Ignore Condition);
@@ -555,8 +551,6 @@ rule("Bastion - start ULT")
 	{
 		Hero Of(Event Player) == Hero(Bastion);
 		Is Alive(Event Player) == True;
-		disabled Is Button Held(Event Player, Ultimate) == True;
-		disabled Ultimate Charge Percent(Event Player) == 100;
 		Is Using Ultimate(Event Player) == True;
 	}
 
@@ -2383,8 +2377,6 @@ disabled rule("==TEST==Bastion lay track points start")
 		Set Global Variable(editBastionPoints, True);
 		Set Global Variable(BASTION_TRACK_POINTS, Empty Array);
 		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Position Of(Event Player));
-		disabled Set Player Variable(Event Player, bastionTrackPointIndex, 0);
-		disabled Modify Global Variable(REIN_PAYLOAD_POINTS, Append To Array, Position Of(Event Player));
 	}
 }
 
@@ -2481,9 +2473,6 @@ disabled rule("==TEST==Bastion lay track points end")
 	actions
 	{
 		Set Global Variable(editBastionPoints, False);
-		disabled Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Position Of(Event Player));
-		disabled Set Player Variable(Event Player, bastionTrackPointIndex, 0);
-		disabled Modify Global Variable(REIN_PAYLOAD_POINTS, Append To Array, Position Of(Event Player));
 		Kill(Event Player, Null);
 	}
 }
