@@ -125,6 +125,46 @@ rule("Game Setup (BAP, BRIG, HAM, ZEN)")
 	}
 }
 
+rule("Game Setup (BASTION)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Set Global Variable(BASTION_SPEED_BASE, 8);
+		Set Global Variable(BASTION_SPEED_BOOST, 15);
+		Set Global Variable(BASTION_SPEED_ULT, 25);
+		Set Global Variable(BASTION_TRACK_POINTS, Empty Array);
+		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(191.086, 8, 63.952));
+		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(191.086, 8, 63.952));
+		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(210.752, 8, 61.928));
+		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(208.369, 9.001, 45.332));
+		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(217.083, 12.001, 44.940));
+		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(216.570, 14, 61.591));
+		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(229.298, 12.999, 62.324));
+		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(234.271, 8.996, 85.470));
+		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(234.489, 8.997, 100.293));
+		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(228.433, 3.998, 108.900));
+		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(223.792, 5.002, 110.995));
+		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(217.518, 23.674, 113.067));
+		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(192.917, 9.002, 110.096));
+		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(192.971, 7.999, 103.396));
+		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(219.678, 5.998, 103.851));
+		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(218.152, 0.998, 80.557));
+		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(186.895, 1.001, 81.087));
+		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(186.421, 1.042, 93.550));
+		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(176.248, 5, 92.580));
+		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(169.576, 5, 81.979));
+		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(173.698, 4.999, 76.309));
+		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(173.563, 6.999, 57.743));
+		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(182.986, 8, 56.294));
+		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(183.024, 8, 64.282));
+	}
+}=j 
+
 rule("Game Setup (ORISA)")
 {
 	event
@@ -470,28 +510,6 @@ rule("Bastion - goes forward automatically")
 			Event Player))), Player Variable(Event Player, bastionSpeed), To World, Cancel Contrary Motion);
 		Wait(0.020, Ignore Condition);
 		Loop If Condition Is True;
-	}
-}
-
-disabled rule("Bastion - unpress LMB to stop")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		Bastion;
-	}
-
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Bastion);
-		Is Alive(Event Player) == True;
-		Is Button Held(Event Player, Primary Fire) == False;
-	}
-
-	actions
-	{
-		Start Forcing Throttle(Event Player, 0, 0, 0, 0, 0, 0);
 	}
 }
 
@@ -2470,45 +2488,7 @@ disabled rule("==TEST==Bastion lay track points end")
 	}
 }
 
-rule("Game Setup (BASTION)")
-{
-	event
-	{
-		Ongoing - Global;
-	}
 
-	actions
-	{
-		Set Global Variable(BASTION_SPEED_BASE, 8);
-		Set Global Variable(BASTION_SPEED_BOOST, 15);
-		Set Global Variable(BASTION_SPEED_ULT, 25);
-		Set Global Variable(BASTION_TRACK_POINTS, Empty Array);
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(191.086, 8, 63.952));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(191.086, 8, 63.952));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(210.752, 8, 61.928));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(208.369, 9.001, 45.332));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(217.083, 12.001, 44.940));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(216.570, 14, 61.591));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(229.298, 12.999, 62.324));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(234.271, 8.996, 85.470));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(234.489, 8.997, 100.293));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(228.433, 3.998, 108.900));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(223.792, 5.002, 110.995));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(217.518, 23.674, 113.067));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(192.917, 9.002, 110.096));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(192.971, 7.999, 103.396));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(219.678, 5.998, 103.851));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(218.152, 0.998, 80.557));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(186.895, 1.001, 81.087));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(186.421, 1.042, 93.550));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(176.248, 5, 92.580));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(169.576, 5, 81.979));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(173.698, 4.999, 76.309));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(173.563, 6.999, 57.743));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(182.986, 8, 56.294));
-		Modify Global Variable(BASTION_TRACK_POINTS, Append To Array, Vector(183.024, 8, 64.282));
-	}
-}
 
 disabled rule("==TEST==Bastion Speed Increase")
 {
@@ -2574,58 +2554,5 @@ disabled rule("==TEST==Pharah==Detect point")
 	{
 		Set Player Variable(Event Player, target, Position Of(Event Player));
 		Small Message(Event Player, Custom String("{0}", Position Of(Event Player), Null, Null));
-	}
-}
-
-disabled rule("Bastion - teleport to next point if too far away")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		All;
-	}
-
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Bastion);
-		Is Alive(Event Player) == True;
-		Distance Between(Position Of(Event Player), Value In Array(Global Variable(BASTION_TRACK_POINTS), Player Variable(Event Player,
-			bastionTrackPointIndex))) >= 20;
-		Distance Between(Position Of(Event Player), Value In Array(Global Variable(BASTION_TRACK_POINTS), Subtract(Player Variable(
-			Event Player, bastionTrackPointIndex), 1))) >= 20;
-		Global Variable(editBastionPoints) == False;
-	}
-
-	actions
-	{
-		Teleport(Event Player, Value In Array(Global Variable(BASTION_TRACK_POINTS), Player Variable(Event Player,
-			bastionTrackPointIndex)));
-	}
-}
-
-disabled rule("Bastion - teleport to next point during ult if too far away")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		All;
-	}
-
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Bastion);
-		Is Alive(Event Player) == True;
-		Distance Between(Position Of(Event Player), Value In Array(Global Variable(BASTION_TRACK_POINTS), Player Variable(Event Player,
-			bastionTrackPointIndex))) >= 10;
-		Is Using Ultimate(Event Player) == True;
-		Global Variable(editBastionPoints) == False;
-	}
-
-	actions
-	{
-		Teleport(Event Player, Value In Array(Global Variable(BASTION_TRACK_POINTS), Player Variable(Event Player,
-			bastionTrackPointIndex)));
 	}
 }
