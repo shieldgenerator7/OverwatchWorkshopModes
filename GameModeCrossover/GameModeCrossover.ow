@@ -51,6 +51,52 @@ variables
 		25: zenPeaceEffectId
 }
 
+rule("Doomfist - 1v1 target jumps")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Doomfist;
+	}
+
+	conditions
+	{
+		Is Button Held(Player Variable(Event Player, doom1v1Target), Jump) == True;
+		Hero Of(Event Player) == Hero(Doomfist);
+		Player Variable(Event Player, doom1v1Target) != Null;
+		Is On Ground(Player Variable(Event Player, doom1v1Target)) == True;
+	}
+
+	actions
+	{
+		Apply Impulse(Player Variable(Event Player, doom1v1Target), Up, 10, To World, Cancel Contrary Motion);
+	}
+}
+
+rule("Doomfist - Doom jumps in 1v1")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Doomfist;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Jump) == True;
+		Hero Of(Event Player) == Hero(Doomfist);
+		Player Variable(Event Player, doom1v1Target) != Null;
+		Is On Ground(Event Player) == True;
+	}
+
+	actions
+	{
+		Apply Impulse(Event Player, Up, 10, To World, Cancel Contrary Motion);
+	}
+}
+
 rule("Game Setup")
 {
 	event
@@ -126,7 +172,7 @@ rule("Game Setup (BAP, BRIG, DOOM, HAM, ZEN)")
 		Set Global Variable(DOOM_ARENA_POS, Empty Array);
 		Modify Global Variable(DOOM_ARENA_POS, Append To Array, Vector(213.010, 16.500, 46.980));
 		Modify Global Variable(DOOM_ARENA_POS, Append To Array, Vector(199.030, 16.500, 47.020));
-		Set Global Variable(DOOM_CAMERA_OFFSET, Vector(-0.420, -4.620, -12.080));
+		Set Global Variable(DOOM_CAMERA_OFFSET, Vector(-0.420, 4.620, -12.080));
 		Set Global Variable(HAMMOND_GOAL_RADIUS, 3);
 		Set Global Variable(ZEN_PEACE_RADIUS, 10);
 	}
@@ -831,6 +877,8 @@ rule("Doomfist - lock player into 1v1")
 		Start Forcing Throttle(Player Variable(Event Player, doom1v1Target), 0, 1, 0, 1, 0, 0);
 		Heal(Event Player, Event Player, 1000);
 		Heal(Player Variable(Event Player, doom1v1Target), Event Player, 1000);
+		Disallow Button(Event Player, Jump);
+		Disallow Button(Player Variable(Event Player, doom1v1Target), Jump);
 	}
 }
 
@@ -890,6 +938,8 @@ rule("Doomfist - 1v1 target dies, give doom +4 (so 5 total for the kill)")
 		Stop Forcing Throttle(Event Player);
 		Stop Forcing Throttle(Player Variable(Event Player, doom1v1Target));
 		Set Player Variable(Event Player, doom1v1Target, Null);
+		Allow Button(Event Player, Jump);
+		Allow Button(Player Variable(Event Player, doom1v1Target), Jump);
 	}
 }
 
@@ -919,6 +969,8 @@ rule("Doomfist - doom dies, give 1v1 target +4 (so 5 total for the kill)")
 		Stop Forcing Throttle(Event Player);
 		Stop Forcing Throttle(Player Variable(Event Player, doom1v1Target));
 		Set Player Variable(Event Player, doom1v1Target, Null);
+		Allow Button(Event Player, Jump);
+		Allow Button(Player Variable(Event Player, doom1v1Target), Jump);
 	}
 }
 
