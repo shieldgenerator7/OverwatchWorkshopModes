@@ -49,6 +49,27 @@ variables
 		23: hammondGoalEffectId
 		24: hammondGoalPos
 		25: zenPeaceEffectId
+		26: winstonMeatEffectPos
+}
+
+rule("Winston dies")
+{
+	event
+	{
+		Player Died;
+		All;
+		Winston;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Winston);
+	}
+
+	actions
+	{
+		Set Damage Dealt(Event Player, 100);
+	}
 }
 
 rule("Doom - Auto aim on Ult")
@@ -2176,8 +2197,12 @@ rule("Winston - player dies and becomes meat")
 	actions
 	{
 		Destroy Effect(Player Variable(Event Player, winstonMeatEffectId));
-		Create Effect(All Players(All Teams), Sphere, Red, Add(Position Of(Event Player), Up), 1, Position and Radius);
+		Create Effect(All Players(All Teams), Sphere, Red, Add(Position Of(Event Player), Multiply(Up, 0.750)), 0.750, None);
 		Set Player Variable(Event Player, winstonMeatEffectId, Last Created Entity);
+		Set Player Variable(Event Player, winstonMeatEffectPos, Position Of(Event Player));
+		Wait(10, Ignore Condition);
+		Destroy Effect(Player Variable(Event Player, winstonMeatEffectId));
+		Set Player Variable(Event Player, winstonMeatEffectId, Null);
 	}
 }
 
@@ -2192,17 +2217,17 @@ rule("Winston - collects meat")
 
 	conditions
 	{
-		Is Alive(Event Player) == False;
+		disabled Is Alive(Event Player) == False;
 		Player Variable(Event Player, winstonMeatEffectId) != Null;
 		Is Hero Being Played(Hero(Winston), All Teams) == True;
 		Is True For Any(Players On Hero(Hero(Winston), All Teams), Compare(Distance Between(Position Of(Current Array Element),
-			Position Of(Event Player)), <=, 3)) == True;
+			Player Variable(Event Player, winstonMeatEffectPos)), <=, 3)) == True;
 	}
 
 	actions
 	{
 		Set Player Variable(Event Player, target, First Of(Filtered Array(Players On Hero(Hero(Winston), All Teams), Compare(
-			Distance Between(Position Of(Current Array Element), Position Of(Event Player)), <=, 3))));
+			Distance Between(Position Of(Current Array Element), Player Variable(Event Player, winstonMeatEffectPos)), <=, 3))));
 		Set Ultimate Charge(Player Variable(Event Player, target), Add(Ultimate Charge Percent(Player Variable(Event Player, target)),
 			25));
 		Destroy Effect(Player Variable(Event Player, winstonMeatEffectId));
@@ -2539,7 +2564,7 @@ rule("==TEST==BOTS==LOOK FOR TARGET")
 	actions
 	{
 		Start Facing(Event Player, Subtract(Position Of(Player Closest To Reticle(Event Player, All Teams)), Position Of(Event Player)),
-			10, To World, Direction and Turn Rate);
+			20, To World, Direction and Turn Rate);
 	}
 }
 
@@ -2560,7 +2585,7 @@ rule("==BOTS==SHOOT BACK==")
 
 	actions
 	{
-		Start Facing(Event Player, Subtract(Position Of(Attacker), Position Of(Event Player)), 10, To World, Direction and Turn Rate);
+		Start Facing(Event Player, Subtract(Position Of(Attacker), Position Of(Event Player)), 50, To World, Direction and Turn Rate);
 	}
 }
 
