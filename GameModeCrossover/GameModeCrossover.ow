@@ -962,9 +962,9 @@ rule("Doomfist - 1v1 target dies, give doom +4 (so 5 total for the kill)")
 		Stop Camera(Player Variable(Event Player, doom1v1Target));
 		Stop Forcing Throttle(Event Player);
 		Stop Forcing Throttle(Player Variable(Event Player, doom1v1Target));
-		Set Player Variable(Event Player, doom1v1Target, Null);
 		Allow Button(Event Player, Jump);
 		Allow Button(Player Variable(Event Player, doom1v1Target), Jump);
+		Set Player Variable(Event Player, doom1v1Target, Null);
 	}
 }
 
@@ -993,9 +993,9 @@ rule("Doomfist - doom dies, give 1v1 target +4 (so 5 total for the kill)")
 		Stop Camera(Player Variable(Event Player, doom1v1Target));
 		Stop Forcing Throttle(Event Player);
 		Stop Forcing Throttle(Player Variable(Event Player, doom1v1Target));
-		Set Player Variable(Event Player, doom1v1Target, Null);
 		Allow Button(Event Player, Jump);
 		Allow Button(Player Variable(Event Player, doom1v1Target), Jump);
+		Set Player Variable(Event Player, doom1v1Target, Null);
 	}
 }
 
