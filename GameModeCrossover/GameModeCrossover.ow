@@ -4,21 +4,21 @@ variables
 		0: target
 		1: BAP_LAVA_GROWTH_SPEED
 		2: BASTION_TRACK_POINTS
-		3: BRIG_RING_RADIUS
-		4: ORISA_OBJECTIVE_RADIUS
-		5: orisaObjectivePos
-		6: orisaObjectiveEffectId
-		7: REIN_PAYLOAD_POINTS
-		8: REIN_PAYLOAD_RADIUS
-		9: REIN_PAYLOAD_GROUND_OFFSET
-		10: REIN_PAYLOAD_MOVESPEED
-		11: REIN_PAYLOAD_CONTEST_RADIUS
-		12: HAMMOND_GOAL_RADIUS
-		13: ZEN_PEACE_RADIUS
-		14: editBastionPoints
-		15: BASTION_SPEED_BASE
-		16: BASTION_SPEED_BOOST
-		17: BASTION_SPEED_ULT
+		3: BASTION_SPEED_BASE
+		4: BASTION_SPEED_BOOST
+		5: BASTION_SPEED_ULT
+		6: BRIG_RING_RADIUS
+		7: ORISA_OBJECTIVE_RADIUS
+		8: orisaObjectivePos
+		9: orisaObjectiveEffectId
+		10: REIN_PAYLOAD_POINTS
+		11: REIN_PAYLOAD_RADIUS
+		12: REIN_PAYLOAD_GROUND_OFFSET
+		13: REIN_PAYLOAD_MOVESPEED
+		14: REIN_PAYLOAD_CONTEST_RADIUS
+		15: HAMMOND_GOAL_RADIUS
+		16: ZEN_PEACE_RADIUS
+        17: editBastionPoints
 
 	player:
 		0: target
@@ -26,27 +26,26 @@ variables
 		2: bapLavaPos
 		3: bapLavaRadius
 		4: bapLavaEffectId
-		5: bastionTrackEffectIds
-		6: bastionTrackPointIndex
-		7: brig1v1Target
-		8: brigRingPos
-		9: brigRingEffectId
-		10: meiHUDTextId
-		11: mercyKiller
-		12: reaperPowerLevel
-		13: reinPayloadPos
-		14: reinPayloadEffectId
-		15: reinPayloadPointIndex
-		16: reinPayloadFlagEffectId
-		17: roadhogEffectId
-		18: roadhogEatRadius
-		19: winstonMeatEffectId
-		20: hammondLastDamager
-		21: hammondGoalEffectId
-		22: hammondGoalPos
-		23: zenPeaceEffectId
-		24: bastionSpeed
-		25: bastionFlagId
+		5: bastionSpeed
+		6: bastionFlagId
+		7: bastionTrackPointIndex
+		8: brig1v1Target
+		9: brigRingPos
+		10: brigRingEffectId
+		11: meiHUDTextId
+		12: mercyKiller
+		13: reaperPowerLevel
+		14: reinPayloadPos
+		15: reinPayloadEffectId
+		16: reinPayloadPointIndex
+		17: reinPayloadFlagEffectId
+		18: roadhogEffectId
+		19: roadhogEatRadius
+		20: winstonMeatEffectId
+		21: hammondLastDamager
+		22: hammondGoalEffectId
+		23: hammondGoalPos
+		24: zenPeaceEffectId
 }
 
 rule("Game Setup")
@@ -414,38 +413,6 @@ rule("Bastion dies - stop forcing things")
 	}
 }
 
-disabled rule("Bastion - Make track")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		Bastion;
-	}
-
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Bastion);
-		Is Alive(Event Player) == True;
-		Player Variable(Event Player, index) < Count Of(Global Variable(BASTION_TRACK_POINTS));
-	}
-
-	actions
-	{
-		Destroy Effect(Value In Array(Player Variable(Event Player, bastionTrackEffectIds), Player Variable(Event Player, index)));
-		Skip If(Compare(Player Variable(Event Player, index), !=, Subtract(Count Of(Global Variable(BASTION_TRACK_POINTS)), 1)), 1);
-		Create Beam Effect(Event Player, Good Beam, Value In Array(Global Variable(BASTION_TRACK_POINTS), 0), Value In Array(
-			Global Variable(BASTION_TRACK_POINTS), Player Variable(Event Player, index)), White, None);
-		Skip If(Compare(Player Variable(Event Player, index), ==, Subtract(Count Of(Global Variable(BASTION_TRACK_POINTS)), 1)), 1);
-		Create Beam Effect(Event Player, Good Beam, Value In Array(Global Variable(BASTION_TRACK_POINTS), Add(Player Variable(Event Player,
-			index), 1)), Value In Array(Global Variable(BASTION_TRACK_POINTS), Player Variable(Event Player, index)), White, None);
-		Set Player Variable At Index(Event Player, bastionTrackEffectIds, Player Variable(Event Player, index), Last Created Entity);
-		Modify Player Variable(Event Player, index, Add, 1);
-		Wait(0.200, Ignore Condition);
-		Loop If Condition Is True;
-	}
-}
-
 rule("Bastion - reaches check point")
 {
 	event
@@ -467,15 +434,6 @@ rule("Bastion - reaches check point")
 	{
 		Set Ultimate Charge(Event Player, Add(Ultimate Charge Percent(Event Player), 5));
 		Play Effect(Event Player, Ring Explosion Sound, White, Event Player, 50);
-		disabled Skip If(Compare(Player Variable(Event Player, bastionTrackPointIndex), ==, 0), 3);
-		disabled Destroy Effect(Value In Array(Player Variable(Event Player, bastionTrackEffectIds), Player Variable(Event Player,
-			bastionTrackPointIndex)));
-		disabled Create Beam Effect(Event Player, Bad Beam, Value In Array(Global Variable(BASTION_TRACK_POINTS), Player Variable(Event Player,
-			bastionTrackPointIndex)), Value In Array(Global Variable(BASTION_TRACK_POINTS), Subtract(Player Variable(Event Player,
-			bastionTrackPointIndex), 1)), Green, None);
-		disabled Set Player Variable At Index(Event Player, bastionTrackEffectIds, Player Variable(Event Player, index), Last Created Entity);
-		Skip If(Compare(Player Variable(Event Player, bastionTrackPointIndex), !=, 0), 4);
-		disabled Set Player Variable(Event Player, index, 0);
 		Big Message(Event Player, Custom String("LAP COMPLETE!", Null, Null, Null));
 		Set Ultimate Charge(Event Player, Add(Ultimate Charge Percent(Event Player), 20));
 		Modify Player Score(Event Player, 1);
@@ -2669,31 +2627,5 @@ disabled rule("Bastion - teleport to next point during ult if too far away")
 	{
 		Teleport(Event Player, Value In Array(Global Variable(BASTION_TRACK_POINTS), Player Variable(Event Player,
 			bastionTrackPointIndex)));
-	}
-}
-
-disabled rule("Bastion - Erase track")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		Bastion;
-	}
-
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Bastion);
-		Is Alive(Event Player) == False;
-		Player Variable(Event Player, index) == 0;
-	}
-
-	actions
-	{
-		Destroy Effect(Value In Array(Player Variable(Event Player, bastionTrackEffectIds), 0));
-		Modify Player Variable(Event Player, bastionTrackEffectIds, Remove From Array By Index, 0);
-		Abort If(Compare(Count Of(Player Variable(Event Player, bastionTrackEffectIds)), ==, 0));
-		Wait(0.200, Ignore Condition);
-		Loop;
 	}
 }
