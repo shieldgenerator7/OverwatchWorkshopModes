@@ -2568,6 +2568,32 @@ rule("==TEST==BOTS==LOOK FOR TARGET")
 	}
 }
 
+rule("==TEST==BOTS==LOOK FOR TARGETS (10 SEC)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Wait(10, Ignore Condition);
+		Set Player Variable(Event Player, target, Random Value In Array(Players Within Radius(Position Of(Event Player), 20, All Teams,
+			Surfaces)));
+		Start Facing(Event Player, Subtract(Position Of(Player Variable(Event Player, target)), Eye Position(Event Player)), 20, To World,
+			Direction and Turn Rate);
+		Loop If Condition Is True;
+	}
+}
+
 rule("==BOTS==SHOOT BACK==")
 {
 	event
