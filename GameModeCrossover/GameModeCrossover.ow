@@ -51,6 +51,31 @@ variables
 		25: zenPeaceEffectId
 }
 
+rule("Doom - Auto aim on Ult")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Doomfist;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Doomfist);
+		Player Variable(Event Player, doom1v1Target) != Null;
+		Is Using Ultimate(Event Player) == True;
+	}
+
+	actions
+	{
+		Wait(0.500, Ignore Condition);
+		Teleport(Event Player, Position Of(Player Variable(Event Player, doom1v1Target)));
+		Wait(0.500, Ignore Condition);
+		Press Button(Event Player, Primary Fire);
+	}
+}
+
 rule("Doomfist - 1v1 target jumps")
 {
 	event
