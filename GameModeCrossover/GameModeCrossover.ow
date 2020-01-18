@@ -45,102 +45,11 @@ variables
 		19: roadhogEffectId
 		20: roadhogEatRadius
 		21: winstonMeatEffectId
-		22: hammondLastDamager
-		23: hammondGoalEffectId
-		24: hammondGoalPos
-		25: zenPeaceEffectId
-		26: winstonMeatEffectPos
-}
-
-rule("Winston dies")
-{
-	event
-	{
-		Player Died;
-		All;
-		Winston;
-	}
-
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Winston);
-	}
-
-	actions
-	{
-		Set Damage Dealt(Event Player, 100);
-	}
-}
-
-rule("Doom - Auto aim on Ult")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		Doomfist;
-	}
-
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Doomfist);
-		Player Variable(Event Player, doom1v1Target) != Null;
-		Is Using Ultimate(Event Player) == True;
-	}
-
-	actions
-	{
-		Wait(0.500, Ignore Condition);
-		Teleport(Event Player, Position Of(Player Variable(Event Player, doom1v1Target)));
-		Wait(0.500, Ignore Condition);
-		Press Button(Event Player, Primary Fire);
-	}
-}
-
-rule("Doomfist - 1v1 target jumps")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		Doomfist;
-	}
-
-	conditions
-	{
-		Is Button Held(Player Variable(Event Player, doom1v1Target), Jump) == True;
-		Hero Of(Event Player) == Hero(Doomfist);
-		Player Variable(Event Player, doom1v1Target) != Null;
-		Is On Ground(Player Variable(Event Player, doom1v1Target)) == True;
-	}
-
-	actions
-	{
-		Apply Impulse(Player Variable(Event Player, doom1v1Target), Up, 10, To World, Cancel Contrary Motion);
-	}
-}
-
-rule("Doomfist - Doom jumps in 1v1")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		Doomfist;
-	}
-
-	conditions
-	{
-		Is Button Held(Event Player, Jump) == True;
-		Hero Of(Event Player) == Hero(Doomfist);
-		Player Variable(Event Player, doom1v1Target) != Null;
-		Is On Ground(Event Player) == True;
-	}
-
-	actions
-	{
-		Apply Impulse(Event Player, Up, 10, To World, Cancel Contrary Motion);
-	}
+		22: winstonMeatEffectPos
+		23: hammondLastDamager
+		24: hammondGoalEffectId
+		25: hammondGoalPos
+		26: zenPeaceEffectId
 }
 
 rule("Game Setup")
@@ -954,6 +863,77 @@ rule("Doomfist - 1v1 face each other")
 			To World);
 		Wait(0.020, Ignore Condition);
 		Loop If Condition Is True;
+	}
+}
+
+rule("Doom - Auto aim on Ult")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Doomfist;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Doomfist);
+		Player Variable(Event Player, doom1v1Target) != Null;
+		Is Using Ultimate(Event Player) == True;
+	}
+
+	actions
+	{
+		Wait(0.500, Ignore Condition);
+		Teleport(Event Player, Position Of(Player Variable(Event Player, doom1v1Target)));
+		Wait(0.500, Ignore Condition);
+		Press Button(Event Player, Primary Fire);
+	}
+}
+
+rule("Doomfist - 1v1 target jumps")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Doomfist;
+	}
+
+	conditions
+	{
+		Is Button Held(Player Variable(Event Player, doom1v1Target), Jump) == True;
+		Hero Of(Event Player) == Hero(Doomfist);
+		Player Variable(Event Player, doom1v1Target) != Null;
+		Is On Ground(Player Variable(Event Player, doom1v1Target)) == True;
+	}
+
+	actions
+	{
+		Apply Impulse(Player Variable(Event Player, doom1v1Target), Up, 10, To World, Cancel Contrary Motion);
+	}
+}
+
+rule("Doomfist - Doom jumps in 1v1")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Doomfist;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Jump) == True;
+		Hero Of(Event Player) == Hero(Doomfist);
+		Player Variable(Event Player, doom1v1Target) != Null;
+		Is On Ground(Event Player) == True;
+	}
+
+	actions
+	{
+		Apply Impulse(Event Player, Up, 10, To World, Cancel Contrary Motion);
 	}
 }
 
@@ -2276,6 +2256,26 @@ rule("Winston Ults Ends")
 	actions
 	{
 		Set Damage Dealt(Event Player, 10);
+	}
+}
+
+rule("Winston dies")
+{
+	event
+	{
+		Player Died;
+		All;
+		Winston;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Winston);
+	}
+
+	actions
+	{
+		Set Damage Dealt(Event Player, 100);
 	}
 }
 
