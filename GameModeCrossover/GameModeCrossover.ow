@@ -10,46 +10,50 @@ variables
 		6: BRIG_RING_RADIUS
 		7: DOOM_ARENA_POS
 		8: DOOM_CAMERA_OFFSET
-		9: ORISA_OBJECTIVE_RADIUS
-		10: orisaObjectivePos
-		11: orisaObjectiveEffectId
-		12: REIN_PAYLOAD_POINTS
-		13: REIN_PAYLOAD_RADIUS
-		14: REIN_PAYLOAD_GROUND_OFFSET
-		15: REIN_PAYLOAD_MOVESPEED
-		16: REIN_PAYLOAD_CONTEST_RADIUS
-		17: HAMMOND_GOAL_RADIUS
-		18: ZEN_PEACE_RADIUS
-		19: editBastionPoints
+        9: JUNK_PROP_RADIUS
+		10: ORISA_OBJECTIVE_RADIUS
+		11: orisaObjectivePos
+		12: orisaObjectiveEffectId
+		13: REIN_PAYLOAD_POINTS
+		14: REIN_PAYLOAD_RADIUS
+		15: REIN_PAYLOAD_GROUND_OFFSET
+		16: REIN_PAYLOAD_MOVESPEED
+		17: REIN_PAYLOAD_CONTEST_RADIUS
+		18: HAMMOND_GOAL_RADIUS
+		19: ZEN_PEACE_RADIUS
+		20: editBastionPoints
 
 	player:
 		0: target
 		1: index
-		2: bapLavaPos
-		3: bapLavaRadius
-		4: bapLavaEffectId
-		5: bastionSpeed
-		6: bastionFlagId
-		7: bastionTrackPointIndex
-		8: brig1v1Target
-		9: brigRingPos
-		10: brigRingEffectId
-		11: doom1v1Target
-		12: meiHUDTextId
-		13: mercyKiller
-		14: reaperPowerLevel
-		15: reinPayloadPos
-		16: reinPayloadEffectId
-		17: reinPayloadPointIndex
-		18: reinPayloadFlagEffectId
-		19: roadhogEffectId
-		20: roadhogEatRadius
-		21: winstonMeatEffectId
-		22: winstonMeatEffectPos
-		23: hammondLastDamager
-		24: hammondGoalEffectId
-		25: hammondGoalPos
-		26: zenPeaceEffectId
+        2: pos
+		3: bapLavaPos
+		4: bapLavaRadius
+		5: bapLavaEffectId
+		6: bastionSpeed
+		7: bastionFlagId
+		8: bastionTrackPointIndex
+		9: brig1v1Target
+		10: brigRingPos
+		11: brigRingEffectId
+		12: doom1v1Target
+        13: junkPropPosList
+        14: junkPropIds
+		15: meiHUDTextId
+		16: mercyKiller
+		17: reaperPowerLevel
+		18: reinPayloadPos
+		19: reinPayloadEffectId
+		20: reinPayloadPointIndex
+		21: reinPayloadFlagEffectId
+		22: roadhogEffectId
+		23: roadhogEatRadius
+		24: winstonMeatEffectId
+		25: winstonMeatEffectPos
+		26: hammondLastDamager
+		27: hammondGoalEffectId
+		28: hammondGoalPos
+		29: zenPeaceEffectId
 }
 
 rule("Game Setup")
@@ -1046,6 +1050,217 @@ rule("Genji - deals double damage (actually just an extra 100)")
 	{
 		Damage(Victim, Attacker, 20);
 	}
+}
+
+rule("Junkrat - Spawns in")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Junkrat);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Small Message(Event Player, Custom String("{0} Junkrat is playing Prop Hunt:", Hero Icon String(Hero Of(Event Player)), Null,
+			Null));
+		Small Message(Event Player, Custom String("{0} Stay hidden, get points when players destroy your props.", Hero Icon String(Hero Of(
+			Event Player)), Null, Null));
+		Wait(3, Ignore Condition);
+		Big Message(Event Player, Custom String("THINK OUTSIDE THE BOX!", Null, Null, Null));
+        Set Invisible(Event Player, All);
+        Set Player Variable(Event Player, index, 0);
+        Set Player Variable(Event Player, junkPropPosList, Empty Array);
+        Modify Player Variable(Event Player, junkPropPosList, Append To Array, Position Of(Event Player));
+        Create Effect(All Players, Sphere, Green, Player Variable(Event Player, pos), Position And Radius);
+        Set Player Variable(Event Player, junkPropIds, Empty Array);
+        Modify Player Variable(Event Player, junkPropIds, Append To Array, Last Created Entity);
+	}
+}
+
+rule("Junkrat dies")
+{
+	event
+	{
+		Player Died;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Junkrat);
+	}
+
+	actions
+	{
+        Set Invisible(Event Player,None);
+	}
+}
+
+rule("Junkrat - Make prop effects")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Junkrat);
+		Is Alive(Event Player) == True;
+        Count Of(Player Variable(Event Player, junkPropIds)) < 11;
+	}
+
+	actions
+	{
+        Set Player Variable(Event Player, pos, Add(Position Of (Event Player),Vector(
+            Random Real(Multiply(Global Variable(JUNK_PROP_RADIUS),-1),Global Variable(JUNK_PROP_RADIUS)),
+            0,
+            Random Real(Multiply(Global Variable(JUNK_PROP_RADIUS),-1),Global Variable(JUNK_PROP_RADIUS))
+            )));
+        Modify Player Variable(Event Player, junkPropPosList, Append To Array, Player Variable(Event Player, pos));
+        Create Effect(All Players, Sphere, Green, Player Variable(Event Player, pos), None);
+        Modify Player Variable(Event Player, junkPropIds, Append To Array, Last Created Entity);
+        Wait(0.016, Ignore Condition);
+        Loop If Condition Is True;
+    }
+}
+
+rule("Junkrat - Move Prop Effects")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Junkrat);
+		Is Alive(Event Player) == True;
+        Horizontal Speed Of(Event Player) > 0;
+	}
+
+	actions
+	{
+        Modify Player Variable(Event Player, index, Add, 1);
+        Skip If(Compare(Player Variable(Event Player, index), <, Count Of(Player Variable(Event Player, junkPropIds))),1);
+        Set Player Variable(Event Player, index, 0);
+        
+        Skip If (Compare(
+             Distance Between(Position Of (Event Player), Value In Array(Player Variable(Event Player, junkPropPosList), Player Variable(Event Player, index))),
+             <,
+            Multiply(Global Variable(JUNK_PROP_RADIUS), 2.5)
+        ),5);
+        Set Player Variable(Event Player, pos, Add(Position Of (Event Player),Vector(
+            Random Real(Multiply(Global Variable(JUNK_PROP_RADIUS),-1),Global Variable(JUNK_PROP_RADIUS)),
+            0,
+            Random Real(Multiply(Global Variable(JUNK_PROP_RADIUS),-1),Global Variable(JUNK_PROP_RADIUS))
+            )));
+        Set Player Variable At Index(Event Player, junkPropPosList, Player Variable(Event Player, index), Player Variable(Event Player, pos));
+        Destroy Effect(Value In Array(Player Variable(Event Player, junkPropIds), Player Variable(Event Player, index)));
+        Create Effect(All Players, Sphere, Green, Player Variable(Event Player, pos), None);
+        Set Player Variable At Index(Event Player, junkPropIds, Player Variable(Event Player, index), Last Created Entity);
+
+        Wait(0.16, Ignore Condition);
+        Loop If Condition Is True;
+    }
+}
+
+rule("Junkrat - Stand still while seen")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Junkrat);
+		Is Alive(Event Player) == True;
+        Is True For Any(
+            All Living Players(All Teams),
+            And(
+                Compare(
+                    Is In Line Of Sight(Eye Position(Current Array Element), Eye Position(Event Player), Barriers Do Not Block Los),
+                    ==,
+                    True
+                ),
+                Compare(
+                    Is In View Angle(Current Array Element, Eye Position(Event Player), 70),
+                    ==,
+                    True
+                )
+            )
+        ) == True;
+	}
+
+	actions
+	{
+        Set Status(Event Player,
+         Filtered Array(All Living Players(All Teams),And(
+                Compare(
+                    Is In Line Of Sight(Eye Position(Current Array Element), Eye Position(Event Player), Barriers Do Not Block Los),
+                    ==,
+                    True
+                ),
+                Compare(
+                    Is In View Angle(Current Array Element, Eye Position(Event Player), 70),
+                    ==,
+                    True
+                )
+            )), 
+         Rooted, 9999);
+    }
+}
+
+rule("Junkrat - Move when not seen")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Junkrat);
+		Is Alive(Event Player) == True;
+        Is True For Any(
+            All Living Players(All Teams),
+            And(
+                Compare(
+                    Is In Line Of Sight(Eye Position(Current Array Element), Eye Position(Event Player), Barriers Do Not Block Los),
+                    ==,
+                    True
+                ),
+                Compare(
+                    Is In View Angle(Current Array Element, Eye Position(Event Player), 70),
+                    ==,
+                    True
+                )
+            )
+        ) == False;
+	}
+
+	actions
+	{
+        Clear Status(Event Player, Rooted);
+    }
 }
 
 rule("Mei - Spawns in")
