@@ -1103,6 +1103,7 @@ rule("Junkrat dies")
 	actions
 	{
 		Set Invisible(Event Player, None);
+		Clear Status(Event Player, Rooted);
 	}
 }
 
