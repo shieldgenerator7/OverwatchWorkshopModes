@@ -22,6 +22,7 @@ variables
 		18: HAMMOND_GOAL_RADIUS
 		19: ZEN_PEACE_RADIUS
 		20: editBastionPoints
+		21: JUNK_PROP_DISTANCE
 
 	player:
 		0: target
@@ -117,7 +118,7 @@ rule("Instant Start")
 	}
 }
 
-rule("Game Setup (BAP, BRIG, DOOM, HAM, ZEN)")
+rule("Game Setup (BAP, BRIG, DOOM, JUNK, HAM, ZEN)")
 {
 	event
 	{
@@ -132,6 +133,8 @@ rule("Game Setup (BAP, BRIG, DOOM, HAM, ZEN)")
 		Modify Global Variable(DOOM_ARENA_POS, Append To Array, Vector(213.010, 16.500, 46.980));
 		Modify Global Variable(DOOM_ARENA_POS, Append To Array, Vector(199.030, 16.500, 47.020));
 		Set Global Variable(DOOM_CAMERA_OFFSET, Vector(-0.420, 4.620, -12.080));
+		Set Global Variable(JUNK_PROP_RADIUS, 0.750);
+		Set Global Variable(JUNK_PROP_DISTANCE, 5);
 		Set Global Variable(HAMMOND_GOAL_RADIUS, 3);
 		Set Global Variable(ZEN_PEACE_RADIUS, 10);
 	}
@@ -1126,8 +1129,8 @@ rule("Junkrat - Make prop effects")
 	actions
 	{
 		Set Player Variable(Event Player, pos, Add(Position Of(Event Player), Vector(Random Real(Multiply(Global Variable(
-			JUNK_PROP_RADIUS), -1.000), Global Variable(JUNK_PROP_RADIUS)), 0, Random Real(Multiply(Global Variable(JUNK_PROP_RADIUS),
-			-1.000), Global Variable(JUNK_PROP_RADIUS)))));
+			JUNK_PROP_DISTANCE), -1.000), Global Variable(JUNK_PROP_DISTANCE)), 0, Random Real(Multiply(Global Variable(
+			JUNK_PROP_DISTANCE), -1.000), Global Variable(JUNK_PROP_DISTANCE)))));
 		Modify Player Variable(Event Player, junkPropPosList, Append To Array, Player Variable(Event Player, pos));
 		Create Effect(All Players(All Teams), Sphere, Green, Player Variable(Event Player, pos), Global Variable(JUNK_PROP_RADIUS), None);
 		Modify Player Variable(Event Player, junkPropIds, Append To Array, Last Created Entity);
@@ -1158,10 +1161,10 @@ rule("Junkrat - Move Prop Effects")
 		Skip If(Compare(Player Variable(Event Player, index), <, Count Of(Player Variable(Event Player, junkPropIds))), 1);
 		Set Player Variable(Event Player, index, 0);
 		Skip If(Compare(Distance Between(Position Of(Event Player), Value In Array(Player Variable(Event Player, junkPropPosList),
-			Player Variable(Event Player, index))), <, Multiply(Global Variable(JUNK_PROP_RADIUS), 2.500)), 5);
+			Player Variable(Event Player, index))), <, Multiply(Global Variable(JUNK_PROP_DISTANCE), 2.500)), 5);
 		Set Player Variable(Event Player, pos, Add(Position Of(Event Player), Vector(Random Real(Multiply(Global Variable(
-			JUNK_PROP_RADIUS), -1.000), Global Variable(JUNK_PROP_RADIUS)), 0, Random Real(Multiply(Global Variable(JUNK_PROP_RADIUS),
-			-1.000), Global Variable(JUNK_PROP_RADIUS)))));
+			JUNK_PROP_DISTANCE), -1.000), Global Variable(JUNK_PROP_DISTANCE)), 0, Random Real(Multiply(Global Variable(
+			JUNK_PROP_DISTANCE), -1.000), Global Variable(JUNK_PROP_DISTANCE)))));
 		Set Player Variable At Index(Event Player, junkPropPosList, Player Variable(Event Player, index), Player Variable(Event Player,
 			pos));
 		Destroy Effect(Value In Array(Player Variable(Event Player, junkPropIds), Player Variable(Event Player, index)));
