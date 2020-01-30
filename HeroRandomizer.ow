@@ -60,32 +60,10 @@ rule("Player Spawns - Randomize heroes")
 		Set Player Variable(Event Player, hero1, Random Value In Array(All Heroes));
 		Set Player Variable(Event Player, hero2, Random Value In Array(All Heroes));
 		Set Player Variable(Event Player, hero3, Random Value In Array(All Heroes));
-		Start Forcing Player To Be Hero(Event Player, Player Variable(Event Player, heroMain));
-		Disallow Button(Event Player, Primary Fire);
-		Disallow Button(Event Player, Secondary Fire);
+		Start Forcing Player To Be Hero(Event Player, Player Variable(Event Player, hero1));
 		Disallow Button(Event Player, Ability 1);
 		Disallow Button(Event Player, Ability 2);
 		Disallow Button(Event Player, Ultimate);
-	}
-}
-
-rule("Player LMB / RMB - Change to main")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		All;
-	}
-
-	conditions
-	{
-		Or(Is Button Held(Event Player, Primary Fire), Is Button Held(Event Player, Secondary Fire)) == True;
-	}
-
-	actions
-	{
-		Set Player Variable(Event Player, currentHero, Player Variable(Event Player, heroMain));
 	}
 }
 
@@ -168,16 +146,12 @@ rule("Player switch to hero")
 	{
 		Set Player Variable(Event Player, ultCharge, Ultimate Charge Percent(Event Player));
 		Start Forcing Player To Be Hero(Event Player, Player Variable(Event Player, currentHero));
+		Wait(0.250, Ignore Condition);
 		Set Ultimate Charge(Event Player, Player Variable(Event Player, ultCharge));
-		Allow Button(Event Player, Primary Fire);
-		Allow Button(Event Player, Secondary Fire);
 		Allow Button(Event Player, Ability 1);
 		Allow Button(Event Player, Ability 2);
 		Allow Button(Event Player, Ultimate);
 		Wait(0.250, Ignore Condition);
-		Skip If(Compare(Player Variable(Event Player, currentHero), ==, Player Variable(Event Player, heroMain)), 2);
-		Disallow Button(Event Player, Primary Fire);
-		Disallow Button(Event Player, Secondary Fire);
 		Skip If(Compare(Player Variable(Event Player, currentHero), ==, Player Variable(Event Player, hero1)), 1);
 		Disallow Button(Event Player, Ability 1);
 		Skip If(Compare(Player Variable(Event Player, currentHero), ==, Player Variable(Event Player, hero2)), 1);
