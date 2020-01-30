@@ -170,3 +170,69 @@ rule("Player switch to hero")
 		Loop If Condition Is True;
 	}
 }
+
+rule("Press Ability 1")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Player Variable(Event Player, hero1);
+	}
+
+	actions
+	{
+		Press Button(Event Player, Ability 1);
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Press Ability 2")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Player Variable(Event Player, hero2);
+	}
+
+	actions
+	{
+		Press Button(Event Player, Ability 2);
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Press Ultimate")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Player Variable(Event Player, hero3);
+	}
+
+	actions
+	{
+		Press Button(Event Player, Ultimate);
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
