@@ -7,6 +7,7 @@ variables
 		3: hero3
 		4: ultCharge
 		5: currentHero
+		6: abilityPressed
 }
 
 rule("Game Setup")
@@ -167,6 +168,7 @@ rule("Player switch to hero")
 
 	actions
 	{
+		Set Player Variable(Event Player, abilityPressed, False);
 		Set Player Variable(Event Player, ultCharge, Ultimate Charge Percent(Event Player));
 		Start Forcing Player To Be Hero(Event Player, Player Variable(Event Player, currentHero));
 		Wait(0.100, Ignore Condition);
@@ -175,12 +177,6 @@ rule("Player switch to hero")
 		Allow Button(Event Player, Ability 2);
 		Allow Button(Event Player, Ultimate);
 		Wait(0.900, Ignore Condition);
-		Skip If(Compare(Player Variable(Event Player, currentHero), !=, Player Variable(Event Player, hero1)), 1);
-		Press Button(Event Player, Ability 1);
-		Skip If(Compare(Player Variable(Event Player, currentHero), !=, Player Variable(Event Player, hero2)), 1);
-		Press Button(Event Player, Ability 2);
-		Skip If(Compare(Player Variable(Event Player, currentHero), !=, Player Variable(Event Player, hero3)), 1);
-		Press Button(Event Player, Ultimate);
 		Wait(0.250, Ignore Condition);
 		Skip If(Compare(Player Variable(Event Player, currentHero), ==, Player Variable(Event Player, hero1)), 1);
 		Disallow Button(Event Player, Ability 1);
@@ -205,6 +201,7 @@ rule("Press Ability 1")
 	{
 		Hero Of(Event Player) == Player Variable(Event Player, hero1);
 		Is Using Ability 1(Event Player) != True;
+		Player Variable(Event Player, abilityPressed) == False;
 	}
 
 	actions
@@ -212,6 +209,7 @@ rule("Press Ability 1")
 		Press Button(Event Player, Ability 1);
 		Wait(0.100, Ignore Condition);
 		Loop If Condition Is True;
+		Set Player Variable(Event Player, abilityPressed, True);
 	}
 }
 
@@ -228,6 +226,7 @@ rule("Press Ability 2")
 	{
 		Hero Of(Event Player) == Player Variable(Event Player, hero2);
 		Is Using Ability 2(Event Player) != True;
+		Player Variable(Event Player, abilityPressed) == False;
 	}
 
 	actions
@@ -235,6 +234,7 @@ rule("Press Ability 2")
 		Press Button(Event Player, Ability 2);
 		Wait(0.100, Ignore Condition);
 		Loop If Condition Is True;
+		Set Player Variable(Event Player, abilityPressed, True);
 	}
 }
 
@@ -251,6 +251,7 @@ rule("Press Ultimate")
 	{
 		Hero Of(Event Player) == Player Variable(Event Player, hero3);
 		Is Using Ultimate(Event Player) != True;
+		Player Variable(Event Player, abilityPressed) == False;
 	}
 
 	actions
@@ -258,5 +259,6 @@ rule("Press Ultimate")
 		Press Button(Event Player, Ultimate);
 		Wait(0.100, Ignore Condition);
 		Loop If Condition Is True;
+		Set Player Variable(Event Player, abilityPressed, True);
 	}
 }
