@@ -40,6 +40,26 @@ rule("==TEST==SPAWN BOTS==")
 	}
 }
 
+rule("Player Spawn - Show Hero HUDs")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Create HUD Text(Event Player, Custom String("SHIFT: {0} {1}", Hero Icon String(Player Variable(Event Player, hero1)),
+			Player Variable(Event Player, hero1), Null), Null, Null, Left, 0, White, White, White, String, Default Visibility);
+		Create HUD Text(Event Player, Custom String("E: {0} {1}", Hero Icon String(Player Variable(Event Player, hero2)), Player Variable(
+			Event Player, hero2), Null), Null, Null, Left, 0, White, White, White, String, Default Visibility);
+		Create HUD Text(Event Player, Custom String("Q: {0} {1}", Hero Icon String(Player Variable(Event Player, hero3)), Player Variable(
+			Event Player, hero3), Null), Null, Null, Left, 0, White, White, White, String, Default Visibility);
+	}
+}
+
 rule("Player Spawns - Randomize heroes")
 {
 	event
