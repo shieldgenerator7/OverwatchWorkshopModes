@@ -149,6 +149,7 @@ rule("Player switch to hero")
 	{
 		Set Player Variable(Event Player, ultCharge, Ultimate Charge Percent(Event Player));
 		Start Forcing Player To Be Hero(Event Player, Player Variable(Event Player, currentHero));
+		Wait(0.100, Ignore Condition);
 		Set Ultimate Charge(Event Player, Player Variable(Event Player, ultCharge));
 		Allow Button(Event Player, Ability 1);
 		Allow Button(Event Player, Ability 2);
@@ -183,6 +184,7 @@ rule("Press Ability 1")
 	conditions
 	{
 		Hero Of(Event Player) == Player Variable(Event Player, hero1);
+		Is Using Ability 1(Event Player) != True;
 	}
 
 	actions
@@ -205,6 +207,7 @@ rule("Press Ability 2")
 	conditions
 	{
 		Hero Of(Event Player) == Player Variable(Event Player, hero2);
+		Is Using Ability 2(Event Player) != True;
 	}
 
 	actions
@@ -227,6 +230,7 @@ rule("Press Ultimate")
 	conditions
 	{
 		Hero Of(Event Player) == Player Variable(Event Player, hero3);
+		Is Using Ultimate(Event Player) != True;
 	}
 
 	actions
