@@ -79,6 +79,7 @@ rule("Player SHIFT - Change to hero 1")
 	conditions
 	{
 		Is Button Held(Event Player, Ability 1) == True;
+		Is Using Ultimate(Event Player) == False;
 	}
 
 	actions
@@ -99,6 +100,7 @@ rule("Player E - Change to hero 2")
 	conditions
 	{
 		Is Button Held(Event Player, Ability 2) == True;
+		Is Using Ultimate(Event Player) == False;
 	}
 
 	actions
@@ -119,6 +121,7 @@ rule("Player Q - Change to hero 3")
 	conditions
 	{
 		Is Button Held(Event Player, Ultimate) == True;
+		Ultimate Charge Percent(Event Player) == 100;
 	}
 
 	actions
