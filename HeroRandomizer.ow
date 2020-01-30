@@ -189,6 +189,11 @@ rule("Player switch to hero")
 	{
 		Is Alive(Event Player) == True;
 		Hero Of(Event Player) != Player Variable(Event Player, currentHero);
+		Has Status(Event Player, Hacked) == False;
+		Has Status(Event Player, Knocked Down) == False;
+		Has Status(Event Player, Asleep) == False;
+		Has Status(Event Player, Frozen) == False;
+		Has Status(Event Player, Stunned) == False;
 	}
 
 	actions
