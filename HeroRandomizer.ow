@@ -1,0 +1,120 @@
+variables
+{
+	player:
+		0: heroMain
+		1: hero1
+		2: hero2
+		3: hero3
+}
+
+rule("Game Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Player Spawns - Randomize heroes")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, heroMain, Random Value In Array(All Heroes));
+		Set Player Variable(Event Player, hero1, Random Value In Array(All Heroes));
+		Set Player Variable(Event Player, hero2, Random Value In Array(All Heroes));
+		Set Player Variable(Event Player, hero3, Random Value In Array(All Heroes));
+		Start Forcing Player To Be Hero(Event Player, Player Variable(Event Player, heroMain));
+	}
+}
+
+rule("Player LMB / RMB - Change to main")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Or(Is Firing Primary(Event Player), Is Firing Secondary(Event Player)) == True;
+	}
+
+	actions
+	{
+		Start Forcing Player To Be Hero(Event Player, Player Variable(Event Player, heroMain));
+	}
+}
+
+rule("Player SHIFT - Change to hero 1")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Using Ability 1(Event Player) == True;
+	}
+
+	actions
+	{
+		Start Forcing Player To Be Hero(Event Player, Player Variable(Event Player, hero1));
+	}
+}
+
+rule("Player E - Change to hero 2")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Using Ability 2(Event Player) == True;
+	}
+
+	actions
+	{
+		Start Forcing Player To Be Hero(Event Player, Player Variable(Event Player, hero2));
+	}
+}
+
+rule("Player Q - Change to hero 3")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Using Ultimate(Event Player) == True;
+	}
+
+	actions
+	{
+		Start Forcing Player To Be Hero(Event Player, Player Variable(Event Player, hero3));
+	}
+}
