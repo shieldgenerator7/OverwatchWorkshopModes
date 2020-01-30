@@ -8,6 +8,7 @@ variables
 		4: ultCharge
 		5: currentHero
 		6: abilityPressed
+		7: healthPercent
 }
 
 rule("Game Setup")
@@ -38,6 +39,29 @@ rule("==TEST==SPAWN BOTS==")
 		Create Dummy Bot(Random Value In Array(All Heroes), All Teams, -1.000, Nearest Walkable Position(Ray Cast Hit Position(
 			Eye Position(Event Player), Add(Eye Position(Event Player), Multiply(Facing Direction Of(Event Player), 100)), All Players(
 			All Teams), Event Player, True)), Multiply(Facing Direction Of(Event Player), -1.000));
+	}
+}
+
+rule("==TEST==BOTS==PRIMARY FIRE")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Primary Fire);
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
 	}
 }
 
@@ -85,6 +109,7 @@ rule("Player Spawns - Randomize heroes")
 		Disallow Button(Event Player, Ability 1);
 		Disallow Button(Event Player, Ability 2);
 		Disallow Button(Event Player, Ultimate);
+		Set Player Variable(Event Player, currentHero, Hero Of(Event Player));
 	}
 }
 
@@ -169,6 +194,7 @@ rule("Player switch to hero")
 	actions
 	{
 		Set Player Variable(Event Player, abilityPressed, False);
+		Set Player Variable(Event Player, healthPercent, Normalized Health(Event Player));
 		Set Player Variable(Event Player, ultCharge, Ultimate Charge Percent(Event Player));
 		Start Forcing Player To Be Hero(Event Player, Player Variable(Event Player, currentHero));
 		Wait(0.100, Ignore Condition);
@@ -177,6 +203,8 @@ rule("Player switch to hero")
 		Allow Button(Event Player, Ability 2);
 		Allow Button(Event Player, Ultimate);
 		Wait(0.900, Ignore Condition);
+		Skip If(And(Compare(Hero Of(Event Player), ==, Hero(D.Va)), Compare(Max Health(Event Player), ==, 150)), 1);
+		Damage(Event Player, Event Player, Multiply(Max Health(Event Player), Subtract(1, Player Variable(Event Player, healthPercent))));
 		Wait(0.250, Ignore Condition);
 		Skip If(Compare(Player Variable(Event Player, currentHero), ==, Player Variable(Event Player, hero1)), 1);
 		Disallow Button(Event Player, Ability 1);
@@ -185,6 +213,7 @@ rule("Player switch to hero")
 		Skip If(Compare(Player Variable(Event Player, currentHero), ==, Player Variable(Event Player, hero3)), 1);
 		Disallow Button(Event Player, Ultimate);
 		Loop If Condition Is True;
+		Small Message(Event Player, Custom String("max health: {0}", Max Health(Event Player), Null, Null));
 	}
 }
 
