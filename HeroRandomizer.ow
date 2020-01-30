@@ -5,6 +5,8 @@ variables
 		1: hero1
 		2: hero2
 		3: hero3
+		4: ultCharge
+		5: currentHero
 }
 
 rule("Game Setup")
@@ -12,6 +14,29 @@ rule("Game Setup")
 	event
 	{
 		Ongoing - Global;
+	}
+}
+
+rule("==TEST==SPAWN BOTS==")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Host Player == True;
+		Is Button Held(Event Player, Interact) == True;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Random Value In Array(All Heroes), All Teams, -1.000, Nearest Walkable Position(Ray Cast Hit Position(
+			Eye Position(Event Player), Add(Eye Position(Event Player), Multiply(Facing Direction Of(Event Player), 100)), All Players(
+			All Teams), Event Player, True)), Multiply(Facing Direction Of(Event Player), -1.000));
 	}
 }
 
@@ -36,6 +61,11 @@ rule("Player Spawns - Randomize heroes")
 		Set Player Variable(Event Player, hero2, Random Value In Array(All Heroes));
 		Set Player Variable(Event Player, hero3, Random Value In Array(All Heroes));
 		Start Forcing Player To Be Hero(Event Player, Player Variable(Event Player, heroMain));
+		Disallow Button(Event Player, Primary Fire);
+		Disallow Button(Event Player, Secondary Fire);
+		Disallow Button(Event Player, Ability 1);
+		Disallow Button(Event Player, Ability 2);
+		Disallow Button(Event Player, Ultimate);
 	}
 }
 
@@ -50,12 +80,12 @@ rule("Player LMB / RMB - Change to main")
 
 	conditions
 	{
-		Or(Is Firing Primary(Event Player), Is Firing Secondary(Event Player)) == True;
+		Or(Is Button Held(Event Player, Primary Fire), Is Button Held(Event Player, Secondary Fire)) == True;
 	}
 
 	actions
 	{
-		Start Forcing Player To Be Hero(Event Player, Player Variable(Event Player, heroMain));
+		Set Player Variable(Event Player, currentHero, Player Variable(Event Player, heroMain));
 	}
 }
 
@@ -70,12 +100,12 @@ rule("Player SHIFT - Change to hero 1")
 
 	conditions
 	{
-		Is Using Ability 1(Event Player) == True;
+		Is Button Held(Event Player, Ability 1) == True;
 	}
 
 	actions
 	{
-		Start Forcing Player To Be Hero(Event Player, Player Variable(Event Player, hero1));
+		Set Player Variable(Event Player, currentHero, Player Variable(Event Player, hero1));
 	}
 }
 
@@ -90,12 +120,12 @@ rule("Player E - Change to hero 2")
 
 	conditions
 	{
-		Is Using Ability 2(Event Player) == True;
+		Is Button Held(Event Player, Ability 2) == True;
 	}
 
 	actions
 	{
-		Start Forcing Player To Be Hero(Event Player, Player Variable(Event Player, hero2));
+		Set Player Variable(Event Player, currentHero, Player Variable(Event Player, hero2));
 	}
 }
 
@@ -110,11 +140,50 @@ rule("Player Q - Change to hero 3")
 
 	conditions
 	{
-		Is Using Ultimate(Event Player) == True;
+		Is Button Held(Event Player, Ultimate) == True;
 	}
 
 	actions
 	{
-		Start Forcing Player To Be Hero(Event Player, Player Variable(Event Player, hero3));
+		Set Player Variable(Event Player, currentHero, Player Variable(Event Player, hero3));
+	}
+}
+
+rule("Player switch to hero")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Hero Of(Event Player) != Player Variable(Event Player, currentHero);
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, ultCharge, Ultimate Charge Percent(Event Player));
+		Start Forcing Player To Be Hero(Event Player, Player Variable(Event Player, currentHero));
+		Set Ultimate Charge(Event Player, Player Variable(Event Player, ultCharge));
+		Allow Button(Event Player, Primary Fire);
+		Allow Button(Event Player, Secondary Fire);
+		Allow Button(Event Player, Ability 1);
+		Allow Button(Event Player, Ability 2);
+		Allow Button(Event Player, Ultimate);
+		Wait(0.250, Ignore Condition);
+		Skip If(Compare(Player Variable(Event Player, currentHero), ==, Player Variable(Event Player, heroMain)), 2);
+		Disallow Button(Event Player, Primary Fire);
+		Disallow Button(Event Player, Secondary Fire);
+		Skip If(Compare(Player Variable(Event Player, currentHero), ==, Player Variable(Event Player, hero1)), 1);
+		Disallow Button(Event Player, Ability 1);
+		Skip If(Compare(Player Variable(Event Player, currentHero), ==, Player Variable(Event Player, hero2)), 1);
+		Disallow Button(Event Player, Ability 2);
+		Skip If(Compare(Player Variable(Event Player, currentHero), ==, Player Variable(Event Player, hero3)), 1);
+		Disallow Button(Event Player, Ultimate);
+		Loop If Condition Is True;
 	}
 }
