@@ -132,7 +132,7 @@ rule("Player Spawn - Initialize player vars")
 	}
 }
 
-rule("Player dealt damage - grant shields")
+disabled rule("Player dealt damage - grant shields")
 {
 	event
 	{
@@ -209,6 +209,7 @@ rule("Player took damage (with shields)")
 	conditions
 	{
 		Player Variable(Event Player, shields) > 0;
+		Player Variable(Event Player, divineProtected) != True;
 	}
 
 	actions
