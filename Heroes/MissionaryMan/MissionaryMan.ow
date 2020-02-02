@@ -325,7 +325,7 @@ rule("Missionary RMB - pray for teammate")
 		disabled Set Player Variable(Event Player, mssnryWatchTarget, Event Player);
 		Set Player Variable(Event Player, mssnryWatchTargetIndex, Index Of Array Value(All Players(Team Of(Event Player)), Player Variable(
 			Event Player, mssnryWatchTarget)));
-		Set Player Variable(Event Player, mssnryWatchTargetPrev, Player Variable(Event Player, mssnryWatchTarget));
+		Set Player Variable(Event Player, mssnryWatchTargetPrev, Null);
 		Start Camera(Event Player, Add(Eye Position(Player Variable(Event Player, mssnryWatchTarget)), Add(Multiply(Facing Direction Of(
 			Player Variable(Event Player, mssnryWatchTarget)), -2.000), Up)), Add(Facing Direction Of(Player Variable(Event Player,
 			mssnryWatchTarget)), Add(Eye Position(Player Variable(Event Player, mssnryWatchTarget)), Add(Multiply(Facing Direction Of(
@@ -361,6 +361,34 @@ rule("Missionary Man LMB during RMB - switch teammate target")
 		Set Player Variable(Event Player, mssnryWatchTargetIndex, 0);
 		Set Player Variable(Event Player, mssnryWatchTarget, Value In Array(All Players(Team Of(Event Player)), Player Variable(
 			Event Player, mssnryWatchTargetIndex)));
+	}
+}
+
+rule("Missionry - Watch Target Switched (move effects to new target)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Soldier: 76);
+		Is Alive(Event Player) == True;
+		Is Button Held(Event Player, Secondary Fire) == True;
+		Player Variable(Event Player, mssnryWatchTarget) != Player Variable(Event Player, mssnryWatchTargetPrev);
+	}
+
+	actions
+	{
+		Skip If(Compare(Player Variable(Event Player, mssnryDivineProtectionTime), >, 0), 4);
+		Set Player Variable(Player Variable(Event Player, mssnryWatchTargetPrev), divineProtected, False);
+		Clear Status(Player Variable(Event Player, mssnryWatchTargetPrev), Unkillable);
+		Set Player Variable(Player Variable(Event Player, mssnryWatchTarget), divineProtected, True);
+		Set Status(Player Variable(Event Player, mssnryWatchTarget), Event Player, Unkillable, 9999);
+		Set Player Variable(Event Player, mssnryWatchTargetPrev, Player Variable(Event Player, mssnryWatchTarget));
 	}
 }
 
@@ -453,7 +481,9 @@ rule("Player divine protected")
 
 	conditions
 	{
-		Player Variable(Event Player, divineProtected) == True;
+		Is True For Any(All Living Players(Team Of(Event Player)), And(Compare(Player Variable(Current Array Element, mssnryWatchTarget),
+			==, Event Player), And(Compare(Is Button Held(Current Array Element, Secondary Fire), ==, True), Compare(Player Variable(
+			Current Array Element, mssnryDivineProtectionTime), >, 0)))) == True;
 	}
 
 	actions
