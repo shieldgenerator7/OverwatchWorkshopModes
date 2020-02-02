@@ -164,6 +164,7 @@ rule("Shields gained (shields > 0)")
 
 	actions
 	{
+		Skip If(Compare(Has Status(Event Player, Unkillable), ==, True), 1);
 		Set Status(Event Player, Event Player, Unkillable, 9999);
 		Create HUD Text(Event Player, Custom String("SHIELDS: {0}", Player Variable(Event Player, shields), Null, Null), Null, Null, Left,
 			0, Blue, White, White, String, Default Visibility);
@@ -198,7 +199,7 @@ rule("Shields lost (shields <= 0)")
 	}
 }
 
-rule("Player took damage (with shields)")
+rule("Shields: Player took damage (with shields)")
 {
 	event
 	{
@@ -223,6 +224,29 @@ rule("Player took damage (with shields)")
 		Skip If(Compare(Player Variable(Event Player, shields), >=, Event Damage), 1);
 		Heal(Event Player, Null, Subtract(Event Damage, Player Variable(Event Player, shields)));
 		Modify Player Variable(Event Player, shields, Subtract, Event Damage);
+	}
+}
+
+rule("Shields: Player has shields and not UNKILLABLE")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, shields) > 0;
+		Has Status(Event Player, Unkillable) == False;
+	}
+
+	actions
+	{
+		Set Status(Event Player, Null, Unkillable, 9999);
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
 	}
 }
 
@@ -441,30 +465,29 @@ rule("Player divine protected")
 	}
 }
 
-rule("Missionry - Watch Target Switched (move effects to new target)")
+rule("Player Divine Protected and not UNKILLABLE")
 {
 	event
 	{
 		Ongoing - Each Player;
 		All;
-		Soldier: 76;
+		All;
 	}
 
 	conditions
 	{
-		Hero Of(Event Player) == Hero(Soldier: 76);
-		Is Alive(Event Player) == True;
-		Is Button Held(Event Player, Secondary Fire) == True;
-		Player Variable(Event Player, mssnryWatchTarget) != Player Variable(Event Player, mssnryWatchTargetPrev);
+		Has Status(Event Player, Unkillable) == False;
+		Is True For Any(All Living Players(Team Of(Event Player)), And(Compare(Player Variable(Current Array Element, mssnryWatchTarget),
+			==, Event Player), And(Compare(Is Button Held(Current Array Element, Secondary Fire), ==, True), Compare(Player Variable(
+			Current Array Element, mssnryDivineProtectionTime), >, 0)))) == True;
 	}
 
 	actions
 	{
-		Skip If(Compare(Player Variable(Event Player, mssnryDivineProtectionTime), >, 0), 4);
-		Set Player Variable(Player Variable(Event Player, mssnryWatchTargetPrev), divineProtected, False);
-		Clear Status(Player Variable(Event Player, mssnryWatchTargetPrev), Unkillable);
-		Set Player Variable(Player Variable(Event Player, mssnryWatchTarget), divineProtected, True);
-		Set Status(Player Variable(Event Player, mssnryWatchTarget), Event Player, Unkillable, 9999);
-		Set Player Variable(Event Player, mssnryWatchTargetPrev, Player Variable(Event Player, mssnryWatchTarget));
+		Set Status(Event Player, Null, Unkillable, 9999);
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
 	}
 }
