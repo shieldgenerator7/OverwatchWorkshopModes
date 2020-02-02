@@ -1,0 +1,129 @@
+variables
+{
+	global:
+		0: SHIELDS_FROM_DAMAGE_PERCENT
+
+	player:
+		0: shields
+		1: shieldHUDID
+}
+
+rule("Game Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Set Global Variable(SHIELDS_FROM_DAMAGE_PERCENT, 0.400);
+	}
+}
+
+rule("Player Spawn - Initialize player vars")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, shields, 0);
+	}
+}
+
+rule("Player dealt damage - grant shields")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, shields, Add, Multiply(Event Damage, Global Variable(SHIELDS_FROM_DAMAGE_PERCENT)));
+	}
+}
+
+rule("Shields gained (shields > 0)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, shields) > 0;
+	}
+
+	actions
+	{
+		Create HUD Text(Event Player, Custom String("SHIELDS: ", Player Variable(Event Player, shields), Null, Null), Null, Null, Left, 0,
+			Blue, White, White, String, Default Visibility);
+		Set Player Variable(Event Player, shieldHUDID, Last Text ID);
+		Set Status(Event Player, Event Player, Unkillable, 9999);
+	}
+}
+
+rule("Shields lost (shields <= 0)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, shields) <= 0;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, shields, 0);
+		Destroy HUD Text(Player Variable(Event Player, shieldHUDID));
+		Clear Status(Event Player, Unkillable);
+	}
+}
+
+rule("Player took damage (with shields)")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, shields) > 0;
+	}
+
+	actions
+	{
+		Skip If(Compare(Event Damage, <, Add(Health(Event Player), Player Variable(Event Player, shields))), 2);
+		Clear Status(Event Player, Unkillable);
+		Damage(Event Player, Attacker, Event Damage);
+		Skip If(Compare(Player Variable(Event Player, shields), <, Event Damage), 1);
+		Heal(Event Player, Null, Event Damage);
+		Skip If(Compare(Player Variable(Event Player, shields), >=, Event Damage), 1);
+		Heal(Event Player, Null, Subtract(Event Damage, Player Variable(Event Player, shields)));
+		Modify Player Variable(Event Player, shields, Subtract, Event Damage);
+	}
+}
