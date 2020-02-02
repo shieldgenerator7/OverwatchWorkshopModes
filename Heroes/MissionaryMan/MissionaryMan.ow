@@ -6,6 +6,8 @@ variables
 		2: MSSNRY_SPEED_DURATION
 		3: MSSNRY_SANCTUARY_DURATION
 		4: MSSNRY_SANCTUARY_RANGE
+		5: MSSNRY_PROTECT_COOLDOWN
+		6: MSSNRY_SPEED_COOLDOWN
 
 	player:
 		0: shields
@@ -24,6 +26,10 @@ variables
 		13: mssnrySanctuaryPos
 		14: mssnrySanctuaryTime
 		15: mssnrySanctuaryEffectID
+		16: mssnryProtectCooldown
+		17: mssnrySpeedCooldown
+		18: mssnryProtectHUDID
+		19: mssnrySpeedHUDID
 }
 
 rule("Game Setup")
@@ -40,6 +46,8 @@ rule("Game Setup")
 		Set Global Variable(MSSNRY_SPEED_DURATION, 5);
 		Set Global Variable(MSSNRY_SANCTUARY_DURATION, 10);
 		Set Global Variable(MSSNRY_SANCTUARY_RANGE, 5);
+		Set Global Variable(MSSNRY_PROTECT_COOLDOWN, 6);
+		Set Global Variable(MSSNRY_SPEED_COOLDOWN, 8);
 	}
 }
 
@@ -289,6 +297,14 @@ rule("Soldier Spawn In: Setup & Disallow abilities")
 			mssnryWatchTarget)), Null, Null, Left, 0, White, White, White, String, Default Visibility);
 		Set Player Variable(Event Player, mssnryWatchTargetHUDID, Last Text ID);
 		Small Message(Event Player, Custom String("Press F for Hero Info", Null, Null, Null));
+		Set Player Variable(Event Player, mssnryProtectCooldown, 0);
+		Set Player Variable(Event Player, mssnrySpeedCooldown, 0);
+		Create HUD Text(Event Player, Custom String("Divine Protection: {0}", Player Variable(Event Player, mssnryProtectCooldown), Null,
+			Null), Null, Null, Left, 1, Blue, White, White, String, Default Visibility);
+		Set Player Variable(Event Player, mssnryProtectHUDID, Last Text ID);
+		Create HUD Text(Event Player, Custom String("God Speed: {0}", Player Variable(Event Player, mssnrySpeedCooldown), Null, Null),
+			Null, Null, Left, 1, Green, White, White, String, Default Visibility);
+		Set Player Variable(Event Player, mssnrySpeedHUDID, Last Text ID);
 	}
 }
 
@@ -446,6 +462,7 @@ rule("Missionary - E - Divine Protection (BEGIN)")
 		Is Alive(Event Player) == True;
 		Is Button Held(Event Player, Secondary Fire) == True;
 		Is Button Held(Event Player, Ability 2) == True;
+		Player Variable(Event Player, mssnryProtectCooldown) == 0;
 	}
 
 	actions
@@ -459,6 +476,8 @@ rule("Missionary - E - Divine Protection (BEGIN)")
 		Create Effect(All Players(All Teams), Good Aura, Blue, Position Of(Player Variable(Event Player, mssnryWatchTarget)), 2,
 			Position and Radius);
 		Set Player Variable(Event Player, mssnryDivineProtectionEffectID, Last Created Entity);
+		Set Player Variable(Event Player, mssnryProtectCooldown, Global Variable(MSSNRY_PROTECT_COOLDOWN));
+		Chase Player Variable At Rate(Event Player, mssnryProtectCooldown, 0, 1, None);
 	}
 }
 
@@ -632,6 +651,7 @@ rule("Missionary - SHIFT - G-O-D speed (BEGIN)")
 		Is Alive(Event Player) == True;
 		Is Button Held(Event Player, Secondary Fire) == True;
 		Is Button Held(Event Player, Ability 1) == True;
+		Player Variable(Event Player, mssnrySpeedCooldown) == 0;
 	}
 
 	actions
@@ -645,6 +665,8 @@ rule("Missionary - SHIFT - G-O-D speed (BEGIN)")
 		Create Effect(All Players(All Teams), Ring, Green, Position Of(Player Variable(Event Player, mssnryWatchTarget)), 1.500,
 			Position and Radius);
 		Set Player Variable(Event Player, mssnryGodSpeedEffectID, Last Created Entity);
+		Set Player Variable(Event Player, mssnrySpeedCooldown, Global Variable(MSSNRY_SPEED_COOLDOWN));
+		Chase Player Variable At Rate(Event Player, mssnrySpeedCooldown, 0, 1, None);
 	}
 }
 
