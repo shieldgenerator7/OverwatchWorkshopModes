@@ -285,12 +285,13 @@ rule("Missionary RMB - pray for teammate")
 
 	actions
 	{
-		Set Player Variable(Event Player, mssnryWatchTarget, Event Player);
+		disabled Set Player Variable(Event Player, mssnryWatchTarget, Event Player);
 		Set Player Variable(Event Player, mssnryWatchTargetIndex, Index Of Array Value(All Players(Team Of(Event Player)), Player Variable(
 			Event Player, mssnryWatchTarget)));
 		Start Camera(Event Player, Add(Eye Position(Player Variable(Event Player, mssnryWatchTarget)), Add(Multiply(Facing Direction Of(
-			Player Variable(Event Player, mssnryWatchTarget)), -1.000), Up)), Eye Position(Player Variable(Event Player,
-			mssnryWatchTarget)), 50);
+			Player Variable(Event Player, mssnryWatchTarget)), -2.000), Up)), Add(Facing Direction Of(Player Variable(Event Player,
+			mssnryWatchTarget)), Add(Eye Position(Player Variable(Event Player, mssnryWatchTarget)), Add(Multiply(Facing Direction Of(
+			Player Variable(Event Player, mssnryWatchTarget)), -2.000), Up))), 50);
 		Set Status(Event Player, Event Player, Knocked Down, 9999);
 		Disallow Button(Event Player, Primary Fire);
 	}
