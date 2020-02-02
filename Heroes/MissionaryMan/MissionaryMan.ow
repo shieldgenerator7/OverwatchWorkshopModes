@@ -7,6 +7,8 @@ variables
 		0: shields
 		1: shieldHUDID
 		2: shieldTextID
+		3: mssnryWatchTarget
+		4: mssnryWatchTargetIndex
 }
 
 rule("Game Setup")
@@ -177,5 +179,134 @@ rule("Player took damage (with shields)")
 		Skip If(Compare(Player Variable(Event Player, shields), >=, Event Damage), 1);
 		Heal(Event Player, Null, Subtract(Event Damage, Player Variable(Event Player, shields)));
 		Modify Player Variable(Event Player, shields, Subtract, Event Damage);
+	}
+}
+
+rule("Soldier Spawn In: Setup & Disallow abilities")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Soldier: 76);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Disallow Button(Event Player, Secondary Fire);
+		Disallow Button(Event Player, Ability 1);
+		Disallow Button(Event Player, Ability 2);
+		Disallow Button(Event Player, Ultimate);
+		Set Player Variable(Event Player, mssnryWatchTarget, Event Player);
+	}
+}
+
+rule("Soldier died - reallow abilities")
+{
+	event
+	{
+		Player Died;
+		All;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Soldier: 76);
+	}
+
+	actions
+	{
+		Allow Button(Event Player, Primary Fire);
+		Allow Button(Event Player, Secondary Fire);
+		Allow Button(Event Player, Ability 1);
+		Allow Button(Event Player, Ability 2);
+		Allow Button(Event Player, Ultimate);
+	}
+}
+
+rule("Missionary RMB - pray for teammate")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Soldier: 76);
+		Is Alive(Event Player) == True;
+		Is Button Held(Event Player, Secondary Fire) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, mssnryWatchTarget, Event Player);
+		Set Player Variable(Event Player, mssnryWatchTargetIndex, Index Of Array Value(All Players(Team Of(Event Player)), Player Variable(
+			Event Player, mssnryWatchTarget)));
+		Set Status(Event Player, Event Player, Knocked Down, 9999);
+		Start Camera(Event Player, Add(Eye Position(Player Variable(Event Player, mssnryWatchTarget)), Add(Multiply(Facing Direction Of(
+			Player Variable(Event Player, mssnryWatchTarget)), -1.000), Up)), Eye Position(Player Variable(Event Player,
+			mssnryWatchTarget)), 0.100);
+		Disallow Button(Event Player, Primary Fire);
+	}
+}
+
+rule("Missionary Man LMB during RMB - switch teammate target")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Soldier: 76);
+		Is Alive(Event Player) == True;
+		Is Button Held(Event Player, Secondary Fire) == True;
+		Is Button Held(Event Player, Primary Fire) == True;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, mssnryWatchTargetIndex, Add, 1);
+		Skip If(Compare(Player Variable(Event Player, mssnryWatchTargetIndex), <, Count Of(All Players(Team Of(Event Player)))), 1);
+		Set Player Variable(Event Player, mssnryWatchTargetIndex, 0);
+		Set Player Variable(Event Player, mssnryWatchTarget, Value In Array(All Players(Team Of(Event Player)), Player Variable(
+			Event Player, mssnryWatchTargetIndex)));
+	}
+}
+
+rule("Missionary Man - stop praying")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Soldier: 76);
+		Is Alive(Event Player) == True;
+		Is Button Held(Event Player, Secondary Fire) == False;
+	}
+
+	actions
+	{
+		Clear Status(Event Player, Knocked Down);
+		Stop Camera(Event Player);
+		Allow Button(Event Player, Primary Fire);
 	}
 }
