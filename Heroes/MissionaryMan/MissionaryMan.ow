@@ -4,6 +4,8 @@ variables
 		0: SHIELDS_FROM_DAMAGE_PERCENT
 		1: MSSNRY_PROTECT_DURATION
 		2: MSSNRY_SPEED_DURATION
+		3: MSSNRY_SANCTUARY_DURATION
+		4: MSSNRY_SANCTUARY_RANGE
 
 	player:
 		0: shields
@@ -18,6 +20,9 @@ variables
 		9: mssnryDivineProtectionEffectID
 		11: mssnryGodSpeedTime
 		12: mssnryGodSpeedEffectID
+		13: mssnrySanctuaryPos
+		14: mssnrySanctuaryTime
+		15: mssnrySanctuaryEffectID
 }
 
 rule("Game Setup")
@@ -32,6 +37,8 @@ rule("Game Setup")
 		Set Global Variable(SHIELDS_FROM_DAMAGE_PERCENT, 0.400);
 		Set Global Variable(MSSNRY_PROTECT_DURATION, 2);
 		Set Global Variable(MSSNRY_SPEED_DURATION, 5);
+		Set Global Variable(MSSNRY_SANCTUARY_DURATION, 10);
+		Set Global Variable(MSSNRY_SANCTUARY_RANGE, 5);
 	}
 }
 
@@ -579,5 +586,134 @@ rule("Missionary - SHIFT - G-O-D speed (END)")
 		Set Projectile Speed(Player Variable(Event Player, mssnryWatchTarget), 100);
 		Stop Chasing Player Variable(Event Player, mssnryGodSpeedTime);
 		Destroy Effect(Player Variable(Event Player, mssnryGodSpeedEffectID));
+	}
+}
+
+rule("Missionary - ULT - HolySanctuary (BEGIN)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Soldier: 76);
+		Is Alive(Event Player) == True;
+		Is Button Held(Event Player, Secondary Fire) == True;
+		Is Button Held(Event Player, Ultimate) == True;
+		Ultimate Charge Percent(Event Player) == 100;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Position Of(Player Variable(Event Player, mssnryWatchTarget)));
+		Set Player Variable(Event Player, mssnrySanctuaryPos, Position Of(Event Player));
+		Set Ultimate Charge(Event Player, 0);
+		Stop Chasing Player Variable(Event Player, mssnrySanctuaryTime);
+		Set Player Variable(Event Player, mssnrySanctuaryTime, Global Variable(MSSNRY_SANCTUARY_DURATION));
+		Chase Player Variable At Rate(Event Player, mssnrySanctuaryTime, 0, 1, None);
+		Create Effect(All Players(All Teams), Light Shaft, White, Position Of(Event Player), Global Variable(MSSNRY_SANCTUARY_RANGE),
+			None);
+		Set Player Variable(Event Player, mssnrySanctuaryEffectID, Last Created Entity);
+		Big Message(All Players(Team Of(Event Player)), Custom String("{0} THROUGH HIM WE SHALL OVERCOME {0}", Hero Icon String(Hero Of(
+			Event Player)), Null, Null));
+		Big Message(All Players(Opposite Team Of(Team Of(Event Player))), Custom String("{0} YOUR SINS HAVE BEEN FORGIVEN {0}",
+			Hero Icon String(Hero Of(Event Player)), Null, Null));
+	}
+}
+
+rule("Player enter HolySanctuary")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Hero Being Played(Hero(Soldier: 76), Team Of(Event Player)) == True;
+		Is True For Any(All Living Players(Team Of(Event Player)), And(Compare(Distance Between(Position Of(Event Player), Player Variable(
+			Current Array Element, mssnrySanctuaryPos)), <=, Global Variable(MSSNRY_SANCTUARY_RANGE)), And(Compare(Player Variable(
+			Current Array Element, mssnrySanctuaryTime), >, 0), True))) == True;
+	}
+
+	actions
+	{
+		Set Status(Event Player, Null, Unkillable, 9999);
+		Wait(1, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Player in HolySanctuary")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is True For Any(All Living Players(Team Of(Event Player)), And(Compare(Distance Between(Position Of(Event Player), Player Variable(
+			Current Array Element, mssnrySanctuaryPos)), <=, Global Variable(MSSNRY_SANCTUARY_RANGE)), And(Compare(Player Variable(
+			Current Array Element, mssnrySanctuaryTime), >, 0), True))) == True;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, shields, Add, Event Damage);
+		Small Message(Players On Hero(Hero(Soldier: 76), Team Of(Event Player)), Custom String(
+			"{0} SANCTUARY {0} DAMAGE CONVERTED: {1} {0} SHIELDS: {2} {0}", Hero Icon String(Hero Of(Event Player)), Event Damage,
+			Player Variable(Event Player, shields)));
+	}
+}
+
+rule("Player exit HolySanctuary")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is True For Any(All Living Players(Team Of(Event Player)), And(Compare(Distance Between(Position Of(Event Player), Player Variable(
+			Current Array Element, mssnrySanctuaryPos)), <=, Global Variable(MSSNRY_SANCTUARY_RANGE)), And(Compare(Player Variable(
+			Current Array Element, mssnrySanctuaryTime), >, 0), True))) == False;
+	}
+
+	actions
+	{
+		Clear Status(Event Player, Unkillable);
+	}
+}
+
+rule("Missionary - ULT - HolySanctuary (END)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, mssnrySanctuaryTime) == 0;
+	}
+
+	actions
+	{
+		Stop Chasing Player Variable(Event Player, mssnrySanctuaryTime);
+		Destroy Effect(Player Variable(Event Player, mssnrySanctuaryEffectID));
 	}
 }
