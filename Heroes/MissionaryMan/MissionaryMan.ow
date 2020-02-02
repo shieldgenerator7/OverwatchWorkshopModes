@@ -18,6 +18,7 @@ variables
 		7: mssnryWatchTargetPrev
 		8: mssnryWatchTargetHUDID
 		9: mssnryDivineProtectionEffectID
+		10: unkillableIconID
 		11: mssnryGodSpeedTime
 		12: mssnryGodSpeedEffectID
 		13: mssnrySanctuaryPos
