@@ -2,6 +2,7 @@ variables
 {
 	global:
 		0: SHIELDS_FROM_DAMAGE_PERCENT
+		1: MSSNRY_PROTECT_DURATION
 
 	player:
 		0: shields
@@ -9,6 +10,10 @@ variables
 		2: shieldTextID
 		3: mssnryWatchTarget
 		4: mssnryWatchTargetIndex
+		5: mssnryDivineProtectionTime
+		6: divineProtected
+		7: mssnryWatchTargetPrev
+		8: mssnryWatchTargetHUDID
 }
 
 rule("Game Setup")
@@ -21,6 +26,7 @@ rule("Game Setup")
 	actions
 	{
 		Set Global Variable(SHIELDS_FROM_DAMAGE_PERCENT, 0.400);
+		Set Global Variable(MSSNRY_PROTECT_DURATION, 2);
 	}
 }
 
@@ -240,6 +246,10 @@ rule("Soldier Spawn In: Setup & Disallow abilities")
 		Disallow Button(Event Player, Ability 2);
 		Disallow Button(Event Player, Ultimate);
 		Set Player Variable(Event Player, mssnryWatchTarget, Event Player);
+		Create HUD Text(Event Player, Custom String("WATCH TARGET: {0} {1} - {2}", Hero Icon String(Hero Of(Player Variable(Event Player,
+			mssnryWatchTarget))), Hero Of(Player Variable(Event Player, mssnryWatchTarget)), Player Variable(Event Player,
+			mssnryWatchTarget)), Null, Null, Left, 0, White, White, White, String, Default Visibility);
+		Set Player Variable(Event Player, mssnryWatchTargetHUDID, Last Text ID);
 	}
 }
 
@@ -264,6 +274,7 @@ rule("Soldier died - reallow abilities")
 		Allow Button(Event Player, Ability 1);
 		Allow Button(Event Player, Ability 2);
 		Allow Button(Event Player, Ultimate);
+		Destroy HUD Text(Player Variable(Event Player, mssnryWatchTargetHUDID));
 	}
 }
 
@@ -288,6 +299,7 @@ rule("Missionary RMB - pray for teammate")
 		disabled Set Player Variable(Event Player, mssnryWatchTarget, Event Player);
 		Set Player Variable(Event Player, mssnryWatchTargetIndex, Index Of Array Value(All Players(Team Of(Event Player)), Player Variable(
 			Event Player, mssnryWatchTarget)));
+		Set Player Variable(Event Player, mssnryWatchTargetPrev, Player Variable(Event Player, mssnryWatchTarget));
 		Start Camera(Event Player, Add(Eye Position(Player Variable(Event Player, mssnryWatchTarget)), Add(Multiply(Facing Direction Of(
 			Player Variable(Event Player, mssnryWatchTarget)), -2.000), Up)), Add(Facing Direction Of(Player Variable(Event Player,
 			mssnryWatchTarget)), Add(Eye Position(Player Variable(Event Player, mssnryWatchTarget)), Add(Multiply(Facing Direction Of(
@@ -345,5 +357,105 @@ rule("Missionary Man - stop praying")
 		Clear Status(Event Player, Knocked Down);
 		Stop Camera(Event Player);
 		Allow Button(Event Player, Primary Fire);
+	}
+}
+
+rule("Missionary - E - Divine Protection (BEGIN)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Soldier: 76);
+		Is Alive(Event Player) == True;
+		Is Button Held(Event Player, Secondary Fire) == True;
+		Is Button Held(Event Player, Ability 2) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Player Variable(Event Player, mssnryWatchTarget), divineProtected, True);
+		Set Status(Player Variable(Event Player, mssnryWatchTarget), Event Player, Unkillable, 9999);
+		Stop Chasing Player Variable(Event Player, mssnryDivineProtectionTime);
+		Set Player Variable(Event Player, mssnryDivineProtectionTime, Global Variable(MSSNRY_PROTECT_DURATION));
+		Chase Player Variable At Rate(Event Player, mssnryDivineProtectionTime, 0, 1, None);
+	}
+}
+
+rule("Missionary - E - Divine Protection (END)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, mssnryDivineProtectionTime) == 0;
+	}
+
+	actions
+	{
+		Set Player Variable(Player Variable(Event Player, mssnryWatchTarget), divineProtected, False);
+		Stop Chasing Player Variable(Event Player, mssnryDivineProtectionTime);
+		Clear Status(Player Variable(Event Player, mssnryWatchTarget), Unkillable);
+	}
+}
+
+rule("Player divine protected")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, divineProtected) == True;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, shields, Add, Event Damage);
+		Small Message(Players On Hero(Hero(Soldier: 76), Team Of(Event Player)), Custom String(
+			"{0} DAMAGE CONVERTED: {1} {0} SHIELDS: {2} {0}", Hero Icon String(Hero Of(Event Player)), Event Damage, Player Variable(
+			Event Player, shields)));
+	}
+}
+
+rule("Missionry - Watch Target Switched (move effects to new target)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Soldier: 76);
+		Is Alive(Event Player) == True;
+		Is Button Held(Event Player, Secondary Fire) == True;
+		Player Variable(Event Player, mssnryWatchTarget) != Player Variable(Event Player, mssnryWatchTargetPrev);
+	}
+
+	actions
+	{
+		Skip If(Compare(Player Variable(Event Player, mssnryDivineProtectionTime), >, 0), 4);
+		Set Player Variable(Player Variable(Event Player, mssnryWatchTargetPrev), divineProtected, False);
+		Clear Status(Player Variable(Event Player, mssnryWatchTargetPrev), Unkillable);
+		Set Player Variable(Player Variable(Event Player, mssnryWatchTarget), divineProtected, True);
+		Set Status(Player Variable(Event Player, mssnryWatchTarget), Event Player, Unkillable, 9999);
+		Set Player Variable(Event Player, mssnryWatchTargetPrev, Player Variable(Event Player, mssnryWatchTarget));
 	}
 }
