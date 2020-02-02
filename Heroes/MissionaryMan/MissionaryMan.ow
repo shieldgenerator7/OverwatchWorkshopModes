@@ -78,7 +78,7 @@ rule("==TEST== SKIP ASSEMBLY ==")
 	}
 }
 
-rule("==TEST==SPAWN BOTS==")
+disabled rule("==TEST==SPAWN BOTS==")
 {
 	event
 	{
@@ -101,7 +101,7 @@ rule("==TEST==SPAWN BOTS==")
 	}
 }
 
-rule("==TEST==BOTS==PRIMARY FIRE")
+disabled rule("==TEST==BOTS==PRIMARY FIRE")
 {
 	event
 	{
@@ -537,6 +537,89 @@ rule("Player Divine Protected and not UNKILLABLE")
 		Loop If Condition Is True;
 	}
 }
+
+disabled rule("==TEST== Unkillable Icons")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Has Status(Event Player, Unkillable) == True;
+	}
+
+	actions
+	{
+		Create Icon(All Players(All Teams), Eye Position(Event Player), Heart, Visible To and Position, Red, True);
+		Set Player Variable(Event Player, unkillableIconID, Last Created Entity);
+	}
+}
+
+disabled rule("==TEST== Unkillable Icons")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Has Status(Event Player, Unkillable) == False;
+	}
+
+	actions
+	{
+		Destroy Icon(Player Variable(Event Player, unkillableIconID));
+	}
+}
+
+disabled rule("==TEST== player half health")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Normalized Health(Event Player) < 0.500;
+	}
+
+	actions
+	{
+		Create Icon(All Players(All Teams), Eye Position(Event Player), Plus, Visible To and Position, Yellow, True);
+		Set Player Variable(Event Player, unkillableIconID, Last Created Entity);
+	}
+}
+
+disabled rule("==TEST== player half health")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Normalized Health(Event Player) > 0.500;
+	}
+
+	actions
+	{
+		Destroy Icon(Player Variable(Event Player, unkillableIconID));
+	}
+}
+
 rule("Missionary - SHIFT - G-O-D speed (BEGIN)")
 {
 	event
