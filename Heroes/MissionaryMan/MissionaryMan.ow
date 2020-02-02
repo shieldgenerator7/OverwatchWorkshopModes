@@ -717,3 +717,31 @@ rule("Missionary - ULT - HolySanctuary (END)")
 		Destroy Effect(Player Variable(Event Player, mssnrySanctuaryEffectID));
 	}
 }
+
+rule("Missionary - Passive - Prayer")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Soldier: 76);
+		Is Alive(Event Player) == True;
+		Is Button Held(Event Player, Secondary Fire) == True;
+	}
+
+	actions
+	{
+		Skip If(Compare(Player Variable(Player Variable(Event Player, mssnryWatchTarget), shields), >, 0), 1);
+		Heal(Player Variable(Event Player, mssnryWatchTarget), Event Player, 2);
+		Skip If(Compare(Player Variable(Player Variable(Event Player, mssnryWatchTarget), shields), <=, 0), 1);
+		Heal(Player Variable(Event Player, mssnryWatchTarget), Event Player, 5);
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+}
