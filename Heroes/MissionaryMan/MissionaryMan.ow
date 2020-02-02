@@ -288,6 +288,7 @@ rule("Soldier Spawn In: Setup & Disallow abilities")
 			mssnryWatchTarget))), Hero Of(Player Variable(Event Player, mssnryWatchTarget)), Player Variable(Event Player,
 			mssnryWatchTarget)), Null, Null, Left, 0, White, White, White, String, Default Visibility);
 		Set Player Variable(Event Player, mssnryWatchTargetHUDID, Last Text ID);
+		Small Message(Event Player, Custom String("Press F for Hero Info", Null, Null, Null));
 	}
 }
 
@@ -855,5 +856,42 @@ rule("Missionary - Target becomes invalid")
 		Skip If(Compare(Player Variable(Event Player, mssnryWatchTargetIndex), <, Count Of(All Living Players(Team Of(Event Player)))), 1);
 		Set Player Variable(Event Player, mssnryWatchTarget, Event Player);
 		Set Facing(Event Player, Facing Direction Of(Player Variable(Event Player, mssnryWatchTarget)), To World);
+	}
+}
+
+rule("Missionary - F - Info")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Interact) == True;
+		Hero Of(Event Player) == Hero(Soldier: 76);
+	}
+
+	actions
+	{
+		Small Message(Event Player, Custom String("{0} Missionary Man is a healer that can heal from anywhere on the map.",
+			Hero Icon String(Hero Of(Event Player)), Null, Null));
+		Wait(3, Ignore Condition);
+		Small Message(Event Player, Custom String(
+			"Secondary Fire: Prayer. He watches over a teammate and heals them. Primary Fire to target a different teammate.", Null, Null,
+			Null));
+		Wait(3, Ignore Condition);
+		Small Message(Event Player, Custom String(
+			"Ability 1: God Speed. During prayer, increase your targetted ally's move speed and projectile speed.", Null, Null, Null));
+		Wait(3, Ignore Condition);
+		Small Message(Event Player, Custom String(
+			"Ability 2: Divine Protection. During Prayer, keep your ally from dying by converting all damage to shields.", Null, Null,
+			Null));
+		Wait(3, Ignore Condition);
+		Small Message(Event Player, Custom String("ULT: During Prayer, teleport to your ally and save all nearby allies from dying.", Null,
+			Null, Null));
+		Wait(3, Ignore Condition);
 	}
 }
