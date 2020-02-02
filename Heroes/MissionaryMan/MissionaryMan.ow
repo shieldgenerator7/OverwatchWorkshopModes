@@ -6,6 +6,7 @@ variables
 	player:
 		0: shields
 		1: shieldHUDID
+		2: shieldTextID
 }
 
 rule("Game Setup")
@@ -118,10 +119,14 @@ rule("Shields gained (shields > 0)")
 
 	actions
 	{
+		Set Status(Event Player, Event Player, Unkillable, 9999);
 		Create HUD Text(Event Player, Custom String("SHIELDS: {0}", Player Variable(Event Player, shields), Null, Null), Null, Null, Left,
 			0, Blue, White, White, String, Default Visibility);
 		Set Player Variable(Event Player, shieldHUDID, Last Text ID);
-		Set Status(Event Player, Event Player, Unkillable, 9999);
+		Create In-World Text(All Players(All Teams), Custom String("Shields: {0}", Player Variable(Event Player, shields), Null, Null),
+			Add(Multiply(Up, 0.100), Eye Position(Event Player)), 1, Clip Against Surfaces, Visible To Position and String, Blue,
+			Default Visibility);
+		Set Player Variable(Event Player, shieldTextID, Last Text ID);
 	}
 }
 
@@ -143,6 +148,7 @@ rule("Shields lost (shields <= 0)")
 	{
 		Set Player Variable(Event Player, shields, 0);
 		Destroy HUD Text(Player Variable(Event Player, shieldHUDID));
+		Destroy In-World Text(Player Variable(Event Player, shieldTextID));
 		Clear Status(Event Player, Unkillable);
 	}
 }
