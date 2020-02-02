@@ -24,6 +24,42 @@ rule("Game Setup")
 	}
 }
 
+rule("==TEST== SKIP SETUP ==")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is In Setup == True;
+	}
+
+	actions
+	{
+		Set Match Time(0);
+	}
+}
+
+rule("==TEST== SKIP ASSEMBLY (MOSTLY) ==")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Assembling Heroes == True;
+	}
+
+	actions
+	{
+		Set Match Time(5);
+	}
+}
+
 rule("==TEST==SPAWN BOTS==")
 {
 	event
