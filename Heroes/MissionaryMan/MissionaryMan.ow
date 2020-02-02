@@ -301,11 +301,6 @@ rule("Soldier died - reallow abilities")
 		Soldier: 76;
 	}
 
-	conditions
-	{
-		Hero Of(Event Player) == Hero(Soldier: 76);
-	}
-
 	actions
 	{
 		Allow Button(Event Player, Primary Fire);
