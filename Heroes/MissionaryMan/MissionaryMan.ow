@@ -338,13 +338,14 @@ rule("Missionary RMB - pray for teammate")
 			Event Player, mssnryWatchTarget)));
 		Set Player Variable(Event Player, mssnryWatchTargetPrev, Null);
 		Start Camera(Event Player, Add(Eye Position(Player Variable(Event Player, mssnryWatchTarget)), Add(Multiply(Facing Direction Of(
-			Player Variable(Event Player, mssnryWatchTarget)), -2.000), Up)), Add(Facing Direction Of(Player Variable(Event Player,
-			mssnryWatchTarget)), Add(Eye Position(Player Variable(Event Player, mssnryWatchTarget)), Add(Multiply(Facing Direction Of(
-			Player Variable(Event Player, mssnryWatchTarget)), -2.000), Up))), 50);
-		Set Status(Event Player, Event Player, Knocked Down, 9999);
+			Player Variable(Event Player, mssnryWatchTarget)), -2.000), Up)), Add(Facing Direction Of(Event Player), Add(Eye Position(
+			Player Variable(Event Player, mssnryWatchTarget)), Add(Multiply(Facing Direction Of(Player Variable(Event Player,
+			mssnryWatchTarget)), -2.000), Up))), 50);
+		Set Status(Event Player, Event Player, Rooted, 9999);
 		Disallow Button(Event Player, Primary Fire);
 		Create Icon(All Players(All Teams), Eye Position(Player Variable(Event Player, mssnryWatchTarget)), Halo, Visible To and Position,
 			White, True);
+		Set Facing(Event Player, Facing Direction Of(Player Variable(Event Player, mssnryWatchTarget)), To World);
 	}
 }
 
@@ -372,6 +373,7 @@ rule("Missionary Man LMB during RMB - switch teammate target")
 		Set Player Variable(Event Player, mssnryWatchTargetIndex, 0);
 		Set Player Variable(Event Player, mssnryWatchTarget, Value In Array(All Living Players(Team Of(Event Player)), Player Variable(
 			Event Player, mssnryWatchTargetIndex)));
+		Set Facing(Event Player, Facing Direction Of(Player Variable(Event Player, mssnryWatchTarget)), To World);
 	}
 }
 
@@ -426,7 +428,7 @@ rule("Missionary Man - stop praying")
 
 	actions
 	{
-		Clear Status(Event Player, Knocked Down);
+		Clear Status(Event Player, Rooted);
 		Stop Camera(Event Player);
 		Allow Button(Event Player, Primary Fire);
 	}
@@ -768,5 +770,6 @@ rule("Missionary - Target becomes invalid")
 			Event Player, mssnryWatchTargetIndex)));
 		Skip If(Compare(Player Variable(Event Player, mssnryWatchTargetIndex), <, Count Of(All Living Players(Team Of(Event Player)))), 1);
 		Set Player Variable(Event Player, mssnryWatchTarget, Event Player);
+		Set Facing(Event Player, Facing Direction Of(Player Variable(Event Player, mssnryWatchTarget)), To World);
 	}
 }
