@@ -14,6 +14,7 @@ variables
 		6: divineProtected
 		7: mssnryWatchTargetPrev
 		8: mssnryWatchTargetHUDID
+		9: mssnryDivineProtectionEffectID
 }
 
 rule("Game Setup")
@@ -307,6 +308,8 @@ rule("Missionary RMB - pray for teammate")
 			Player Variable(Event Player, mssnryWatchTarget)), -2.000), Up))), 50);
 		Set Status(Event Player, Event Player, Knocked Down, 9999);
 		Disallow Button(Event Player, Primary Fire);
+		Create Icon(All Players(All Teams), Eye Position(Player Variable(Event Player, mssnryWatchTarget)), Halo, Visible To and Position,
+			White, True);
 	}
 }
 
@@ -385,6 +388,10 @@ rule("Missionary - E - Divine Protection (BEGIN)")
 		Stop Chasing Player Variable(Event Player, mssnryDivineProtectionTime);
 		Set Player Variable(Event Player, mssnryDivineProtectionTime, Global Variable(MSSNRY_PROTECT_DURATION));
 		Chase Player Variable At Rate(Event Player, mssnryDivineProtectionTime, 0, 1, None);
+		Destroy Effect(Player Variable(Event Player, mssnryDivineProtectionEffectID));
+		Create Effect(All Players(All Teams), Good Aura, Blue, Position Of(Player Variable(Event Player, mssnryWatchTarget)), 2,
+			Position and Radius);
+		Set Player Variable(Event Player, mssnryDivineProtectionEffectID, Last Created Entity);
 	}
 }
 
@@ -407,6 +414,7 @@ rule("Missionary - E - Divine Protection (END)")
 		Set Player Variable(Player Variable(Event Player, mssnryWatchTarget), divineProtected, False);
 		Stop Chasing Player Variable(Event Player, mssnryDivineProtectionTime);
 		Clear Status(Player Variable(Event Player, mssnryWatchTarget), Unkillable);
+		Destroy Effect(Player Variable(Event Player, mssnryDivineProtectionEffectID));
 	}
 }
 
