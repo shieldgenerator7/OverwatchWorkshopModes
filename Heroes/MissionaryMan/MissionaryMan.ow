@@ -42,7 +42,7 @@ rule("==TEST== SKIP SETUP ==")
 	}
 }
 
-rule("==TEST== SKIP ASSEMBLY (MOSTLY) ==")
+rule("==TEST== SKIP ASSEMBLY ==")
 {
 	event
 	{
@@ -56,7 +56,7 @@ rule("==TEST== SKIP ASSEMBLY (MOSTLY) ==")
 
 	actions
 	{
-		Set Match Time(5);
+		Set Match Time(0);
 	}
 }
 
@@ -288,10 +288,10 @@ rule("Missionary RMB - pray for teammate")
 		Set Player Variable(Event Player, mssnryWatchTarget, Event Player);
 		Set Player Variable(Event Player, mssnryWatchTargetIndex, Index Of Array Value(All Players(Team Of(Event Player)), Player Variable(
 			Event Player, mssnryWatchTarget)));
-		Set Status(Event Player, Event Player, Knocked Down, 9999);
 		Start Camera(Event Player, Add(Eye Position(Player Variable(Event Player, mssnryWatchTarget)), Add(Multiply(Facing Direction Of(
 			Player Variable(Event Player, mssnryWatchTarget)), -1.000), Up)), Eye Position(Player Variable(Event Player,
-			mssnryWatchTarget)), 0.100);
+			mssnryWatchTarget)), 50);
+		Set Status(Event Player, Event Player, Knocked Down, 9999);
 		Disallow Button(Event Player, Primary Fire);
 	}
 }
