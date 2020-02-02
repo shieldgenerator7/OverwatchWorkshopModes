@@ -3,6 +3,7 @@ variables
 	global:
 		0: SHIELDS_FROM_DAMAGE_PERCENT
 		1: MSSNRY_PROTECT_DURATION
+		2: MSSNRY_SPEED_DURATION
 
 	player:
 		0: shields
@@ -15,6 +16,8 @@ variables
 		7: mssnryWatchTargetPrev
 		8: mssnryWatchTargetHUDID
 		9: mssnryDivineProtectionEffectID
+		11: mssnryGodSpeedTime
+		12: mssnryGodSpeedEffectID
 }
 
 rule("Game Setup")
@@ -28,6 +31,7 @@ rule("Game Setup")
 	{
 		Set Global Variable(SHIELDS_FROM_DAMAGE_PERCENT, 0.400);
 		Set Global Variable(MSSNRY_PROTECT_DURATION, 2);
+		Set Global Variable(MSSNRY_SPEED_DURATION, 5);
 	}
 }
 
@@ -383,11 +387,16 @@ rule("Missionry - Watch Target Switched (move effects to new target)")
 
 	actions
 	{
-		Skip If(Compare(Player Variable(Event Player, mssnryDivineProtectionTime), >, 0), 4);
+		Skip If(Compare(Player Variable(Event Player, mssnryDivineProtectionTime), <=, 0), 4);
 		Set Player Variable(Player Variable(Event Player, mssnryWatchTargetPrev), divineProtected, False);
 		Clear Status(Player Variable(Event Player, mssnryWatchTargetPrev), Unkillable);
 		Set Player Variable(Player Variable(Event Player, mssnryWatchTarget), divineProtected, True);
 		Set Status(Player Variable(Event Player, mssnryWatchTarget), Event Player, Unkillable, 9999);
+		Skip If(Compare(Player Variable(Event Player, mssnryGodSpeedTime), <=, 0), 4);
+		Set Move Speed(Player Variable(Event Player, mssnryWatchTargetPrev), 100);
+		Set Projectile Speed(Player Variable(Event Player, mssnryWatchTargetPrev), 100);
+		Set Move Speed(Player Variable(Event Player, mssnryWatchTarget), 200);
+		Set Projectile Speed(Player Variable(Event Player, mssnryWatchTarget), 200);
 		Set Player Variable(Event Player, mssnryWatchTargetPrev, Player Variable(Event Player, mssnryWatchTarget));
 	}
 }
@@ -519,5 +528,56 @@ rule("Player Divine Protected and not UNKILLABLE")
 		Loop If Condition Is True;
 	}
 }
+rule("Missionary - SHIFT - G-O-D speed (BEGIN)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Soldier: 76);
+		Is Alive(Event Player) == True;
+		Is Button Held(Event Player, Secondary Fire) == True;
+		Is Button Held(Event Player, Ability 1) == True;
+	}
+
+	actions
+	{
+		Set Move Speed(Player Variable(Event Player, mssnryWatchTarget), 200);
+		Set Projectile Speed(Player Variable(Event Player, mssnryWatchTarget), 200);
+		Stop Chasing Player Variable(Event Player, mssnryGodSpeedTime);
+		Set Player Variable(Event Player, mssnryGodSpeedTime, Global Variable(MSSNRY_SPEED_DURATION));
+		Chase Player Variable At Rate(Event Player, mssnryGodSpeedTime, 0, 1, None);
+		Destroy Effect(Player Variable(Event Player, mssnryGodSpeedEffectID));
+		Create Effect(All Players(All Teams), Ring, Green, Position Of(Player Variable(Event Player, mssnryWatchTarget)), 1.500,
+			Position and Radius);
+		Set Player Variable(Event Player, mssnryGodSpeedEffectID, Last Created Entity);
+	}
+}
+
+rule("Missionary - SHIFT - G-O-D speed (END)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, mssnryGodSpeedTime) == 0;
+	}
+
+	actions
+	{
+		Set Move Speed(Player Variable(Event Player, mssnryWatchTarget), 100);
+		Set Projectile Speed(Player Variable(Event Player, mssnryWatchTarget), 100);
+		Stop Chasing Player Variable(Event Player, mssnryGodSpeedTime);
+		Destroy Effect(Player Variable(Event Player, mssnryGodSpeedEffectID));
 	}
 }
