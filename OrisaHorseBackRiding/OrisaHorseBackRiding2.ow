@@ -62,6 +62,11 @@ settings
 				Ultimate Generation Deadeye: 200%
 			}
 
+			Orisa
+			{
+				Movement Speed: 200%
+			}
+
 			enabled heroes
 			{
 				Lúcio
@@ -79,6 +84,7 @@ variables
 		1: MOUNT_RADIUS
 		2: RIDER_OFFSET
 		3: HORSE_FLEE_RADIUS
+		4: HORSE_LOOK_TURN_ANGLE
 
 	player:
 		0: rider
@@ -110,7 +116,8 @@ rule("Game Setup (Spawn Orisa)")
 		End;
 		Set Global Variable(MOUNT_RADIUS, 2);
 		Set Global Variable(RIDER_OFFSET, Up);
-		Set Global Variable(HORSE_FLEE_RADIUS, 10);
+		Set Global Variable(HORSE_FLEE_RADIUS, 20);
+		Set Global Variable(HORSE_LOOK_TURN_ANGLE, 90);
 	}
 }
 
@@ -147,6 +154,26 @@ rule("==TEST== SKIP ASSEMBLY ==")
 	actions
 	{
 		Set Match Time(0);
+	}
+}
+
+rule("==TEST== Reload kills player ==")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Reload) == True;
+	}
+
+	actions
+	{
+		Kill(Event Player, Null);
 	}
 }
 
@@ -390,19 +417,18 @@ rule("AI Orisa (Lonely) Run from Rider (Lonely)")
 		Player Variable(Event Player, rider) == Null;
 		Is Dummy Bot(Event Player) == True;
 		"If there's a rider nearby that is alive and lonely"
-		Is True For Any(Players Within Radius(Position Of(Event Player), Global Variable(HORSE_FLEE_RADIUS), All Teams, Surfaces), And(And(
-			Compare(Hero Of(Current Array Element), !=, Hero(Orisa)), Compare(Has Status(Current Array Element, Knocked Down), ==, False)),
-			And(Compare(Is Alive(Current Array Element), ==, True), Compare(Player Variable(Current Array Element, horse), ==, Null))))
-			== True;
+		Is True For Any(Players in View Angle(Event Player, All Teams, 45), And(And(Compare(Hero Of(Current Array Element), !=, Hero(
+			Orisa)), Compare(Has Status(Current Array Element, Knocked Down), ==, False)), And(Compare(Is Alive(Current Array Element), ==,
+			True), Compare(Player Variable(Current Array Element, horse), ==, Null)))) == True;
 	}
 
 	actions
 	{
 		"Set rider"
-		Set Player Variable(Event Player, fleeUntarget, Value In Array(Filtered Array(Players Within Radius(Position Of(Event Player),
-			Global Variable(HORSE_FLEE_RADIUS), All Teams, Off), And(And(Compare(Hero Of(Current Array Element), !=, Hero(Orisa)), Compare(
-			Has Status(Current Array Element, Knocked Down), ==, False)), And(Compare(Is Alive(Current Array Element), ==, True), Compare(
-			Player Variable(Current Array Element, horse), ==, Null)))), 0));
+		Set Player Variable(Event Player, fleeUntarget, Value In Array(Filtered Array(Players in View Angle(Event Player, All Teams, 45),
+			And(And(Compare(Hero Of(Current Array Element), !=, Hero(Orisa)), Compare(Has Status(Current Array Element, Knocked Down), ==,
+			False)), And(Compare(Is Alive(Current Array Element), ==, True), Compare(Player Variable(Current Array Element, horse), ==,
+			Null)))), 0));
 		Set Player Variable(Event Player, fleeDestination, Nearest Walkable Position(Multiply(Subtract(Position Of(Event Player),
 			Position Of(Player Variable(Event Player, fleeUntarget))), Global Variable(HORSE_FLEE_RADIUS))));
 		Start Facing(Event Player, Subtract(Player Variable(Event Player, fleeDestination), Position Of(Event Player)), 100, To World,
@@ -461,22 +487,36 @@ rule("AI Orisa (Lonely) stop fleeing")
 	}
 }
 
-rule("==TEST== Reload kills player ==")
+rule("AI Orisa (Lonely) turn around occassionally")
 {
 	event
 	{
 		Ongoing - Each Player;
 		All;
-		All;
+		Orisa;
 	}
 
 	conditions
 	{
-		Is Button Held(Event Player, Reload) == True;
+		Hero Of(Event Player) == Hero(Orisa);
+		Is Alive(Event Player) == True;
+		Player Variable(Event Player, rider) == Null;
+		Is Dummy Bot(Event Player) == True;
+		"Horse is standing still"
+		Throttle Of(Event Player) == Vector(0, 0, 0);
+		"If there's a rider nearby that is alive and lonely"
+		disabled Is True For Any(Players in View Angle(Event Player, All Teams, 45), And(And(Compare(Hero Of(Current Array Element), !=, Hero(
+			Orisa)), Compare(Has Status(Current Array Element, Knocked Down), ==, False)), And(Compare(Is Alive(Current Array Element), ==,
+			True), Compare(Player Variable(Current Array Element, horse), ==, Null)))) == True;
 	}
 
 	actions
 	{
-		Kill(Event Player, Null);
+		"Orisa change direction"
+		Start Facing(Event Player, Direction From Angles(Add(Random Integer(Multiply(Global Variable(HORSE_LOOK_TURN_ANGLE), -1.000),
+			Global Variable(HORSE_LOOK_TURN_ANGLE)), Horizontal Angle From Direction(Facing Direction Of(Event Player))), 0), 100,
+			To World, Direction and Turn Rate);
+		Wait(Random Integer(0, 5), Ignore Condition);
+		Loop If Condition Is True;
 	}
 }
