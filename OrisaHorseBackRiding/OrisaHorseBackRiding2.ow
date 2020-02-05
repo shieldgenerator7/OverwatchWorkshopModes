@@ -42,6 +42,13 @@ settings
 	{
 		General
 		{
+			Lúcio
+			{
+				Amp It Up Cooldown Time: 0%
+				Movement Speed: 200%
+				Soundwave Cooldown Time: 0%
+			}
+
 			McCree
 			{
 				Combat Roll Cooldown Time: 50%
@@ -57,6 +64,7 @@ settings
 
 			enabled heroes
 			{
+				Lúcio
 				McCree
 				Pharah
 			}
