@@ -1,0 +1,297 @@
+variables
+{
+	global:
+		0: loopVar
+		1: MOUNT_RADIUS
+		2: RIDER_OFFSET
+
+	player:
+		0: rider
+		1: horse
+		2: facingDirection
+}
+
+subroutines
+{
+	1: horseGetDismount
+}
+
+rule("Game Setup (Spawn Orisa)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		"Loop last slots"
+		For Global Variable(loopVar, 6, 12, 1);
+			"Spawn Orisas"
+			Create Dummy Bot(Hero(Orisa), All Teams, Global Variable(loopVar), Vector(Random Integer(-20.000, 20), 0, Random Integer(-20.000,
+				20)), Vector(0, 1, 0));
+		End;
+		Set Global Variable(MOUNT_RADIUS, 1.500);
+		Set Global Variable(RIDER_OFFSET, Up);
+	}
+}
+
+rule("==TEST== SKIP SETUP ==")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is In Setup == True;
+	}
+
+	actions
+	{
+		Set Match Time(0);
+	}
+}
+
+rule("==TEST== SKIP ASSEMBLY ==")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Assembling Heroes == True;
+	}
+
+	actions
+	{
+		Set Match Time(0);
+	}
+}
+
+rule("Pharah Pointer")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Pharah;
+	}
+
+	actions
+	{
+		Create HUD Text(Event Player, Custom String("Position: {0}", Position Of(Event Player), Null, Null), Null, Null, Left, 0, White,
+			White, White, String, Default Visibility);
+	}
+}
+
+rule("Horse (Lonely) finds a Rider (Lonely)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Orisa;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Orisa);
+		Is Alive(Event Player) == True;
+		Player Variable(Event Player, rider) == Null;
+		"If there's a rider nearby that is alive and lonely"
+		Is True For Any(Players Within Radius(Position Of(Event Player), Global Variable(MOUNT_RADIUS), All Teams, Off), And(And(Compare(
+			Hero Of(Current Array Element), !=, Hero(Orisa)), Compare(Has Status(Current Array Element, Knocked Down), ==, False)), And(
+			Compare(Is Alive(Current Array Element), ==, True), Compare(Player Variable(Current Array Element, horse), ==, Null))))
+			== True;
+	}
+
+	actions
+	{
+		"Set rider"
+		Set Player Variable(Event Player, rider, Value In Array(Filtered Array(Players Within Radius(Position Of(Event Player),
+			Global Variable(MOUNT_RADIUS), All Teams, Off), And(And(Compare(Hero Of(Current Array Element), !=, Hero(Orisa)), Compare(
+			Has Status(Current Array Element, Knocked Down), ==, False)), And(Compare(Is Alive(Current Array Element), ==, True), Compare(
+			Player Variable(Current Array Element, horse), ==, Null)))), 0));
+		"Set rider's horse to this"
+		Set Player Variable(Player Variable(Event Player, rider), horse, Event Player);
+		"Heal horse"
+		Heal(Event Player, Player Variable(Event Player, rider), 1000);
+		"Heal rider"
+		Heal(Player Variable(Event Player, rider), Event Player, 1000);
+		Set Status(Player Variable(Event Player, rider), Event Player, Phased Out, 9999);
+	}
+}
+
+rule("Rider rides horse (actions copied from \\\"Stacks\\\" by Squ1dward)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != Hero(Orisa);
+		Is Alive(Event Player) == True;
+		Player Variable(Event Player, horse) != Null;
+	}
+
+	actions
+	{
+		Apply Impulse(Event Player, Direction Towards(Position Of(Event Player), Add(Position Of(Event Player), Vector(
+			Speed Of In Direction(Event Player, Left), Vertical Speed Of(Event Player), Speed Of In Direction(Event Player, Forward)))),
+			Multiply(Speed Of(Event Player), -0.800), To World, Incorporate Contrary Motion);
+		Apply Impulse(Event Player, Direction Towards(Event Player, Add(Position Of(Player Variable(Event Player, horse)), Global Variable(
+			RIDER_OFFSET))), Multiply(Distance Between(Position Of(Event Player), Add(Position Of(Player Variable(Event Player, horse)),
+			Global Variable(RIDER_OFFSET))), 10), To World, Cancel Contrary Motion);
+		Skip If(Or(Compare(Distance Between(Position Of(Event Player), Position Of(Player Variable(Event Player, horse))), <, 2), Compare(
+			Is Alive(Player Variable(Event Player, horse)), !=, True)), 3);
+		Set Player Variable(Event Player, facingDirection, Vertical Facing Angle Of(Event Player));
+		Teleport(Event Player, Add(Position Of(Player Variable(Event Player, horse)), Global Variable(RIDER_OFFSET)));
+		Set Facing(Event Player, Direction From Angles(Horizontal Facing Angle Of(Event Player), Player Variable(Event Player,
+			facingDirection)), To World);
+		Wait(0.016, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Horse at low health, eject rider")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		Orisa;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Orisa);
+		Normalized Health(Event Player) <= 0.300;
+		Player Variable(Event Player, rider) != Null;
+		Attacker != Player Variable(Event Player, rider);
+	}
+
+	actions
+	{
+		Call Subroutine(horseGetDismount);
+	}
+}
+
+rule("Horse follow direction of rider")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Orisa;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Orisa);
+		Is Alive(Event Player) == True;
+		Player Variable(Event Player, rider) != Null;
+	}
+
+	actions
+	{
+		Start Facing(Event Player, Facing Direction Of(Player Variable(Event Player, rider)), 50, To World, Direction and Turn Rate);
+		Start Forcing Throttle(Event Player, 1, 1, 0, 1, 0, 1);
+	}
+}
+
+rule("Horse Get Dismounted")
+{
+	event
+	{
+		Subroutine;
+		horseGetDismount;
+	}
+
+	actions
+	{
+		Apply Impulse(Player Variable(Event Player, rider), Multiply(2, Add(Up, Multiply(Facing Direction Of(Event Player), -1.000))), 10,
+			To World, Cancel Contrary Motion);
+		Clear Status(Player Variable(Event Player, rider), Phased Out);
+		Set Status(Player Variable(Event Player, rider), Attacker, Knocked Down, 3);
+		Set Player Variable(Player Variable(Event Player, rider), horse, Null);
+		Set Player Variable(Event Player, rider, Null);
+		Stop Facing(Event Player);
+		Stop Forcing Throttle(Event Player);
+	}
+}
+
+rule("Horse Died")
+{
+	event
+	{
+		Player Died;
+		All;
+		Orisa;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Orisa);
+		Player Variable(Event Player, rider) != Null;
+	}
+
+	actions
+	{
+		Call Subroutine(horseGetDismount);
+	}
+}
+
+rule("Rider died")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != Hero(Orisa);
+		Player Variable(Event Player, horse) != Null;
+	}
+
+	actions
+	{
+		Stop Facing(Player Variable(Event Player, horse));
+		Stop Forcing Throttle(Player Variable(Event Player, horse));
+		Set Player Variable(Player Variable(Event Player, rider), horse, Null);
+		Set Player Variable(Event Player, rider, Null);
+		Clear Status(Event Player, Phased Out);
+	}
+}
+
+rule("Rider harms horse on accident")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != Hero(Orisa);
+		Player Variable(Event Player, horse) != Null;
+		Victim == Player Variable(Event Player, horse);
+	}
+
+	actions
+	{
+		Heal(Player Variable(Event Player, horse), Event Player, Multiply(Event Damage, 1.500));
+	}
+}
