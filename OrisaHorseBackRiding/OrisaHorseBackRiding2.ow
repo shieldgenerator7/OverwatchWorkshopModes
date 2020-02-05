@@ -54,7 +54,6 @@ settings
 				Combat Roll Cooldown Time: 50%
 				Flashbang Cooldown Time: 50%
 				Health: 25%
-				Movement Speed: 150%
 				No Ammunition Requirement: On
 				Secondary Fire: Off
 				Ultimate Generation - Combat Deadeye: 200%
@@ -86,6 +85,8 @@ variables
 		3: HORSE_FLEE_RADIUS
 		4: HORSE_LOOK_TURN_ANGLE
 		5: HORSE_WILD_ALLOWED_RADIUS
+		6: FLAG_ALLOWED_RADIUS
+		7: FLAG_CAPTURE_RADIUS
 
 	player:
 		0: rider
@@ -93,6 +94,8 @@ variables
 		2: facingDirection
 		3: fleeUntarget
 		4: fleeDestination
+		5: nextFlagPos
+		6: flagId
 }
 
 subroutines
@@ -120,6 +123,9 @@ rule("Game Setup (Spawn Orisa)")
 		Set Global Variable(HORSE_FLEE_RADIUS, 20);
 		Set Global Variable(HORSE_LOOK_TURN_ANGLE, 180);
 		Set Global Variable(HORSE_WILD_ALLOWED_RADIUS, 50);
+		Set Global Variable(FLAG_ALLOWED_RADIUS, 350);
+		Set Global Variable(FLAG_CAPTURE_RADIUS, 3);
+		Disable Built-In Game Mode Scoring;
 	}
 }
 
@@ -378,6 +384,7 @@ rule("Rider died")
 		Set Player Variable(Player Variable(Event Player, horse), rider, Null);
 		Set Player Variable(Event Player, horse, Null);
 		Clear Status(Event Player, Phased Out);
+		Destroy Effect(Player Variable(Event Player, flagId));
 	}
 }
 
@@ -490,7 +497,7 @@ rule("AI Orisa (Lonely) stop fleeing")
 	}
 }
 
-rule("AI Orisa (Lonely) turn around occassionally")
+disabled rule("AI Orisa (Lonely) turn around occassionally")
 {
 	event
 	{
@@ -506,7 +513,7 @@ rule("AI Orisa (Lonely) turn around occassionally")
 		Player Variable(Event Player, rider) == Null;
 		Is Dummy Bot(Event Player) == True;
 		"Horse is standing still"
-		Throttle Of(Event Player) == Vector(0, 0, 0);
+		Horizontal Speed Of(Event Player) == 0;
 		"If there's a rider nearby that is alive and lonely"
 		disabled Is True For Any(Players in View Angle(Event Player, All Teams, 45), And(And(Compare(Hero Of(Current Array Element), !=, Hero(
 			Orisa)), Compare(Has Status(Current Array Element, Knocked Down), ==, False)), And(Compare(Is Alive(Current Array Element), ==,
@@ -574,5 +581,57 @@ rule("AI Orisa (Lonely) stay in ranged area")
 		Start Facing(Event Player, Subtract(Player Variable(Event Player, fleeDestination), Position Of(Event Player)), 100, To World,
 			Direction and Turn Rate);
 		Teleport(Event Player, Vector(Random Integer(-20.000, 20), 0, Random Integer(-20.000, 20)));
+	}
+}
+
+rule("Player reached flag")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != Hero(Orisa);
+		Is Alive(Event Player) == True;
+		Distance Between(Position Of(Event Player), Player Variable(Event Player, nextFlagPos)) <= Global Variable(FLAG_CAPTURE_RADIUS);
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, nextFlagPos, Vector(Random Integer(Multiply(Global Variable(FLAG_ALLOWED_RADIUS), -1.000),
+			Global Variable(FLAG_ALLOWED_RADIUS)), 0, Random Integer(Multiply(Global Variable(FLAG_ALLOWED_RADIUS), -1.000),
+			Global Variable(FLAG_ALLOWED_RADIUS))));
+		Modify Player Score(Event Player, 1);
+		Modify Player Score(Player Variable(Event Player, horse), 1);
+	}
+}
+
+rule("Rider spawn")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != Hero(Orisa);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, nextFlagPos, Vector(Random Integer(Multiply(Global Variable(FLAG_ALLOWED_RADIUS), -1.000),
+			Global Variable(FLAG_ALLOWED_RADIUS)), 0, Random Integer(Multiply(Global Variable(FLAG_ALLOWED_RADIUS), -1.000),
+			Global Variable(FLAG_ALLOWED_RADIUS))));
+		Destroy Effect(Player Variable(Event Player, flagId));
+		Create Icon(Event Player, Player Variable(Event Player, nextFlagPos), Flag, Position, Green, True);
+		Set Player Variable(Event Player, flagId, Last Created Entity);
 	}
 }
