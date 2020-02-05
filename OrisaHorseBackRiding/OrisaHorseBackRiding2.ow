@@ -23,7 +23,7 @@ settings
 		{
 			enabled maps
 			{
-				Workshop Island
+				Workshop Expanse
 			}
 		}
 
@@ -450,5 +450,25 @@ rule("AI Orisa (Lonely) stop fleeing")
 	{
 		Stop Forcing Throttle(Event Player);
 		Stop Facing(Event Player);
+	}
+}
+
+rule("==TEST== Reload kills player ==")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Reload) == True;
+	}
+
+	actions
+	{
+		Kill(Event Player, Null);
 	}
 }
