@@ -375,8 +375,8 @@ rule("Rider died")
 	{
 		Stop Facing(Player Variable(Event Player, horse));
 		Stop Forcing Throttle(Player Variable(Event Player, horse));
-		Set Player Variable(Player Variable(Event Player, rider), horse, Null);
-		Set Player Variable(Event Player, rider, Null);
+		Set Player Variable(Player Variable(Event Player, horse), rider, Null);
+		Set Player Variable(Event Player, horse, Null);
 		Clear Status(Event Player, Phased Out);
 	}
 }
