@@ -1,3 +1,69 @@
+settings
+{
+	lobby
+	{
+		Allow Players Who Are In Queue: Yes
+		Max FFA Players: 6
+		Max Spectators: 11
+	}
+
+	modes
+	{
+		disabled Assault
+		{
+			Limit Roles: 2 Of Each Role Per Team
+		}
+
+		disabled Control
+		{
+			Limit Roles: 2 Of Each Role Per Team
+		}
+
+		Deathmatch
+		{
+			enabled maps
+			{
+				Workshop Island
+			}
+		}
+
+		disabled Escort
+		{
+			Limit Roles: 2 Of Each Role Per Team
+		}
+
+		disabled Hybrid
+		{
+			Limit Roles: 2 Of Each Role Per Team
+		}
+	}
+
+	heroes
+	{
+		General
+		{
+			McCree
+			{
+				Combat Roll Cooldown Time: 50%
+				Flashbang Cooldown Time: 50%
+				Health: 25%
+				Movement Speed: 150%
+				No Ammunition Requirement: On
+				Secondary Fire: Off
+				Ultimate Generation - Combat Deadeye: 200%
+				Ultimate Generation - Passive Deadeye: 200%
+				Ultimate Generation Deadeye: 200%
+			}
+
+			enabled heroes
+			{
+				McCree
+				Pharah
+			}
+		}
+	}
+}
+
 variables
 {
 	global:
@@ -29,7 +95,7 @@ rule("Game Setup (Spawn Orisa)")
 	actions
 	{
 		"Loop last slots"
-		For Global Variable(loopVar, 6, 12, 1);
+		For Global Variable(loopVar, 0, 12, 1);
 			"Spawn Orisas"
 			Create Dummy Bot(Hero(Orisa), All Teams, Global Variable(loopVar), Vector(Random Integer(-20.000, 20), 0, Random Integer(-20.000,
 				20)), Vector(0, 1, 0));
