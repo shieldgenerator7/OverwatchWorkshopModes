@@ -48,9 +48,22 @@ rule("Game Setup")
 		Set Global Variable(PIECE_MOVE_DELAY, -5.000);
 		Set Global Variable(pieceMoveTimer, Global Variable(PIECE_MOVE_DURATION));
 		Chase Global Variable At Rate(pieceMoveTimer, 0, 1, None);
+	}
+}
+
+rule("Game Setup: Card Draw Deck")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
 		Set Global Variable(CARDS_HEROES, Empty Array);
 		Modify Global Variable(CARDS_HEROES, Append To Array, Hero(Soldier: 76));
 		Modify Global Variable(CARDS_HEROES, Append To Array, Hero(Reinhardt));
+		Modify Global Variable(CARDS_HEROES, Append To Array, Hero(Mercy));
 	}
 }
 
@@ -521,14 +534,22 @@ rule("King.refreshHand() (makes hand card visual effects)")
 			Create Effect(Event Player, Ring, White, Value In Array(Player Variable(Event Player, playerHandPosList), Player Variable(
 				Event Player, loopVar2)), 1.500, None);
 			Modify Player Variable(Event Player, playerCardEffectIds, Append To Array, Last Created Entity);
+			"Soldier: 76 - Raider"
 			If(Compare(Value In Array(Player Variable(Event Player, playerCards), Player Variable(Event Player, loopVar2)), ==, Hero(
 				Soldier: 76)));
 				Create In-World Text(Event Player, Custom String("{0} - RAIDER", Hero Icon String(Hero(Soldier: 76)), Null, Null), Value In Array(
 					Player Variable(Event Player, playerHandPosList), Add(Player Variable(Event Player, loopVar2), -1.000)), 2, Do Not Clip,
 					String, White, Default Visibility);
+			"Reinhardt - Raider"
 			Else If(Compare(Value In Array(Player Variable(Event Player, playerCards), Player Variable(Event Player, loopVar2)), ==, Hero(
 					Reinhardt)));
 				Create In-World Text(Event Player, Custom String("{0} - RAIDER", Hero Icon String(Hero(Reinhardt)), Null, Null), Value In Array(
+					Player Variable(Event Player, playerHandPosList), Add(Player Variable(Event Player, loopVar2), -1.000)), 2, Do Not Clip,
+					String, White, Default Visibility);
+			"Mercy - Raider"
+			Else If(Compare(Value In Array(Player Variable(Event Player, playerCards), Player Variable(Event Player, loopVar2)), ==, Hero(
+					Mercy)));
+				Create In-World Text(Event Player, Custom String("{0} - RAIDER", Hero Icon String(Hero(Mercy)), Null, Null), Value In Array(
 					Player Variable(Event Player, playerHandPosList), Add(Player Variable(Event Player, loopVar2), -1.000)), 2, Do Not Clip,
 					String, White, Default Visibility);
 			End;

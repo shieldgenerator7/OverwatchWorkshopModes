@@ -31,6 +31,7 @@ settings
 		General
 		{
 			Allow Hero Switching: Off
+			Game Mode Start: Immediately
 			Hero Limit: Off
 		}
 	}
@@ -42,6 +43,11 @@ settings
 			Ability Cooldown Time: 0%
 			No Ammunition Requirement: On
 			Spawn With Ultimate Ready: On
+
+			Mercy
+			{
+				Weapons Enabled: Caduceus Staff Only
+			}
 		}
 	}
 }
