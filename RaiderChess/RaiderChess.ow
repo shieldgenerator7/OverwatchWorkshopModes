@@ -238,12 +238,15 @@ rule("King Spawn Raider ==TEST==")
 		Is Dummy Bot(Event Player) == False;
 		Is Button Held(Event Player, Primary Fire) == True;
 		Count Of(All Living Players(Team Of(Event Player))) < 6;
+		Absolute Value(Subtract(X Component Of(Player Variable(Event Player, playerTargetSquare)), Multiply(X Component Of(Player Variable(
+			Event Player, PLAYER_FACING_DIR)), -18.000))) <= 2;
 	}
 
 	actions
 	{
-		Create Dummy Bot(Random Value In Array(Global Variable(CARDS_HEROES)), Team Of(Event Player), -1.000, Player Variable(Event Player,
-			playerTargetSquareLine), Player Variable(Event Player, PLAYER_FACING_DIR));
+		Create Dummy Bot(Value In Array(Player Variable(Event Player, playerCards), Divide(Add(Z Component Of(Player Variable(Event Player,
+			playerTargetSquare)), 14), 4)), Team Of(Event Player), -1.000, Player Variable(Event Player, playerTargetSquareLine),
+			Player Variable(Event Player, PLAYER_FACING_DIR));
 	}
 }
 
