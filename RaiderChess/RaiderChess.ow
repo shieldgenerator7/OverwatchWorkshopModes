@@ -145,12 +145,13 @@ rule("King Spawn Raider ==TEST==")
 	{
 		Is Dummy Bot(Event Player) == False;
 		Is Button Held(Event Player, Primary Fire) == True;
+		Count Of(All Living Players(Team Of(Event Player))) < 6;
 	}
 
 	actions
 	{
-		Create Dummy Bot(Hero(Soldier: 76), Team Of(Event Player), -1.000, Player Variable(Event Player, playerTargetSquare),
-			Player Variable(Event Player, PLAYER_FACING_DIR));
+		Create Dummy Bot(Random Value In Array(All Heroes), Team Of(Event Player), -1.000, Player Variable(Event Player,
+			playerTargetSquare), Player Variable(Event Player, PLAYER_FACING_DIR));
 	}
 }
 
