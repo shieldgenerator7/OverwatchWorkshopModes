@@ -131,3 +131,67 @@ rule("King looking around (ongoing)")
 		Loop If Condition Is True;
 	}
 }
+
+rule("King Spawn Raider ==TEST==")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == False;
+		Is Button Held(Event Player, Primary Fire) == True;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Hero(Soldier: 76), Team Of(Event Player), -1.000, Player Variable(Event Player, playerTargetSquare),
+			Player Variable(Event Player, PLAYER_FACING_DIR));
+	}
+}
+
+rule("Piece Spawn In")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Start Holding Button(Event Player, Primary Fire);
+		Start Forcing Throttle(Event Player, 1, 1, 0, 0, 0, 0);
+	}
+}
+
+rule("Piece Dies")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Destroy Dummy Bot(Team Of(Event Player), Slot Of(Event Player));
+	}
+}
