@@ -76,6 +76,8 @@ rule("==TEST== Pharah Pointer ==")
 	{
 		Create HUD Text(Event Player, Custom String("Position: {0}", Position Of(Event Player), Null, Null), Null, Null, Left, 0, White,
 			White, White, String, Default Visibility);
+		Create HUD Text(Event Player, Custom String("Target Square: {0}", Player Variable(Event Player, playerTargetSquare), Null, Null),
+			Null, Null, Left, 0, White, White, White, String, Default Visibility);
 	}
 }
 
@@ -97,9 +99,9 @@ rule("King looks at square")
 	{
 		Set Player Variable(Event Player, playerTargetPosPrev, Player Variable(Event Player, playerTargetPos));
 		If(Compare(Y Component Of(Player Variable(Event Player, playerTargetPos)), ==, 0));
-			Set Player Variable(Event Player, playerTargetSquare, Vector(Multiply(2, Round To Integer(Divide(X Component Of(Player Variable(
-				Event Player, playerTargetPos)), 2), To Nearest)), 0, Multiply(2, Round To Integer(Divide(Z Component Of(Player Variable(
-				Event Player, playerTargetPos)), 2), To Nearest))));
+			Set Player Variable(Event Player, playerTargetSquare, Vector(Add(2, Multiply(4, Round To Integer(Divide(X Component Of(
+				Player Variable(Event Player, playerTargetPos)), 4), Down))), 0, Add(2, Multiply(4, Round To Integer(Divide(Z Component Of(
+				Player Variable(Event Player, playerTargetPos)), 4), Down)))));
 		End;
 		Wait(0.100, Ignore Condition);
 		Loop If Condition Is True;
