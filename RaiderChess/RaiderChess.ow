@@ -19,6 +19,7 @@ variables
 		9: playerCardEffectIds
 		10: loopVar
 		11: loopVar2
+		12: playerHandPosList
 }
 
 subroutines
@@ -160,6 +161,11 @@ rule("King Spawn In (Player)")
 			Position and Radius);
 		Create Effect(All Players(All Teams), Sphere, Green, Player Variable(Event Player, playerTargetSquareLine), 2,
 			Position and Radius);
+		Set Player Variable(Event Player, playerHandPosList, Empty Array);
+		For Player Variable(Event Player, loopVar, 0, 8, 1);
+			Modify Player Variable(Event Player, playerHandPosList, Append To Array, Vector(Multiply(X Component Of(Player Variable(
+				Event Player, PLAYER_FACING_DIR)), -18.000), 0, Add(Multiply(Player Variable(Event Player, loopVar), 4), -14.000)));
+		End;
 		Set Player Variable(Event Player, playerCards, Empty Array);
 		Set Player Variable(Event Player, playerCardEffectIds, Empty Array);
 		For Player Variable(Event Player, loopVar, 0, 8, 1);
@@ -238,15 +244,15 @@ rule("King Spawn Raider ==TEST==")
 		Is Dummy Bot(Event Player) == False;
 		Is Button Held(Event Player, Primary Fire) == True;
 		Count Of(All Living Players(Team Of(Event Player))) < 6;
-		Absolute Value(Subtract(X Component Of(Player Variable(Event Player, playerTargetSquare)), Multiply(X Component Of(Player Variable(
-			Event Player, PLAYER_FACING_DIR)), -18.000))) <= 2;
+		Index Of Array Value(Player Variable(Event Player, playerHandPosList), Player Variable(Event Player, playerTargetSquare)) >= 0;
 	}
 
 	actions
 	{
-		Create Dummy Bot(Value In Array(Player Variable(Event Player, playerCards), Divide(Add(Z Component Of(Player Variable(Event Player,
-			playerTargetSquare)), 14), 4)), Team Of(Event Player), -1.000, Player Variable(Event Player, playerTargetSquareLine),
-			Player Variable(Event Player, PLAYER_FACING_DIR));
+		Small Message(Event Player, Custom String("Attempting to spawn bot", Null, Null, Null));
+		Create Dummy Bot(Value In Array(Player Variable(Event Player, playerCards), Index Of Array Value(Player Variable(Event Player,
+			playerHandPosList), Player Variable(Event Player, playerTargetSquare))), Team Of(Event Player), -1.000, Player Variable(
+			Event Player, playerTargetSquareLine), Player Variable(Event Player, PLAYER_FACING_DIR));
 	}
 }
 
@@ -400,19 +406,19 @@ rule("King.refreshHand() (makes visual effects)")
 		End;
 		"Add an effect for each card"
 		For Player Variable(Event Player, loopVar2, 0, Count Of(Player Variable(Event Player, playerCards)), 1);
-			Create Effect(Event Player, Ring, White, Vector(Multiply(X Component Of(Player Variable(Event Player, PLAYER_FACING_DIR)),
-				-18.000), 0, Add(Multiply(Player Variable(Event Player, loopVar2), 4), -14.000)), 1.500, None);
+			Create Effect(Event Player, Ring, White, Value In Array(Player Variable(Event Player, playerHandPosList), Player Variable(
+				Event Player, loopVar2)), 1.500, None);
 			Modify Player Variable(Event Player, playerCardEffectIds, Append To Array, Last Created Entity);
 			If(Compare(Value In Array(Player Variable(Event Player, playerCards), Player Variable(Event Player, loopVar2)), ==, Hero(
 				Soldier: 76)));
-				Create In-World Text(Event Player, Custom String("{0} - RAIDER", Hero Icon String(Hero(Soldier: 76)), Null, Null), Vector(Multiply(
-					X Component Of(Player Variable(Event Player, PLAYER_FACING_DIR)), -18.000), 1, Add(Multiply(Player Variable(Event Player,
-					loopVar2), 4), -18.000)), 1, Do Not Clip, String, White, Default Visibility);
+				Create In-World Text(Event Player, Custom String("{0} - RAIDER", Hero Icon String(Hero(Soldier: 76)), Null, Null), Value In Array(
+					Player Variable(Event Player, playerHandPosList), Add(Player Variable(Event Player, loopVar2), -1.000)), 2, Do Not Clip,
+					String, White, Default Visibility);
 			Else If(Compare(Value In Array(Player Variable(Event Player, playerCards), Player Variable(Event Player, loopVar2)), ==, Hero(
 					Reinhardt)));
-				Create In-World Text(Event Player, Custom String("{0} - RAIDER", Hero Icon String(Hero(Reinhardt)), Null, Null), Vector(Multiply(
-					X Component Of(Player Variable(Event Player, PLAYER_FACING_DIR)), -18.000), 1, Add(Multiply(Player Variable(Event Player,
-					loopVar2), 4), -18.000)), 1, Do Not Clip, String, White, Default Visibility);
+				Create In-World Text(Event Player, Custom String("{0} - RAIDER", Hero Icon String(Hero(Reinhardt)), Null, Null), Value In Array(
+					Player Variable(Event Player, playerHandPosList), Add(Player Variable(Event Player, loopVar2), -1.000)), 2, Do Not Clip,
+					String, White, Default Visibility);
 			End;
 			Modify Player Variable(Event Player, playerCardEffectIds, Append To Array, Last Text ID);
 		End;
