@@ -1,0 +1,77 @@
+settings
+{
+	lobby
+	{
+		Allow Players Who Are In Queue: Yes
+		Max FFA Players: 6
+		Max Spectators: 11
+	}
+
+	modes
+	{
+		disabled Assault
+		{
+			Limit Roles: 2 Of Each Role Per Team
+		}
+
+		disabled Control
+		{
+			Limit Roles: 2 Of Each Role Per Team
+		}
+
+		Deathmatch
+		{
+			enabled maps
+			{
+				Workshop Expanse
+			}
+		}
+
+		disabled Escort
+		{
+			Limit Roles: 2 Of Each Role Per Team
+		}
+
+		disabled Hybrid
+		{
+			Limit Roles: 2 Of Each Role Per Team
+		}
+	}
+
+	heroes
+	{
+		General
+		{
+			Lúcio
+			{
+				Amp It Up Cooldown Time: 0%
+				Movement Speed: 200%
+				Soundwave Cooldown Time: 0%
+			}
+
+			McCree
+			{
+				Combat Roll Cooldown Time: 50%
+				Flashbang Cooldown Time: 50%
+				Health: 25%
+				No Ammunition Requirement: On
+				Secondary Fire: Off
+				Ultimate Generation - Combat Deadeye: 200%
+				Ultimate Generation - Passive Deadeye: 200%
+				Ultimate Generation Deadeye: 200%
+			}
+
+			Orisa
+			{
+				Movement Speed: 200%
+			}
+
+			enabled heroes
+			{
+				Lúcio
+				McCree
+				Pharah
+			}
+		}
+	}
+}
