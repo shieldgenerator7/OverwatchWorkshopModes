@@ -476,7 +476,9 @@ rule("King.drawCard()")
 
 	actions
 	{
+		Abort If(Compare(Count Of(Player Variable(Event Player, playerCards)), >=, 8));
 		Modify Player Variable(Event Player, playerCards, Append To Array, Random Value In Array(Global Variable(CARDS_HEROES)));
+		Call Subroutine(refreshTargetEffect);
 	}
 }
 
@@ -554,5 +556,27 @@ rule("King.refreshTargetEffect() (makes selector visual effects)")
 				Position and Radius);
 			Set Player Variable(Event Player, playerTargetEffectId, Last Created Entity);
 		End;
+	}
+}
+
+rule("King Draw Card (Melee)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == False;
+		Is Button Held(Event Player, Melee) == True;
+	}
+
+	actions
+	{
+		Call Subroutine(drawCard);
+		Call Subroutine(refreshHand);
 	}
 }
