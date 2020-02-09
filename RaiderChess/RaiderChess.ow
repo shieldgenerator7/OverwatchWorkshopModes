@@ -822,11 +822,12 @@ rule("Soldier - Instant Heal")
 	{
 		Is Dummy Bot(Event Player) == True;
 		Player Variable(Event Player, pieceType) == 3;
+		Is On Ground(Event Player) == True;
 	}
 
 	actions
 	{
-		Press Button(Event Player, Ability 2);
+		Start Holding Button(Event Player, Ability 2);
 		Wait(5, Ignore Condition);
 		Kill(Event Player, Null);
 	}
