@@ -29,6 +29,7 @@ subroutines
 {
 	0: drawCard
 	1: refreshHand
+	2: refreshTargetEffect
 }
 
 rule("Game Setup")
@@ -160,10 +161,6 @@ rule("King Spawn In (Player)")
 		Set Player Variable(Event Player, playerTargetPos, Vector(0, -100.000, 0));
 		Create Effect(All Players(All Teams), Sphere, White, Player Variable(Event Player, playerTargetSquare), 2, Position and Radius);
 		Set Player Variable(Event Player, playerTargetEffectId, Last Created Entity);
-		Create Effect(All Players(All Teams), Sphere, Yellow, Player Variable(Event Player, playerTargetSquareGrid), 2,
-			Position and Radius);
-		Create Effect(All Players(All Teams), Sphere, Green, Player Variable(Event Player, playerTargetSquareLine), 2,
-			Position and Radius);
 		Set Player Variable(Event Player, playerHandPosList, Empty Array);
 		For Player Variable(Event Player, loopVar, 0, 8, 1);
 			Modify Player Variable(Event Player, playerHandPosList, Append To Array, Vector(Multiply(X Component Of(Player Variable(
@@ -260,6 +257,7 @@ rule("King Select Card (Player Action Part 1)")
 			Player Variable(Event Player, playerTargetSquare)));
 		"Set input mode to \"Player select place to play card\""
 		Set Player Variable(Event Player, playerInputMode, 1);
+		Call Subroutine(refreshTargetEffect);
 	}
 }
 
@@ -292,6 +290,7 @@ rule("King plays card at position (Player Action Part 2)")
 			Player Variable(Event Player, playerTargetSquare)));
 		"Set input mode to \"Player select card to play\""
 		Set Player Variable(Event Player, playerInputMode, 0);
+		Call Subroutine(refreshTargetEffect);
 	}
 }
 
@@ -447,7 +446,7 @@ rule("King.drawCard()")
 	}
 }
 
-rule("King.refreshHand() (makes visual effects)")
+rule("King.refreshHand() (makes hand card visual effects)")
 {
 	event
 	{
@@ -481,6 +480,28 @@ rule("King.refreshHand() (makes visual effects)")
 					String, White, Default Visibility);
 			End;
 			Modify Player Variable(Event Player, playerCardEffectIds, Append To Array, Last Text ID);
+		End;
+	}
+}
+
+rule("King.refreshTargetEffect() (makes selector visual effects)")
+{
+	event
+	{
+		Subroutine;
+		refreshTargetEffect;
+	}
+
+	actions
+	{
+		Destroy Effect(Player Variable(Event Player, playerTargetEffectId));
+		If(Compare(Player Variable(Event Player, playerInputMode), ==, 0));
+			Create Effect(All Players(All Teams), Sphere, White, Player Variable(Event Player, playerTargetSquare), 2, Position and Radius);
+			Set Player Variable(Event Player, playerTargetEffectId, Last Created Entity);
+		Else;
+			Create Effect(All Players(All Teams), Sphere, Green, Player Variable(Event Player, playerTargetSquareLine), 2,
+				Position and Radius);
+			Set Player Variable(Event Player, playerTargetEffectId, Last Created Entity);
 		End;
 	}
 }
