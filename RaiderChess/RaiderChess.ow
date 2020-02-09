@@ -75,6 +75,9 @@ rule("Game Setup: Card Draw Deck")
 		"Mercy - Raider"
 		Modify Global Variable(CARDS_HEROES, Append To Array, Hero(Mercy));
 		Modify Global Variable(CARDS_TYPES, Append To Array, 2);
+		"Soldier - Instant Heal"
+		Modify Global Variable(CARDS_HEROES, Append To Array, Hero(Soldier: 76));
+		Modify Global Variable(CARDS_TYPES, Append To Array, 3);
 	}
 }
 
@@ -570,12 +573,20 @@ rule("King.refreshHand() (makes hand card visual effects)")
 			Create Effect(Event Player, Ring, White, Value In Array(Player Variable(Event Player, playerHandPosList), Player Variable(
 				Event Player, loopVar2)), 1.500, None);
 			Modify Player Variable(Event Player, playerCardEffectIds, Append To Array, Last Created Entity);
-			"Soldier: 76 - Raider"
+			"Soldier: 76"
 			If(Compare(Value In Array(Player Variable(Event Player, playerCards), Player Variable(Event Player, loopVar2)), ==, Hero(
 				Soldier: 76)));
-				Create In-World Text(Event Player, Custom String("{0} - RAIDER", Hero Icon String(Hero(Soldier: 76)), Null, Null), Value In Array(
-					Player Variable(Event Player, playerHandPosList), Add(Player Variable(Event Player, loopVar2), -1.000)), 2, Do Not Clip,
-					String, White, Default Visibility);
+				"Soldier: 76 - Raider"
+				If(Compare(Value In Array(Player Variable(Event Player, playerCardTypes), Player Variable(Event Player, loopVar2)), ==, 2));
+					Create In-World Text(Event Player, Custom String("{0} - RAIDER", Hero Icon String(Hero(Soldier: 76)), Null, Null), Value In Array(
+						Player Variable(Event Player, playerHandPosList), Add(Player Variable(Event Player, loopVar2), -1.000)), 2, Do Not Clip,
+						String, White, Default Visibility);
+				"Soldier: 76 - Instant Heal"
+				Else If(Compare(Value In Array(Player Variable(Event Player, playerCardTypes), Player Variable(Event Player, loopVar2)), ==, 3));
+					Create In-World Text(Event Player, Custom String("{0} - Instant Heal", Hero Icon String(Hero(Soldier: 76)), Null, Null),
+						Value In Array(Player Variable(Event Player, playerHandPosList), Add(Player Variable(Event Player, loopVar2), -1.000)), 2,
+						Do Not Clip, String, Yellow, Default Visibility);
+				End;
 			"Reinhardt - Raider"
 			Else If(Compare(Value In Array(Player Variable(Event Player, playerCards), Player Variable(Event Player, loopVar2)), ==, Hero(
 					Reinhardt)));
@@ -795,5 +806,28 @@ rule("Mercy \"Stand\"")
 		Start Holding Button(Event Player, Ability 1);
 		Wait(1, Ignore Condition);
 		Stop Holding Button(Event Player, Ability 1);
+	}
+}
+
+rule("Soldier - Instant Heal")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Player Variable(Event Player, pieceType) == 3;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Ability 2);
+		Wait(5, Ignore Condition);
+		Kill(Event Player, Null);
 	}
 }
