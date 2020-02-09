@@ -144,12 +144,21 @@ rule("King Spawn In (Player)")
 	{
 		Set Gravity(Event Player, 0);
 		Wait(0.250, Ignore Condition);
+		Set Player Variable(Event Player, playerHandPosList, Empty Array);
 		If(Compare(Team Of(Event Player), ==, Team 1));
 			Teleport(Event Player, Vector(-25.000, 10, 0));
 			Set Player Variable(Event Player, PLAYER_FACING_DIR, Left);
+			For Player Variable(Event Player, loopVar, 0, 8, 1);
+				Modify Player Variable(Event Player, playerHandPosList, Append To Array, Vector(Multiply(X Component Of(Player Variable(
+					Event Player, PLAYER_FACING_DIR)), -18.000), 0, Add(Multiply(Player Variable(Event Player, loopVar), -4.000), 14)));
+			End;
 		Else;
 			Teleport(Event Player, Vector(25, 10, 0));
 			Set Player Variable(Event Player, PLAYER_FACING_DIR, Right);
+			For Player Variable(Event Player, loopVar, 0, 8, 1);
+				Modify Player Variable(Event Player, playerHandPosList, Append To Array, Vector(Multiply(X Component Of(Player Variable(
+					Event Player, PLAYER_FACING_DIR)), -18.000), 0, Add(Multiply(Player Variable(Event Player, loopVar), 4), -14.000)));
+			End;
 		End;
 		Set Facing(Event Player, Add(Player Variable(Event Player, PLAYER_FACING_DIR), Down), To World);
 		Set Status(Event Player, Null, Rooted, 9999);
@@ -162,11 +171,6 @@ rule("King Spawn In (Player)")
 		Set Player Variable(Event Player, playerTargetPos, Vector(0, -100.000, 0));
 		Create Effect(All Players(All Teams), Sphere, White, Player Variable(Event Player, playerTargetSquare), 2, Position and Radius);
 		Set Player Variable(Event Player, playerTargetEffectId, Last Created Entity);
-		Set Player Variable(Event Player, playerHandPosList, Empty Array);
-		For Player Variable(Event Player, loopVar, 0, 8, 1);
-			Modify Player Variable(Event Player, playerHandPosList, Append To Array, Vector(Multiply(X Component Of(Player Variable(
-				Event Player, PLAYER_FACING_DIR)), -18.000), 0, Add(Multiply(Player Variable(Event Player, loopVar), 4), -14.000)));
-		End;
 		Set Player Variable(Event Player, playerCards, Empty Array);
 		Set Player Variable(Event Player, playerCardEffectIds, Empty Array);
 		For Player Variable(Event Player, loopVar, 0, 8, 1);
