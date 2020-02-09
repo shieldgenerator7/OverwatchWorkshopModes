@@ -315,6 +315,32 @@ rule("King mouse up (Player Action Part 1.5)")
 	}
 }
 
+rule("King RMB - cancel card select (Player Action Part 1.75)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == False;
+		Or(Is Button Held(Event Player, Secondary Fire), Is Button Held(Event Player, Crouch)) == True;
+		"If input mode is \"Player select place to play card\""
+		Player Variable(Event Player, playerInputMode) == 1;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, playerClickUsed, False);
+		"Set input mode to \"Player select card to play\""
+		Set Player Variable(Event Player, playerInputMode, 0);
+		Call Subroutine(refreshTargetEffect);
+	}
+}
+
 rule("Piece Spawn In")
 {
 	event
