@@ -564,6 +564,7 @@ rule("King.refreshHand() (makes hand card visual effects)")
 				Destroy In-World Text(Value In Array(Player Variable(Event Player, playerCardEffectIds), Player Variable(Event Player, loopVar2)));
 			End;
 		End;
+		Set Player Variable(Event Player, playerCardEffectIds, Empty Array);
 		"Add an effect for each card"
 		For Player Variable(Event Player, loopVar2, 0, Count Of(Player Variable(Event Player, playerCards)), 1);
 			Create Effect(Event Player, Ring, White, Value In Array(Player Variable(Event Player, playerHandPosList), Player Variable(
