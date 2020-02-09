@@ -54,7 +54,7 @@ rule("Game Setup")
 	}
 }
 
-rule("Game Setup: Card Draw Deck Raiders")
+rule("Game Setup: Card Draw Deck Raiders (Type 2)")
 {
 	event
 	{
@@ -84,7 +84,7 @@ rule("Game Setup: Card Draw Deck Raiders")
 	}
 }
 
-rule("Game Setup: Card Draw Deck Instant Heal")
+rule("Game Setup: Card Draw Deck Instant Heal (Type 3)")
 {
 	event
 	{
@@ -99,15 +99,22 @@ rule("Game Setup: Card Draw Deck Instant Heal")
 	}
 }
 
-rule("Game Setup: Card Draw Deck Instant Util")
+rule("Game Setup: Card Draw Deck Instant Util (Type 5)")
 {
 	event
 	{
 		Ongoing - Global;
 	}
+
+	actions
+	{
+		"Sombra - Instant Util"
+		Modify Global Variable(CARDS_HEROES, Append To Array, Hero(Sombra));
+		Modify Global Variable(CARDS_TYPES, Append To Array, 5);
+	}
 }
 
-rule("Game Setup: Card Draw Deck Instant Attack")
+rule("Game Setup: Card Draw Deck Instant Attack (Type 7)")
 {
 	event
 	{
@@ -651,6 +658,13 @@ rule("King.refreshHand() (makes hand card visual effects)")
 				Create In-World Text(Event Player, Custom String("{0} - 'RAIDER'", Hero Icon String(Hero(Bastion)), Null, Null), Value In Array(
 					Player Variable(Event Player, playerHandPosList), Add(Player Variable(Event Player, loopVar2), -1.000)), 2, Do Not Clip,
 					String, White, Default Visibility);
+			"Sombra"
+			Else If(Compare(Value In Array(Player Variable(Event Player, playerCards), Player Variable(Event Player, loopVar2)), ==, Hero(
+					Sombra)));
+				"Sombra - Instant Util"
+				Create In-World Text(Event Player, Custom String("{0} - INSTANT UTIL", Hero Icon String(Hero(Sombra)), Null, Null), Value In Array(
+					Player Variable(Event Player, playerHandPosList), Add(Player Variable(Event Player, loopVar2), -1.000)), 2, Do Not Clip,
+					String, Red, Default Visibility);
 			"Doomfist"
 			Else If(Compare(Value In Array(Player Variable(Event Player, playerCards), Player Variable(Event Player, loopVar2)), ==, Hero(
 					Doomfist)));
@@ -1020,6 +1034,34 @@ rule("Soldier - Instant Heal")
 	{
 		Start Holding Button(Event Player, Ability 2);
 		Wait(5, Ignore Condition);
+		Kill(Event Player, Null);
+	}
+}
+
+rule("Sombra - Instant Util")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Sombra;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Player Variable(Event Player, pieceType) == 5;
+		disabled Is On Ground(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Gravity(Event Player, 0);
+		Set Facing(Event Player, Down, To World);
+		Start Holding Button(Event Player, Secondary Fire);
+		Wait(2, Ignore Condition);
+		Set Gravity(Event Player, 100);
+		Wait(3, Ignore Condition);
 		Kill(Event Player, Null);
 	}
 }
