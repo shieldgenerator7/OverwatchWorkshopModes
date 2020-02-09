@@ -10,6 +10,12 @@ rule("Game Setup")
 	{
 		Ongoing - Global;
 	}
+
+	actions
+	{
+		Disable Built-In Game Mode Respawning(All Players(All Teams));
+		Disable Built-In Game Mode Scoring;
+	}
 }
 
 rule("King Spawn In (Player)")
@@ -41,6 +47,12 @@ rule("King Spawn In (Player)")
 		End;
 		Set Facing(Event Player, Add(Player Variable(Event Player, playerFacingDir), Down), To World);
 		Set Status(Event Player, Null, Rooted, 9999);
+		Set Primary Fire Enabled(Event Player, False);
+		Set Secondary Fire Enabled(Event Player, False);
+		Set Ability 1 Enabled(Event Player, False);
+		Set Ability 2 Enabled(Event Player, False);
+		Set Ultimate Ability Enabled(Event Player, False);
+		Disallow Button(Event Player, Jump);
 	}
 }
 
