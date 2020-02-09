@@ -5,6 +5,7 @@ variables
 		1: PIECE_MOVE_DELAY
 		2: pieceMoveTimer
 		3: CARDS_HEROES
+		4: CARDS_TYPES
 
 	player:
 		0: PLAYER_FACING_DIR
@@ -23,6 +24,8 @@ variables
 		13: playerInputMode
 		14: playerClickUsed
 		15: playerSelectedCardIndex
+		16: playerCardTypes
+		17: pieceType
 }
 
 subroutines
@@ -61,9 +64,17 @@ rule("Game Setup: Card Draw Deck")
 	actions
 	{
 		Set Global Variable(CARDS_HEROES, Empty Array);
+		"Card Types: 2=Raider, 3=Instant Heal, 5=Instant Util, 7=Instant Attack; Times the type by 100 to indicate it's an ultimate"
+		Set Global Variable(CARDS_TYPES, Empty Array);
+		"Solder - Raider"
 		Modify Global Variable(CARDS_HEROES, Append To Array, Hero(Soldier: 76));
+		Modify Global Variable(CARDS_TYPES, Append To Array, 2);
+		"Reinhardt - Raider"
 		Modify Global Variable(CARDS_HEROES, Append To Array, Hero(Reinhardt));
+		Modify Global Variable(CARDS_TYPES, Append To Array, 2);
+		"Mercy - Raider"
 		Modify Global Variable(CARDS_HEROES, Append To Array, Hero(Mercy));
+		Modify Global Variable(CARDS_TYPES, Append To Array, 2);
 	}
 }
 
@@ -185,6 +196,7 @@ rule("King Spawn In (Player)")
 		Create Effect(All Players(All Teams), Sphere, White, Player Variable(Event Player, playerTargetSquare), 2, Position and Radius);
 		Set Player Variable(Event Player, playerTargetEffectId, Last Created Entity);
 		Set Player Variable(Event Player, playerCards, Empty Array);
+		Set Player Variable(Event Player, playerCardTypes, Empty Array);
 		Set Player Variable(Event Player, playerCardEffectIds, Empty Array);
 		For Player Variable(Event Player, loopVar, 0, 8, 1);
 			Call Subroutine(drawCard);
@@ -305,12 +317,21 @@ rule("King plays card at position (Player Action Part 2)")
 	actions
 	{
 		Set Player Variable(Event Player, playerClickUsed, True);
-		Create Dummy Bot(Value In Array(Player Variable(Event Player, playerCards), Player Variable(Event Player,
-			playerSelectedCardIndex)), Team Of(Event Player), -1.000, Player Variable(Event Player, playerTargetSquareLine),
-			Player Variable(Event Player, PLAYER_FACING_DIR));
+		If(Compare(Value In Array(Player Variable(Event Player, playerCardTypes), Player Variable(Event Player, playerSelectedCardIndex)),
+			==, 2));
+			Create Dummy Bot(Value In Array(Player Variable(Event Player, playerCards), Player Variable(Event Player,
+				playerSelectedCardIndex)), Team Of(Event Player), -1.000, Player Variable(Event Player, playerTargetSquareLine),
+				Player Variable(Event Player, PLAYER_FACING_DIR));
+		Else If(Compare(Value In Array(Player Variable(Event Player, playerCardTypes), Player Variable(Event Player,
+				playerSelectedCardIndex)), ==, 3));
+			Create Dummy Bot(Value In Array(Player Variable(Event Player, playerCards), Player Variable(Event Player,
+				playerSelectedCardIndex)), Team Of(Event Player), -1.000, Add(Player Variable(Event Player, playerTargetSquareGrid), Multiply(
+				Up, 5)), Player Variable(Event Player, PLAYER_FACING_DIR));
+		End;
 		"Set input mode to \"Player select card to play\""
 		Set Player Variable(Event Player, playerInputMode, 0);
 		Call Subroutine(refreshTargetEffect);
+		Wait(0.250, Ignore Condition);
 		Call Subroutine(removeCard);
 	}
 }
@@ -381,6 +402,9 @@ rule("Piece Spawn In")
 	{
 		Set Player Variable(Event Player, pieceOwner, Value In Array(Filtered Array(All Players(Team Of(Event Player)), Compare(
 			Is Dummy Bot(Current Array Element), ==, False)), 0));
+		"Set piece type to the piece type in owner's selected index"
+		Set Player Variable(Event Player, pieceType, Value In Array(Player Variable(Player Variable(Event Player, pieceOwner),
+			playerCardTypes), Player Variable(Player Variable(Event Player, pieceOwner), playerSelectedCardIndex)));
 	}
 }
 
@@ -423,6 +447,7 @@ rule("Piece reaches enemy line")
 		Facing Direction Of(Event Player) != 0;
 		Position Of(Event Player) != Vector(0, 0, 0);
 		Facing Direction Of(Event Player) != Vector(0, 0, 0);
+		Player Variable(Event Player, pieceType) == 2;
 	}
 
 	actions
@@ -493,7 +518,12 @@ rule("King.drawCard()")
 	actions
 	{
 		Abort If(Compare(Count Of(Player Variable(Event Player, playerCards)), >=, 8));
-		Modify Player Variable(Event Player, playerCards, Append To Array, Random Value In Array(Global Variable(CARDS_HEROES)));
+		Set Player Variable(Event Player, playerSelectedCardIndex, Random Integer(0, Subtract(Count Of(Global Variable(CARDS_HEROES)),
+			1)));
+		Modify Player Variable(Event Player, playerCards, Append To Array, Value In Array(Global Variable(CARDS_HEROES), Player Variable(
+			Event Player, playerSelectedCardIndex)));
+		Modify Player Variable(Event Player, playerCardTypes, Append To Array, Value In Array(Global Variable(CARDS_TYPES),
+			Player Variable(Event Player, playerSelectedCardIndex)));
 		Call Subroutine(refreshTargetEffect);
 	}
 }
@@ -509,6 +539,8 @@ rule("King.removeCard()")
 	actions
 	{
 		Modify Player Variable(Event Player, playerCards, Remove From Array By Index, Player Variable(Event Player,
+			playerSelectedCardIndex));
+		Modify Player Variable(Event Player, playerCardTypes, Remove From Array By Index, Player Variable(Event Player,
 			playerSelectedCardIndex));
 		Set Player Variable(Event Player, playerSelectedCardIndex, -1.000);
 		Call Subroutine(refreshHand);
@@ -574,12 +606,18 @@ rule("King.refreshTargetEffect() (makes selector visual effects)")
 		Destroy Effect(Player Variable(Event Player, playerTargetEffectId));
 		If(Compare(Player Variable(Event Player, playerInputMode), ==, 0));
 			Create Effect(All Players(All Teams), Sphere, White, Player Variable(Event Player, playerTargetSquare), 2, Position and Radius);
-			Set Player Variable(Event Player, playerTargetEffectId, Last Created Entity);
 		Else;
-			Create Effect(All Players(All Teams), Sphere, Green, Player Variable(Event Player, playerTargetSquareLine), 2,
-				Position and Radius);
-			Set Player Variable(Event Player, playerTargetEffectId, Last Created Entity);
+			If(Compare(Value In Array(Player Variable(Event Player, playerCardTypes), Player Variable(Event Player, playerSelectedCardIndex)),
+				==, 2));
+				Create Effect(All Players(All Teams), Sphere, Green, Player Variable(Event Player, playerTargetSquareLine), 2,
+					Position and Radius);
+			Else If(Compare(Value In Array(Player Variable(Event Player, playerCardTypes), Player Variable(Event Player,
+					playerSelectedCardIndex)), ==, 3));
+				Create Effect(All Players(All Teams), Sphere, Yellow, Player Variable(Event Player, playerTargetSquareGrid), 2,
+					Position and Radius);
+			End;
 		End;
+		Set Player Variable(Event Player, playerTargetEffectId, Last Created Entity);
 	}
 }
 
@@ -619,6 +657,7 @@ rule("Soldier Run")
 		Is Dummy Bot(Event Player) == True;
 		Is Alive(Event Player) == True;
 		Global Variable(pieceMoveTimer) > 0;
+		Player Variable(Event Player, pieceType) == 2;
 	}
 
 	actions
@@ -643,6 +682,7 @@ rule("Soldier Stand")
 		Is Dummy Bot(Event Player) == True;
 		Is Alive(Event Player) == True;
 		Global Variable(pieceMoveTimer) < 0;
+		Player Variable(Event Player, pieceType) == 2;
 	}
 
 	actions
@@ -668,6 +708,7 @@ rule("Reinhardt Run")
 		Is Dummy Bot(Event Player) == True;
 		Is Alive(Event Player) == True;
 		Global Variable(pieceMoveTimer) > 0;
+		Player Variable(Event Player, pieceType) == 2;
 	}
 
 	actions
@@ -692,6 +733,7 @@ rule("Reinhardt Stand")
 		Is Dummy Bot(Event Player) == True;
 		Is Alive(Event Player) == True;
 		Global Variable(pieceMoveTimer) < 0;
+		Player Variable(Event Player, pieceType) == 2;
 	}
 
 	actions
@@ -715,6 +757,7 @@ rule("Mercy \"Run\"")
 	{
 		Is Dummy Bot(Event Player) == True;
 		Is Alive(Event Player) == True;
+		Player Variable(Event Player, pieceType) == 2;
 	}
 
 	actions
@@ -743,6 +786,7 @@ rule("Mercy \"Stand\"")
 		Is Dummy Bot(Event Player) == True;
 		Is Alive(Event Player) == True;
 		Global Variable(pieceMoveTimer) < 0;
+		Player Variable(Event Player, pieceType) == 2;
 	}
 
 	actions
