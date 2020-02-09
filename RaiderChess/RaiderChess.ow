@@ -1,5 +1,10 @@
 variables
 {
+	global:
+		0: PIECE_MOVE_DURATION
+		1: PIECE_MOVE_DELAY
+		2: pieceMoveTimer
+
 	player:
 		0: PLAYER_FACING_DIR
 		1: playerTargetPos
@@ -21,6 +26,38 @@ rule("Game Setup")
 	{
 		Disable Built-In Game Mode Respawning(All Players(All Teams));
 		Disable Built-In Game Mode Scoring;
+		Set Global Variable(PIECE_MOVE_DURATION, 1);
+		Set Global Variable(PIECE_MOVE_DELAY, -5.000);
+		Set Global Variable(pieceMoveTimer, Global Variable(PIECE_MOVE_DURATION));
+		Chase Global Variable At Rate(pieceMoveTimer, 0, 1, None);
+	}
+}
+
+rule("Global Movement Timer")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Absolute Value(Global Variable(pieceMoveTimer)) <= 0.020;
+	}
+
+	actions
+	{
+		Stop Chasing Global Variable(pieceMoveTimer);
+		"If it finished red light time,"
+		If(Compare(Global Variable(pieceMoveTimer), <, 0));
+			"Start green light time"
+			Set Global Variable(pieceMoveTimer, Global Variable(PIECE_MOVE_DURATION));
+		"If finished green light time"
+		Else;
+			"Start red light time"
+			Set Global Variable(pieceMoveTimer, Global Variable(PIECE_MOVE_DELAY));
+		End;
+		Chase Global Variable At Rate(pieceMoveTimer, 0, 1, None);
 	}
 }
 
@@ -255,6 +292,53 @@ rule("Piece reaches enemy line")
 	actions
 	{
 		Modify Team Score(Team Of(Event Player), 1);
-		Kill(Event Player, Null);
+	}
+}
+
+rule("Piece Moves")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Global Variable(pieceMoveTimer) > 0;
+	}
+
+	actions
+	{
+		Start Forcing Throttle(Event Player, 1, 1, 0, 0, 0, 0);
+		Stop Holding Button(Event Player, Primary Fire);
+		Start Holding Button(Event Player, Secondary Fire);
+	}
+}
+
+rule("Piece Stops Moving")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Global Variable(pieceMoveTimer) < 0;
+	}
+
+	actions
+	{
+		Stop Forcing Throttle(Event Player);
+		Stop Holding Button(Event Player, Secondary Fire);
+		Start Holding Button(Event Player, Primary Fire);
 	}
 }
