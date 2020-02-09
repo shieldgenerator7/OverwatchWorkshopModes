@@ -54,7 +54,7 @@ rule("Game Setup")
 	}
 }
 
-rule("Game Setup: Card Draw Deck")
+rule("Game Setup: Card Draw Deck Raiders")
 {
 	event
 	{
@@ -78,9 +78,41 @@ rule("Game Setup: Card Draw Deck")
 		"Genji - Raider"
 		Modify Global Variable(CARDS_HEROES, Append To Array, Hero(Genji));
 		Modify Global Variable(CARDS_TYPES, Append To Array, 2);
+	}
+}
+
+rule("Game Setup: Card Draw Deck Instant Heal")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
 		"Soldier - Instant Heal"
 		Modify Global Variable(CARDS_HEROES, Append To Array, Hero(Soldier: 76));
 		Modify Global Variable(CARDS_TYPES, Append To Array, 3);
+	}
+}
+
+rule("Game Setup: Card Draw Deck Instant Util")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Game Setup: Card Draw Deck Instant Attack")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
 		"Doomfist - Instant Attack"
 		Modify Global Variable(CARDS_HEROES, Append To Array, Hero(Doomfist));
 		Modify Global Variable(CARDS_TYPES, Append To Array, 7);
