@@ -19,6 +19,7 @@ variables
 		9: playerCardEffectIds
 		10: loopVar
 		11: loopVar2
+		12: tempLoop
 }
 
 subroutines
@@ -397,23 +398,20 @@ rule("King.refreshHand() (makes visual effects)")
 		End;
 		"Add an effect for each card"
 		For Player Variable(Event Player, loopVar2, 0, Count Of(Player Variable(Event Player, playerCards)), 1);
-			Create Effect(Event Player, Ring, White, Vector(Multiply(X Component Of(Player Variable(Event Player, PLAYER_FACING_DIR)),
-				-18.000), 0, Add(Multiply(Player Variable(Event Player, loopVar2), 4), -14.000)), 1.500, None);
+			Set Player Variable(Event Player, tempLoop, Vector(Multiply(X Component Of(Player Variable(Event Player, PLAYER_FACING_DIR)),
+				-18.000), 0, Add(Multiply(Player Variable(Event Player, loopVar2), 4), -14.000)));
+			Create Effect(Event Player, Ring, White, Player Variable(Event Player, tempLoop), 1.500, None);
 			Modify Player Variable(Event Player, playerCardEffectIds, Append To Array, Last Created Entity);
 			If(Compare(Value In Array(Player Variable(Event Player, playerCards), Player Variable(Event Player, loopVar2)), ==, Hero(
 				Soldier: 76)));
 				Create In-World Text(Event Player, Custom String("{0} {1}: RAIDER", Hero Icon String(Hero(Soldier: 76)), Hero(Soldier: 76), Null),
-					Vector(Multiply(X Component Of(Player Variable(Event Player, PLAYER_FACING_DIR)), -18.000), 1, Add(Multiply(Player Variable(
-					Event Player, loopVar2), 4), -18.000)), 1, Do Not Clip, String, White, Default Visibility);
-				Modify Player Variable(Event Player, playerCardEffectIds, Append To Array, Last Text ID);
-			End;
-			If(Compare(Value In Array(Player Variable(Event Player, playerCards), Player Variable(Event Player, loopVar2)), ==, Hero(
-				Reinhardt)));
+					Player Variable(Event Player, tempLoop), 1, Do Not Clip, String, Green, Default Visibility);
+			Else If(Compare(Value In Array(Player Variable(Event Player, playerCards), Player Variable(Event Player, loopVar2)), ==, Hero(
+					Reinhardt)));
 				Create In-World Text(Event Player, Custom String("{0} {1}: RAIDER", Hero Icon String(Hero(Reinhardt)), Hero(Reinhardt), Null),
-					Vector(Multiply(X Component Of(Player Variable(Event Player, PLAYER_FACING_DIR)), -18.000), 1, Add(Multiply(Player Variable(
-					Event Player, loopVar2), 4), -18.000)), 1, Do Not Clip, String, White, Default Visibility);
-				Modify Player Variable(Event Player, playerCardEffectIds, Append To Array, Last Text ID);
+					Player Variable(Event Player, tempLoop), 1, Do Not Clip, String, Green, Default Visibility);
 			End;
+			Modify Player Variable(Event Player, playerCardEffectIds, Append To Array, Last Text ID);
 		End;
 	}
 }
