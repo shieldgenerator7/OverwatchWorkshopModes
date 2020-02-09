@@ -245,10 +245,14 @@ rule("King Select Card (Player Action Part 1)")
 		Is Dummy Bot(Event Player) == False;
 		Is Button Held(Event Player, Primary Fire) == True;
 		Count Of(All Living Players(Team Of(Event Player))) < 6;
+		"Player is clicking in the card row"
 		Index Of Array Value(Player Variable(Event Player, playerHandPosList), Player Variable(Event Player, playerTargetSquare)) >= 0;
 		"If input mode is \"Player select card to play\""
 		disabled Player Variable(Event Player, playerInputMode) == 0;
 		Player Variable(Event Player, playerClickUsed) == False;
+		"There's actually a card at the given index"
+		Count Of(Player Variable(Event Player, playerCards)) > Index Of Array Value(Player Variable(Event Player, playerHandPosList),
+			Player Variable(Event Player, playerTargetSquare));
 	}
 
 	actions
