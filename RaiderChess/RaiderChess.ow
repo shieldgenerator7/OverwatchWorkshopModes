@@ -404,12 +404,12 @@ rule("King.refreshHand() (makes visual effects)")
 			Modify Player Variable(Event Player, playerCardEffectIds, Append To Array, Last Created Entity);
 			If(Compare(Value In Array(Player Variable(Event Player, playerCards), Player Variable(Event Player, loopVar2)), ==, Hero(
 				Soldier: 76)));
-				Create In-World Text(Event Player, Custom String("{0} {1}: RAIDER", Hero Icon String(Hero(Soldier: 76)), Hero(Soldier: 76), Null),
-					Player Variable(Event Player, tempLoop), 1, Do Not Clip, String, Green, Default Visibility);
+				Create In-World Text(Event Player, Custom String("{0} - RAIDER", Hero Icon String(Hero(Soldier: 76)), Null, Null), Player Variable(
+					Event Player, tempLoop), 2, Do Not Clip, String, Green, Default Visibility);
 			Else If(Compare(Value In Array(Player Variable(Event Player, playerCards), Player Variable(Event Player, loopVar2)), ==, Hero(
 					Reinhardt)));
-				Create In-World Text(Event Player, Custom String("{0} {1}: RAIDER", Hero Icon String(Hero(Reinhardt)), Hero(Reinhardt), Null),
-					Player Variable(Event Player, tempLoop), 1, Do Not Clip, String, Green, Default Visibility);
+				Create In-World Text(Event Player, Custom String("{0} - RAIDER", Hero Icon String(Hero(Reinhardt)), Null, Null), Player Variable(
+					Event Player, tempLoop), 2, Do Not Clip, String, Green, Default Visibility);
 			End;
 			Modify Player Variable(Event Player, playerCardEffectIds, Append To Array, Last Text ID);
 		End;
