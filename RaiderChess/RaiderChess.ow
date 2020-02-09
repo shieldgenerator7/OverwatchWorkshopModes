@@ -24,6 +24,26 @@ rule("Game Setup")
 	}
 }
 
+rule("==SKIP SETUP==")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Assembling Heroes == True;
+	}
+
+	actions
+	{
+		Set Match Time(0);
+	}
+}
+
 rule("King Spawn In (Player)")
 {
 	event
@@ -208,5 +228,33 @@ rule("Piece Dies")
 	actions
 	{
 		Destroy Dummy Bot(Team Of(Event Player), Slot Of(Event Player));
+	}
+}
+
+rule("Piece reaches enemy line")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Absolute Value(Subtract(X Component Of(Position Of(Event Player)), Multiply(X Component Of(Facing Direction Of(Event Player)),
+			17))) <= 1;
+		Position Of(Event Player) != 0;
+		Facing Direction Of(Event Player) != 0;
+		Position Of(Event Player) != Vector(0, 0, 0);
+		Facing Direction Of(Event Player) != Vector(0, 0, 0);
+	}
+
+	actions
+	{
+		Modify Team Score(Team Of(Event Player), 1);
+		Kill(Event Player, Null);
 	}
 }

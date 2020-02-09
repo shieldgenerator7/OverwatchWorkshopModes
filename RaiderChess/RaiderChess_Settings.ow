@@ -19,7 +19,7 @@ settings
 		Team Deathmatch
 		{
 			Mercy Resurrect Counteracts Kills: Off
-			Score To Win: 5
+			Score To Win: 200
 			Self Initiated Respawn: Off
 
 			enabled maps
