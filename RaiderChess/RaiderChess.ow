@@ -6,6 +6,8 @@ variables
 		2: playerTargetPosPrev
 		3: playerTargetSquare
 		4: playerTargetEffectId
+		5: playerTargetSquareGrid
+		6: playerTargetSquareLine
 }
 
 rule("Game Setup")
@@ -60,6 +62,10 @@ rule("King Spawn In (Player)")
 		Set Player Variable(Event Player, playerTargetPos, Vector(0, -100.000, 0));
 		Create Effect(All Players(All Teams), Sphere, White, Player Variable(Event Player, playerTargetSquare), 2, Position and Radius);
 		Set Player Variable(Event Player, playerTargetEffectId, Last Created Entity);
+		Create Effect(All Players(All Teams), Sphere, Yellow, Player Variable(Event Player, playerTargetSquareGrid), 2,
+			Position and Radius);
+		Create Effect(All Players(All Teams), Sphere, Green, Player Variable(Event Player, playerTargetSquareLine), 2,
+			Position and Radius);
 	}
 }
 
@@ -78,6 +84,10 @@ rule("==TEST== Pharah Pointer ==")
 			White, White, String, Default Visibility);
 		Create HUD Text(Event Player, Custom String("Target Square: {0}", Player Variable(Event Player, playerTargetSquare), Null, Null),
 			Null, Null, Left, 0, White, White, White, String, Default Visibility);
+		Create HUD Text(Event Player, Custom String("Target Square Grid: {0}", Player Variable(Event Player, playerTargetSquareGrid), Null,
+			Null), Null, Null, Left, 0, White, White, White, String, Default Visibility);
+		Create HUD Text(Event Player, Custom String("Target Square Line: {0}", Player Variable(Event Player, playerTargetSquareLine), Null,
+			Null), Null, Null, Left, 0, White, White, White, String, Default Visibility);
 	}
 }
 
@@ -102,6 +112,10 @@ rule("King looks at square")
 			Set Player Variable(Event Player, playerTargetSquare, Vector(Add(2, Multiply(4, Round To Integer(Divide(X Component Of(
 				Player Variable(Event Player, playerTargetPos)), 4), Down))), 0, Add(2, Multiply(4, Round To Integer(Divide(Z Component Of(
 				Player Variable(Event Player, playerTargetPos)), 4), Down)))));
+			Set Player Variable(Event Player, playerTargetSquareGrid, Vector(Min(14, Max(-14.000, X Component Of(Player Variable(Event Player,
+				playerTargetSquare)))), 0, Min(14, Max(-14.000, Z Component Of(Player Variable(Event Player, playerTargetSquare))))));
+			Set Player Variable(Event Player, playerTargetSquareLine, Vector(Multiply(X Component Of(Player Variable(Event Player,
+				PLAYER_FACING_DIR)), -14.000), 0, Z Component Of(Player Variable(Event Player, playerTargetSquareGrid))));
 		End;
 		Wait(0.100, Ignore Condition);
 		Loop If Condition Is True;
@@ -151,7 +165,7 @@ rule("King Spawn Raider ==TEST==")
 	actions
 	{
 		Create Dummy Bot(Random Value In Array(All Heroes), Team Of(Event Player), -1.000, Player Variable(Event Player,
-			playerTargetSquare), Player Variable(Event Player, PLAYER_FACING_DIR));
+			playerTargetSquareLine), Player Variable(Event Player, PLAYER_FACING_DIR));
 	}
 }
 
