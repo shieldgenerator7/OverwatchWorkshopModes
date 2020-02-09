@@ -30,6 +30,7 @@ subroutines
 	0: drawCard
 	1: refreshHand
 	2: refreshTargetEffect
+	3: removeCard
 }
 
 rule("Game Setup")
@@ -286,11 +287,10 @@ rule("King plays card at position (Player Action Part 2)")
 		Create Dummy Bot(Value In Array(Player Variable(Event Player, playerCards), Player Variable(Event Player,
 			playerSelectedCardIndex)), Team Of(Event Player), -1.000, Player Variable(Event Player, playerTargetSquareLine),
 			Player Variable(Event Player, PLAYER_FACING_DIR));
-		disabled Set Player Variable(Event Player, playerSelectedCardIndex, Index Of Array Value(Player Variable(Event Player, playerHandPosList),
-			Player Variable(Event Player, playerTargetSquare)));
 		"Set input mode to \"Player select card to play\""
 		Set Player Variable(Event Player, playerInputMode, 0);
 		Call Subroutine(refreshTargetEffect);
+		Call Subroutine(removeCard);
 	}
 }
 
@@ -469,6 +469,23 @@ rule("King.drawCard()")
 	actions
 	{
 		Modify Player Variable(Event Player, playerCards, Append To Array, Random Value In Array(Global Variable(CARDS_HEROES)));
+	}
+}
+
+rule("King.removeCard()")
+{
+	event
+	{
+		Subroutine;
+		removeCard;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, playerCards, Remove From Array By Index, Player Variable(Event Player,
+			playerSelectedCardIndex));
+		Set Player Variable(Event Player, playerSelectedCardIndex, -1.000);
+		Call Subroutine(refreshHand);
 	}
 }
 
