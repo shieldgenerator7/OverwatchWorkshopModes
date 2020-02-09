@@ -25,18 +25,37 @@ rule("King Spawn In (Player)")
 	{
 		Is Alive(Event Player) == True;
 		Is Dummy Bot(Event Player) == False;
+		Has Spawned(Event Player) == True;
 	}
 
 	actions
 	{
 		Set Gravity(Event Player, 0);
-		If(Compare(Slot Of(Event Player), <=, 5));
-			Teleport(Event Player, Vector(-20.000, 10, 0));
-			Set Player Variable(Event Player, playerFacingDir, Right);
-		Else;
-			Teleport(Event Player, Vector(20, 10, 0));
+		Wait(0.250, Ignore Condition);
+		If(Compare(Team Of(Event Player), ==, Team 1));
+			Teleport(Event Player, Vector(-25.000, 10, 0));
 			Set Player Variable(Event Player, playerFacingDir, Left);
+		Else;
+			Teleport(Event Player, Vector(25, 10, 0));
+			Set Player Variable(Event Player, playerFacingDir, Right);
 		End;
-		Set Facing(Event Player, Add(Player Variable(Event Player, playerFacingDir), Multiply(Down, 10)), To World);
+		Set Facing(Event Player, Add(Player Variable(Event Player, playerFacingDir), Down), To World);
+		Set Status(Event Player, Null, Rooted, 9999);
+	}
+}
+
+rule("==TEST== Pharah Pointer ==")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Pharah;
+	}
+
+	actions
+	{
+		Create HUD Text(Event Player, Custom String("Position: {0}", Position Of(Event Player), Null, Null), Null, Null, Left, 0, White,
+			White, White, String, Default Visibility);
 	}
 }
