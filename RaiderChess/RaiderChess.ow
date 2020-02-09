@@ -75,6 +75,9 @@ rule("Game Setup: Card Draw Deck")
 		"Mercy - Raider"
 		Modify Global Variable(CARDS_HEROES, Append To Array, Hero(Mercy));
 		Modify Global Variable(CARDS_TYPES, Append To Array, 2);
+		"Genji - Raider"
+		Modify Global Variable(CARDS_HEROES, Append To Array, Hero(Genji));
+		Modify Global Variable(CARDS_TYPES, Append To Array, 2);
 		"Soldier - Instant Heal"
 		Modify Global Variable(CARDS_HEROES, Append To Array, Hero(Soldier: 76));
 		Modify Global Variable(CARDS_TYPES, Append To Array, 3);
@@ -601,6 +604,12 @@ rule("King.refreshHand() (makes hand card visual effects)")
 				Create In-World Text(Event Player, Custom String("{0} - RAIDER", Hero Icon String(Hero(Mercy)), Null, Null), Value In Array(
 					Player Variable(Event Player, playerHandPosList), Add(Player Variable(Event Player, loopVar2), -1.000)), 2, Do Not Clip,
 					String, White, Default Visibility);
+			"Genji - Raider"
+			Else If(Compare(Value In Array(Player Variable(Event Player, playerCards), Player Variable(Event Player, loopVar2)), ==, Hero(
+					Genji)));
+				Create In-World Text(Event Player, Custom String("{0} - RAIDER", Hero Icon String(Hero(Genji)), Null, Null), Value In Array(
+					Player Variable(Event Player, playerHandPosList), Add(Player Variable(Event Player, loopVar2), -1.000)), 2, Do Not Clip,
+					String, White, Default Visibility);
 			"Doomfist"
 			Else If(Compare(Value In Array(Player Variable(Event Player, playerCards), Player Variable(Event Player, loopVar2)), ==, Hero(
 					Doomfist)));
@@ -821,6 +830,53 @@ rule("Mercy \"Stand\"")
 		Start Holding Button(Event Player, Ability 1);
 		Wait(1, Ignore Condition);
 		Stop Holding Button(Event Player, Ability 1);
+	}
+}
+
+rule("Genji \"Run\"")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Genji;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Player Variable(Event Player, pieceType) == 2;
+		Global Variable(pieceMoveTimer) > 0;
+	}
+
+	actions
+	{
+		Stop Holding Button(Event Player, Secondary Fire);
+		Press Button(Event Player, Ability 1);
+	}
+}
+
+rule("Genji Stand")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Genji;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Global Variable(pieceMoveTimer) < 0;
+		Player Variable(Event Player, pieceType) == 2;
+	}
+
+	actions
+	{
+		Start Holding Button(Event Player, Secondary Fire);
 	}
 }
 
