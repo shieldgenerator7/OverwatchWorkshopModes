@@ -4,6 +4,7 @@ variables
 		0: PIECE_MOVE_DURATION
 		1: PIECE_MOVE_DELAY
 		2: pieceMoveTimer
+		3: CARDS_HEROES
 
 	player:
 		0: PLAYER_FACING_DIR
@@ -31,6 +32,9 @@ rule("Game Setup")
 		Set Global Variable(PIECE_MOVE_DELAY, -5.000);
 		Set Global Variable(pieceMoveTimer, Global Variable(PIECE_MOVE_DURATION));
 		Chase Global Variable At Rate(pieceMoveTimer, 0, 1, None);
+		Set Global Variable(CARDS_HEROES, Empty Array);
+		Modify Global Variable(CARDS_HEROES, Append To Array, Hero(Soldier: 76));
+		Modify Global Variable(CARDS_HEROES, Append To Array, Hero(Reinhardt));
 	}
 }
 
@@ -222,7 +226,7 @@ rule("King Spawn Raider ==TEST==")
 
 	actions
 	{
-		Create Dummy Bot(Random Value In Array(All Heroes), Team Of(Event Player), -1.000, Player Variable(Event Player,
+		Create Dummy Bot(Random Value In Array(Global Variable(CARDS_HEROES)), Team Of(Event Player), -1.000, Player Variable(Event Player,
 			playerTargetSquareLine), Player Variable(Event Player, PLAYER_FACING_DIR));
 	}
 }
