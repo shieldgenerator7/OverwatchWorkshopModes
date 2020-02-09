@@ -388,10 +388,12 @@ rule("King.refreshHand() (makes visual effects)")
 
 	actions
 	{
-		"Remove old effects first"
-		For Player Variable(Event Player, loopVar2, 0, Count Of(Player Variable(Event Player, playerCardEffectIds)), 1);
-			Destroy Effect(Value In Array(Player Variable(Event Player, playerCardEffectIds), Player Variable(Event Player, loopVar2)));
-			Destroy In-World Text(Value In Array(Player Variable(Event Player, playerCardEffectIds), Player Variable(Event Player, loopVar2)));
+		If(Compare(Count Of(Player Variable(Event Player, playerCardEffectIds)), >, 0));
+			"Remove old effects first"
+			For Player Variable(Event Player, loopVar2, 0, Count Of(Player Variable(Event Player, playerCardEffectIds)), 1);
+				Destroy Effect(Value In Array(Player Variable(Event Player, playerCardEffectIds), Player Variable(Event Player, loopVar2)));
+				Destroy In-World Text(Value In Array(Player Variable(Event Player, playerCardEffectIds), Player Variable(Event Player, loopVar2)));
+			End;
 		End;
 		"Add an effect for each card"
 		For Player Variable(Event Player, loopVar2, 0, Count Of(Player Variable(Event Player, playerCards)), 1);
