@@ -20,6 +20,9 @@ variables
 		10: loopVar
 		11: loopVar2
 		12: playerHandPosList
+		13: playerInputMode
+		14: playerClickUsed
+		15: playerSelectedCardIndex
 }
 
 subroutines
@@ -230,7 +233,7 @@ rule("King looking around (ongoing)")
 	}
 }
 
-rule("King Spawn Raider ==TEST==")
+rule("King Select Card (Player Action Part 1)")
 {
 	event
 	{
@@ -245,14 +248,71 @@ rule("King Spawn Raider ==TEST==")
 		Is Button Held(Event Player, Primary Fire) == True;
 		Count Of(All Living Players(Team Of(Event Player))) < 6;
 		Index Of Array Value(Player Variable(Event Player, playerHandPosList), Player Variable(Event Player, playerTargetSquare)) >= 0;
+		"If input mode is \"Player select card to play\""
+		disabled Player Variable(Event Player, playerInputMode) == 0;
+		Player Variable(Event Player, playerClickUsed) == False;
 	}
 
 	actions
 	{
-		Small Message(Event Player, Custom String("Attempting to spawn bot", Null, Null, Null));
-		Create Dummy Bot(Value In Array(Player Variable(Event Player, playerCards), Index Of Array Value(Player Variable(Event Player,
-			playerHandPosList), Player Variable(Event Player, playerTargetSquare))), Team Of(Event Player), -1.000, Player Variable(
-			Event Player, playerTargetSquareLine), Player Variable(Event Player, PLAYER_FACING_DIR));
+		Set Player Variable(Event Player, playerClickUsed, True);
+		Set Player Variable(Event Player, playerSelectedCardIndex, Index Of Array Value(Player Variable(Event Player, playerHandPosList),
+			Player Variable(Event Player, playerTargetSquare)));
+		"Set input mode to \"Player select place to play card\""
+		Set Player Variable(Event Player, playerInputMode, 1);
+	}
+}
+
+rule("King plays card at position (Player Action Part 2)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == False;
+		Is Button Held(Event Player, Primary Fire) == True;
+		Count Of(All Living Players(Team Of(Event Player))) < 6;
+		"If input mode is \"Player select place to play card\""
+		Player Variable(Event Player, playerInputMode) == 1;
+		Player Variable(Event Player, playerClickUsed) == False;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, playerClickUsed, True);
+		Create Dummy Bot(Value In Array(Player Variable(Event Player, playerCards), Player Variable(Event Player,
+			playerSelectedCardIndex)), Team Of(Event Player), -1.000, Player Variable(Event Player, playerTargetSquareLine),
+			Player Variable(Event Player, PLAYER_FACING_DIR));
+		disabled Set Player Variable(Event Player, playerSelectedCardIndex, Index Of Array Value(Player Variable(Event Player, playerHandPosList),
+			Player Variable(Event Player, playerTargetSquare)));
+		"Set input mode to \"Player select card to play\""
+		Set Player Variable(Event Player, playerInputMode, 0);
+	}
+}
+
+rule("King mouse up (Player Action Part 1.5)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == False;
+		Is Button Held(Event Player, Primary Fire) == False;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, playerClickUsed, False);
 	}
 }
 
