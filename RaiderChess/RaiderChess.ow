@@ -956,61 +956,61 @@ rule("Bastion Spawn")
 	{
 		Wait(1.500, Ignore Condition);
 		Press Button(Event Player, Ability 1);
-		Stop Holding Button(Event Player, Ability 2);
 		Start Holding Button(Event Player, Primary Fire);
-		Wait(5, Ignore Condition);
+		Start Forcing Throttle(Event Player, 1, 1, 0, 0, 0, 0);
+	}
+}
+
+rule("Bastion Heal")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Bastion;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Player Variable(Event Player, pieceType) == 2;
+		Normalized Health(Event Player) < 0.500;
+	}
+
+	actions
+	{
 		Stop Holding Button(Event Player, Primary Fire);
 		Start Holding Button(Event Player, Ability 2);
 		Wait(3, Ignore Condition);
-		Loop If Condition Is True;
-	}
-}
-
-disabled rule("Bastion \"Run\"")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		Bastion;
-	}
-
-	conditions
-	{
-		Is Dummy Bot(Event Player) == True;
-		Is Alive(Event Player) == True;
-		Player Variable(Event Player, pieceType) == 2;
-		Global Variable(pieceMoveTimer) > 0;
-	}
-
-	actions
-	{
-		Stop Holding Button(Event Player, Primary Fire);
-		Start Holding Button(Event Player, Ability 2);
-	}
-}
-
-disabled rule("Bastion Stand")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		Bastion;
-	}
-
-	conditions
-	{
-		Is Dummy Bot(Event Player) == True;
-		Is Alive(Event Player) == True;
-		Global Variable(pieceMoveTimer) < 0;
-		Player Variable(Event Player, pieceType) == 2;
-	}
-
-	actions
-	{
 		Stop Holding Button(Event Player, Ability 2);
 		Start Holding Button(Event Player, Primary Fire);
+	}
+}
+
+rule("Bastion Go back to Turret Form")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Bastion;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Player Variable(Event Player, pieceType) == 2;
+		Horizontal Speed Of(Event Player) >= 1;
+	}
+
+	actions
+	{
+		Start Holding Button(Event Player, Ability 1);
+		Wait(2, Ignore Condition);
+		Loop If Condition Is True;
+		Stop Holding Button(Event Player, Ability 1);
 	}
 }
 

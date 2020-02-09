@@ -44,10 +44,17 @@ settings
 			No Ammunition Requirement: On
 			Spawn With Ultimate Ready: On
 
+			Bastion
+			{
+				Ammunition Clip Size Scalar: 50%
+			    No Ammunition Requirement: Off
+			}
+
 			Mercy
 			{
 				Weapons Enabled: Caduceus Staff Only
 			}
 		}
+	}
 	}
 }
