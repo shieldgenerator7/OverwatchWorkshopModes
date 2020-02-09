@@ -13,6 +13,7 @@ variables
 		4: playerTargetEffectId
 		5: playerTargetSquareGrid
 		6: playerTargetSquareLine
+		7: pieceOwner
 }
 
 rule("Game Setup")
@@ -243,8 +244,8 @@ rule("Piece Spawn In")
 
 	actions
 	{
-		Start Holding Button(Event Player, Primary Fire);
-		Start Forcing Throttle(Event Player, 1, 1, 0, 0, 0, 0);
+		Set Player Variable(Event Player, pieceOwner, Value In Array(Filtered Array(All Players(Team Of(Event Player)), Compare(
+			Is Dummy Bot(Current Array Element), ==, False)), 0));
 	}
 }
 
@@ -281,8 +282,8 @@ rule("Piece reaches enemy line")
 	{
 		Is Dummy Bot(Event Player) == True;
 		Is Alive(Event Player) == True;
-		Absolute Value(Subtract(X Component Of(Position Of(Event Player)), Multiply(X Component Of(Facing Direction Of(Event Player)),
-			17))) <= 1;
+		Absolute Value(Subtract(X Component Of(Position Of(Event Player)), Multiply(X Component Of(Player Variable(Player Variable(
+			Event Player, pieceOwner), PLAYER_FACING_DIR)), 17))) <= 1;
 		Position Of(Event Player) != 0;
 		Facing Direction Of(Event Player) != 0;
 		Position Of(Event Player) != Vector(0, 0, 0);
