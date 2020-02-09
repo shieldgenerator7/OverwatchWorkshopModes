@@ -1,7 +1,11 @@
 variables
 {
 	player:
-		0: playerFacingDir
+		0: PLAYER_FACING_DIR
+		1: playerTargetPos
+		2: playerTargetPosPrev
+		3: playerTargetSquare
+		4: playerTargetEffectId
 }
 
 rule("Game Setup")
@@ -40,12 +44,12 @@ rule("King Spawn In (Player)")
 		Wait(0.250, Ignore Condition);
 		If(Compare(Team Of(Event Player), ==, Team 1));
 			Teleport(Event Player, Vector(-25.000, 10, 0));
-			Set Player Variable(Event Player, playerFacingDir, Left);
+			Set Player Variable(Event Player, PLAYER_FACING_DIR, Left);
 		Else;
 			Teleport(Event Player, Vector(25, 10, 0));
-			Set Player Variable(Event Player, playerFacingDir, Right);
+			Set Player Variable(Event Player, PLAYER_FACING_DIR, Right);
 		End;
-		Set Facing(Event Player, Add(Player Variable(Event Player, playerFacingDir), Down), To World);
+		Set Facing(Event Player, Add(Player Variable(Event Player, PLAYER_FACING_DIR), Down), To World);
 		Set Status(Event Player, Null, Rooted, 9999);
 		Set Primary Fire Enabled(Event Player, False);
 		Set Secondary Fire Enabled(Event Player, False);
@@ -53,6 +57,9 @@ rule("King Spawn In (Player)")
 		Set Ability 2 Enabled(Event Player, False);
 		Set Ultimate Ability Enabled(Event Player, False);
 		Disallow Button(Event Player, Jump);
+		Set Player Variable(Event Player, playerTargetPos, Vector(0, -100.000, 0));
+		Create Effect(All Players(All Teams), Sphere, White, Player Variable(Event Player, playerTargetSquare), 2, Position and Radius);
+		Set Player Variable(Event Player, playerTargetEffectId, Last Created Entity);
 	}
 }
 
@@ -69,5 +76,56 @@ rule("==TEST== Pharah Pointer ==")
 	{
 		Create HUD Text(Event Player, Custom String("Position: {0}", Position Of(Event Player), Null, Null), Null, Null, Left, 0, White,
 			White, White, String, Default Visibility);
+	}
+}
+
+rule("King looks at square")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, playerTargetPos) != Player Variable(Event Player, playerTargetPosPrev);
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, playerTargetPosPrev, Player Variable(Event Player, playerTargetPos));
+		If(Compare(Y Component Of(Player Variable(Event Player, playerTargetPos)), ==, 0));
+			Set Player Variable(Event Player, playerTargetSquare, Vector(Multiply(2, Round To Integer(Divide(X Component Of(Player Variable(
+				Event Player, playerTargetPos)), 2), To Nearest)), 0, Multiply(2, Round To Integer(Divide(Z Component Of(Player Variable(
+				Event Player, playerTargetPos)), 2), To Nearest))));
+		End;
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("King looking around (ongoing)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Is Dummy Bot(Event Player) == False;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, playerTargetPos, Ray Cast Hit Position(Eye Position(Event Player), Add(Eye Position(
+			Event Player), Multiply(Facing Direction Of(Event Player), 100)), Event Player, All Players(All Teams), False));
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
 	}
 }
