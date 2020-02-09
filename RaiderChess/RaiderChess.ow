@@ -15,6 +15,16 @@ variables
 		5: playerTargetSquareGrid
 		6: playerTargetSquareLine
 		7: pieceOwner
+		8: playerCards
+		9: playerCardEffectIds
+		10: loopVar
+		11: loopVar2
+}
+
+subroutines
+{
+	0: drawCard
+	1: refreshHand
 }
 
 rule("Game Setup")
@@ -128,6 +138,12 @@ rule("King Spawn In (Player)")
 			Position and Radius);
 		Create Effect(All Players(All Teams), Sphere, Green, Player Variable(Event Player, playerTargetSquareLine), 2,
 			Position and Radius);
+		Set Player Variable(Event Player, playerCards, Empty Array);
+		Set Player Variable(Event Player, playerCardEffectIds, Empty Array);
+		For Player Variable(Event Player, loopVar, 0, 8, 1);
+			Call Subroutine(drawCard);
+		End;
+		Call Subroutine(refreshHand);
 	}
 }
 
@@ -345,5 +361,42 @@ rule("Piece Stops Moving")
 		Stop Forcing Throttle(Event Player);
 		Stop Holding Button(Event Player, Secondary Fire);
 		Start Holding Button(Event Player, Primary Fire);
+	}
+}
+
+rule("King.drawCard()")
+{
+	event
+	{
+		Subroutine;
+		drawCard;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, playerCards, Append To Array, Random Value In Array(Global Variable(CARDS_HEROES)));
+	}
+}
+
+rule("King.refreshHand()")
+{
+	event
+	{
+		Subroutine;
+		refreshHand;
+	}
+
+	actions
+	{
+		"Remove old effects first"
+		For Player Variable(Event Player, loopVar2, 0, Count Of(Player Variable(Event Player, playerCardEffectIds)), 1);
+			Destroy Effect(Value In Array(Player Variable(Event Player, playerCardEffectIds), Player Variable(Event Player, loopVar2)));
+		End;
+		"Add an effect for each card"
+		For Player Variable(Event Player, loopVar2, 0, Count Of(Player Variable(Event Player, playerCards)), 1);
+			Create Effect(Event Player, Ring, White, Vector(Multiply(X Component Of(Player Variable(Event Player, PLAYER_FACING_DIR)),
+				-18.000), 0, Add(Multiply(Player Variable(Event Player, loopVar2), 4), -18.000)), 1.500, None);
+			Modify Player Variable(Event Player, playerCardEffectIds, Append To Array, Last Created Entity);
+		End;
 	}
 }
