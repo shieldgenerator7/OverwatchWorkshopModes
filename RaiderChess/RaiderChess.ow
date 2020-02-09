@@ -325,8 +325,7 @@ rule("King plays card at position (Player Action Part 2)")
 			Create Dummy Bot(Value In Array(Player Variable(Event Player, playerCards), Player Variable(Event Player,
 				playerSelectedCardIndex)), Team Of(Event Player), -1.000, Player Variable(Event Player, playerTargetSquareLine),
 				Player Variable(Event Player, PLAYER_FACING_DIR));
-		Else If(Compare(Value In Array(Player Variable(Event Player, playerCardTypes), Player Variable(Event Player,
-				playerSelectedCardIndex)), ==, 3));
+		Else;
 			Create Dummy Bot(Value In Array(Player Variable(Event Player, playerCards), Player Variable(Event Player,
 				playerSelectedCardIndex)), Team Of(Event Player), -1.000, Add(Player Variable(Event Player, playerTargetSquareGrid), Multiply(
 				Up, 5)), Player Variable(Event Player, PLAYER_FACING_DIR));
@@ -627,6 +626,12 @@ rule("King.refreshTargetEffect() (makes selector visual effects)")
 					playerSelectedCardIndex)), ==, 3));
 				Create Effect(All Players(All Teams), Sphere, Yellow, Player Variable(Event Player, playerTargetSquareGrid), 2,
 					Position and Radius);
+			Else If(Compare(Value In Array(Player Variable(Event Player, playerCardTypes), Player Variable(Event Player,
+					playerSelectedCardIndex)), ==, 5));
+				Create Effect(All Players(All Teams), Sphere, Blue, Player Variable(Event Player, playerTargetSquareGrid), 2, Position and Radius);
+			Else If(Compare(Value In Array(Player Variable(Event Player, playerCardTypes), Player Variable(Event Player,
+					playerSelectedCardIndex)), ==, 7));
+				Create Effect(All Players(All Teams), Sphere, Red, Player Variable(Event Player, playerTargetSquareGrid), 2, Position and Radius);
 			End;
 		End;
 		Set Player Variable(Event Player, playerTargetEffectId, Last Created Entity);
