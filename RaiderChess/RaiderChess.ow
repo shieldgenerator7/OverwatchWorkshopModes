@@ -1003,6 +1003,8 @@ rule("Bastion Go back to Turret Form")
 		Is Alive(Event Player) == True;
 		Player Variable(Event Player, pieceType) == 2;
 		Horizontal Speed Of(Event Player) >= 1;
+		Absolute Value(Subtract(X Component Of(Position Of(Event Player)), Multiply(X Component Of(Player Variable(Player Variable(
+			Event Player, pieceOwner), PLAYER_FACING_DIR)), 18))) > 3;
 	}
 
 	actions
