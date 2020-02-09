@@ -400,12 +400,20 @@ rule("King.refreshHand() (makes visual effects)")
 			Create Effect(Event Player, Ring, White, Vector(Multiply(X Component Of(Player Variable(Event Player, PLAYER_FACING_DIR)),
 				-18.000), 0, Add(Multiply(Player Variable(Event Player, loopVar2), 4), -14.000)), 1.500, None);
 			Modify Player Variable(Event Player, playerCardEffectIds, Append To Array, Last Created Entity);
-			Create In-World Text(Event Player, Custom String("{0} {1}: RAIDER", Hero Icon String(Hero Of(Value In Array(Player Variable(
-				Event Player, playerCards), Player Variable(Event Player, loopVar2)))), Hero Of(Value In Array(Player Variable(Event Player,
-				playerCards), Player Variable(Event Player, loopVar2))), Null), Vector(Multiply(X Component Of(Player Variable(Event Player,
-				PLAYER_FACING_DIR)), -18.000), 1, Add(Multiply(Player Variable(Event Player, loopVar2), 4), -18.000)), 1, Do Not Clip, String,
-				White, Default Visibility);
-			Modify Player Variable(Event Player, playerCardEffectIds, Append To Array, Last Text ID);
+			If(Compare(Value In Array(Player Variable(Event Player, playerCards), Player Variable(Event Player, loopVar2)), ==, Hero(
+				Soldier: 76)));
+				Create In-World Text(Event Player, Custom String("{0} {1}: RAIDER", Hero Icon String(Hero(Soldier: 76)), Hero(Soldier: 76), Null),
+					Vector(Multiply(X Component Of(Player Variable(Event Player, PLAYER_FACING_DIR)), -18.000), 1, Add(Multiply(Player Variable(
+					Event Player, loopVar2), 4), -18.000)), 1, Do Not Clip, String, White, Default Visibility);
+				Modify Player Variable(Event Player, playerCardEffectIds, Append To Array, Last Text ID);
+			End;
+			If(Compare(Value In Array(Player Variable(Event Player, playerCards), Player Variable(Event Player, loopVar2)), ==, Hero(
+				Reinhardt)));
+				Create In-World Text(Event Player, Custom String("{0} {1}: RAIDER", Hero Icon String(Hero(Reinhardt)), Hero(Reinhardt), Null),
+					Vector(Multiply(X Component Of(Player Variable(Event Player, PLAYER_FACING_DIR)), -18.000), 1, Add(Multiply(Player Variable(
+					Event Player, loopVar2), 4), -18.000)), 1, Do Not Clip, String, White, Default Visibility);
+				Modify Player Variable(Event Player, playerCardEffectIds, Append To Array, Last Text ID);
+			End;
 		End;
 	}
 }
