@@ -428,6 +428,9 @@ rule("Piece reaches enemy line")
 	actions
 	{
 		Modify Team Score(Team Of(Event Player), 1);
+		If(Compare(Hero Of(Event Player), ==, Hero(Mercy)));
+			Start Forcing Throttle(Event Player, 1, 1, 0, 0, 0, 0);
+		End;
 	}
 }
 
@@ -671,7 +674,6 @@ rule("Reinhardt Run")
 	{
 		Start Forcing Throttle(Event Player, 1, 1, 0, 0, 0, 0);
 		Stop Holding Button(Event Player, Secondary Fire);
-		Press Button(Event Player, Ability 2);
 		Start Holding Button(Event Player, Primary Fire);
 	}
 }
