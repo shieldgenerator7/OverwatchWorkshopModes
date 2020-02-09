@@ -431,7 +431,7 @@ rule("Piece reaches enemy line")
 	}
 }
 
-rule("Piece Moves")
+disabled rule("Piece Moves")
 {
 	event
 	{
@@ -455,7 +455,7 @@ rule("Piece Moves")
 	}
 }
 
-rule("Piece Stops Moving")
+disabled rule("Piece Stops Moving")
 {
 	event
 	{
@@ -599,5 +599,54 @@ rule("King Draw Card (Melee)")
 	{
 		Call Subroutine(drawCard);
 		Call Subroutine(refreshHand);
+	}
+}
+
+rule("Soldier Run")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Global Variable(pieceMoveTimer) > 0;
+	}
+
+	actions
+	{
+		Stop Holding Button(Event Player, Primary Fire);
+		Start Forcing Throttle(Event Player, 1, 1, 0, 0, 0, 0);
+		Start Holding Button(Event Player, Ability 1);
+	}
+}
+
+rule("Soldier Stand")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Soldier: 76;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Global Variable(pieceMoveTimer) < 0;
+	}
+
+	actions
+	{
+		Stop Forcing Throttle(Event Player);
+		Stop Holding Button(Event Player, Ability 1);
+		Start Holding Button(Event Player, Primary Fire);
+		Press Button(Event Player, Secondary Fire);
 	}
 }
