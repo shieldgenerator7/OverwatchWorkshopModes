@@ -1,0 +1,45 @@
+settings
+{
+	lobby
+	{
+		Match Voice Chat: Enabled
+		Max Spectators: 12
+		Swap Teams After Match: No
+	}
+
+	modes
+	{
+		disabled Deathmatch
+		{
+			Score To Win: 20
+		}
+
+		Team Deathmatch
+		{
+			Mercy Resurrect Counteracts Kills: Off
+			Score To Win: 5
+			Self Initiated Respawn: Off
+
+			enabled maps
+			{
+				Workshop Island
+			}
+		}
+
+		General
+		{
+			Allow Hero Switching: Off
+			Hero Limit: Off
+		}
+	}
+
+	heroes
+	{
+		General
+		{
+			Ability Cooldown Time: 0%
+			No Ammunition Requirement: On
+			Spawn With Ultimate Ready: On
+		}
+	}
+}

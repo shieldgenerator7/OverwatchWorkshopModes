@@ -1,0 +1,42 @@
+variables
+{
+	player:
+		0: playerFacingDir
+}
+
+rule("Game Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("King Spawn In (Player)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Is Dummy Bot(Event Player) == False;
+	}
+
+	actions
+	{
+		Set Gravity(Event Player, 0);
+		If(Compare(Slot Of(Event Player), <=, 5));
+			Teleport(Event Player, Vector(-20.000, 10, 0));
+			Set Player Variable(Event Player, playerFacingDir, Right);
+		Else;
+			Teleport(Event Player, Vector(20, 10, 0));
+			Set Player Variable(Event Player, playerFacingDir, Left);
+		End;
+		Set Facing(Event Player, Add(Player Variable(Event Player, playerFacingDir), Multiply(Down, 10)), To World);
+	}
+}
