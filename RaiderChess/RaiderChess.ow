@@ -650,3 +650,52 @@ rule("Soldier Stand")
 		Press Button(Event Player, Secondary Fire);
 	}
 }
+
+rule("Reinhardt Run")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Global Variable(pieceMoveTimer) > 0;
+	}
+
+	actions
+	{
+		Start Forcing Throttle(Event Player, 1, 1, 0, 0, 0, 0);
+		Stop Holding Button(Event Player, Secondary Fire);
+		Press Button(Event Player, Ability 2);
+		Start Holding Button(Event Player, Primary Fire);
+	}
+}
+
+rule("Reinhardt Stand")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Is Alive(Event Player) == True;
+		Global Variable(pieceMoveTimer) < 0;
+	}
+
+	actions
+	{
+		Stop Forcing Throttle(Event Player);
+		Stop Holding Button(Event Player, Primary Fire);
+		Start Holding Button(Event Player, Secondary Fire);
+	}
+}
