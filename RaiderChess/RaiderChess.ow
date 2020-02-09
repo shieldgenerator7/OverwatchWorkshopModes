@@ -96,6 +96,28 @@ rule("==SKIP SETUP==")
 	}
 }
 
+rule("==TEST== Pharah Pointer ==")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Pharah;
+	}
+
+	actions
+	{
+		Create HUD Text(Event Player, Custom String("Position: {0}", Position Of(Event Player), Null, Null), Null, Null, Left, 0, White,
+			White, White, String, Default Visibility);
+		Create HUD Text(Event Player, Custom String("Target Square: {0}", Player Variable(Event Player, playerTargetSquare), Null, Null),
+			Null, Null, Left, 0, White, White, White, String, Default Visibility);
+		Create HUD Text(Event Player, Custom String("Target Square Grid: {0}", Player Variable(Event Player, playerTargetSquareGrid), Null,
+			Null), Null, Null, Left, 0, White, White, White, String, Default Visibility);
+		Create HUD Text(Event Player, Custom String("Target Square Line: {0}", Player Variable(Event Player, playerTargetSquareLine), Null,
+			Null), Null, Null, Left, 0, White, White, White, String, Default Visibility);
+	}
+}
+
 rule("King Spawn In (Player)")
 {
 	event
@@ -144,28 +166,6 @@ rule("King Spawn In (Player)")
 			Call Subroutine(drawCard);
 		End;
 		Call Subroutine(refreshHand);
-	}
-}
-
-rule("==TEST== Pharah Pointer ==")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		Pharah;
-	}
-
-	actions
-	{
-		Create HUD Text(Event Player, Custom String("Position: {0}", Position Of(Event Player), Null, Null), Null, Null, Left, 0, White,
-			White, White, String, Default Visibility);
-		Create HUD Text(Event Player, Custom String("Target Square: {0}", Player Variable(Event Player, playerTargetSquare), Null, Null),
-			Null, Null, Left, 0, White, White, White, String, Default Visibility);
-		Create HUD Text(Event Player, Custom String("Target Square Grid: {0}", Player Variable(Event Player, playerTargetSquareGrid), Null,
-			Null), Null, Null, Left, 0, White, White, White, String, Default Visibility);
-		Create HUD Text(Event Player, Custom String("Target Square Line: {0}", Player Variable(Event Player, playerTargetSquareLine), Null,
-			Null), Null, Null, Left, 0, White, White, White, String, Default Visibility);
 	}
 }
 
@@ -378,7 +378,7 @@ rule("King.drawCard()")
 	}
 }
 
-rule("King.refreshHand()")
+rule("King.refreshHand() (makes visual effects)")
 {
 	event
 	{
@@ -391,12 +391,19 @@ rule("King.refreshHand()")
 		"Remove old effects first"
 		For Player Variable(Event Player, loopVar2, 0, Count Of(Player Variable(Event Player, playerCardEffectIds)), 1);
 			Destroy Effect(Value In Array(Player Variable(Event Player, playerCardEffectIds), Player Variable(Event Player, loopVar2)));
+			Destroy In-World Text(Value In Array(Player Variable(Event Player, playerCardEffectIds), Player Variable(Event Player, loopVar2)));
 		End;
 		"Add an effect for each card"
 		For Player Variable(Event Player, loopVar2, 0, Count Of(Player Variable(Event Player, playerCards)), 1);
 			Create Effect(Event Player, Ring, White, Vector(Multiply(X Component Of(Player Variable(Event Player, PLAYER_FACING_DIR)),
-				-18.000), 0, Add(Multiply(Player Variable(Event Player, loopVar2), 4), -18.000)), 1.500, None);
+				-18.000), 0, Add(Multiply(Player Variable(Event Player, loopVar2), 4), -14.000)), 1.500, None);
 			Modify Player Variable(Event Player, playerCardEffectIds, Append To Array, Last Created Entity);
+			Create In-World Text(Event Player, Custom String("{0} {1}: RAIDER", Hero Icon String(Hero Of(Value In Array(Player Variable(
+				Event Player, playerCards), Player Variable(Event Player, loopVar2)))), Hero Of(Value In Array(Player Variable(Event Player,
+				playerCards), Player Variable(Event Player, loopVar2))), Null), Vector(Multiply(X Component Of(Player Variable(Event Player,
+				PLAYER_FACING_DIR)), -18.000), 1, Add(Multiply(Player Variable(Event Player, loopVar2), 4), -18.000)), 1, Do Not Clip, String,
+				White, Default Visibility);
+			Modify Player Variable(Event Player, playerCardEffectIds, Append To Array, Last Text ID);
 		End;
 	}
 }
