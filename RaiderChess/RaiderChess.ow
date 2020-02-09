@@ -664,7 +664,7 @@ rule("King.refreshHand() (makes hand card visual effects)")
 				"Sombra - Instant Util"
 				Create In-World Text(Event Player, Custom String("{0} - INSTANT UTIL", Hero Icon String(Hero(Sombra)), Null, Null), Value In Array(
 					Player Variable(Event Player, playerHandPosList), Add(Player Variable(Event Player, loopVar2), -1.000)), 2, Do Not Clip,
-					String, Red, Default Visibility);
+					String, Blue, Default Visibility);
 			"Doomfist"
 			Else If(Compare(Value In Array(Player Variable(Event Player, playerCards), Player Variable(Event Player, loopVar2)), ==, Hero(
 					Doomfist)));
