@@ -1,5 +1,10 @@
 settings
 {
+	main
+	{
+		Description: "Raider Chess == Get 50 Raiders across the board to win! == LMB to select, RMB / CROUCH to cancel, MELEE to draw a card"
+	}
+
 	lobby
 	{
 		Match Voice Chat: Enabled
@@ -47,7 +52,7 @@ settings
 			Bastion
 			{
 				Ammunition Clip Size Scalar: 50%
-			    No Ammunition Requirement: Off
+				No Ammunition Requirement: Off
 			}
 
 			Mercy
