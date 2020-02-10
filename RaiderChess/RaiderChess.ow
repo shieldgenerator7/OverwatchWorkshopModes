@@ -84,7 +84,7 @@ rule("Game Setup: Card Draw Deck Raiders (Type 2)")
 	}
 }
 
-disabled rule("Game Setup: Card Draw Deck Instant Heal (Type 3)")
+rule("Game Setup: Card Draw Deck Instant Heal (Type 3)")
 {
 	event
 	{
@@ -117,7 +117,7 @@ rule("Game Setup: Card Draw Deck Instant Util (Type 5)")
 	}
 }
 
-disabled rule("Game Setup: Card Draw Deck Instant Attack (Type 7)")
+rule("Game Setup: Card Draw Deck Instant Attack (Type 7)")
 {
 	event
 	{
@@ -620,8 +620,19 @@ rule("King.refreshHand() (makes hand card visual effects)")
 		Set Player Variable(Event Player, playerCardEffectIds, Empty Array);
 		"Add an effect for each card"
 		For Player Variable(Event Player, loopVar2, 0, Count Of(Player Variable(Event Player, playerCards)), 1);
-			Create Effect(Event Player, Ring, White, Value In Array(Player Variable(Event Player, playerHandPosList), Player Variable(
-				Event Player, loopVar2)), 1.500, None);
+			If(Compare(Value In Array(Player Variable(Event Player, playerCardTypes), Player Variable(Event Player, loopVar2)), ==, 2));
+				Create Effect(Event Player, Ring, White, Value In Array(Player Variable(Event Player, playerHandPosList), Player Variable(
+					Event Player, loopVar2)), 1.500, None);
+			Else If(Compare(Value In Array(Player Variable(Event Player, playerCardTypes), Player Variable(Event Player, loopVar2)), ==, 3));
+				Create Effect(Event Player, Ring, Yellow, Value In Array(Player Variable(Event Player, playerHandPosList), Player Variable(
+					Event Player, loopVar2)), 1.500, None);
+			Else If(Compare(Value In Array(Player Variable(Event Player, playerCardTypes), Player Variable(Event Player, loopVar2)), ==, 5));
+				Create Effect(Event Player, Ring, Blue, Value In Array(Player Variable(Event Player, playerHandPosList), Player Variable(
+					Event Player, loopVar2)), 1.500, None);
+			Else If(Compare(Value In Array(Player Variable(Event Player, playerCardTypes), Player Variable(Event Player, loopVar2)), ==, 7));
+				Create Effect(Event Player, Ring, Red, Value In Array(Player Variable(Event Player, playerHandPosList), Player Variable(
+					Event Player, loopVar2)), 1.500, None);
+			End;
 			Modify Player Variable(Event Player, playerCardEffectIds, Append To Array, Last Created Entity);
 			"Soldier: 76"
 			If(Compare(Value In Array(Player Variable(Event Player, playerCards), Player Variable(Event Player, loopVar2)), ==, Hero(
