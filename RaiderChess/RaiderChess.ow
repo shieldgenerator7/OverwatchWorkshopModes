@@ -191,11 +191,11 @@ rule("==SKIP SETUP==")
 
 	actions
 	{
-		Set Match Time(0);
+		Set Match Time(5);
 	}
 }
 
-rule("==TEST== Pharah Pointer ==")
+disabled rule("==TEST== Pharah Pointer ==")
 {
 	event
 	{
@@ -271,6 +271,12 @@ rule("King Spawn In (Player)")
 			Call Subroutine(drawCard);
 		End;
 		Call Subroutine(refreshHand);
+		Create HUD Text(Event Player, Custom String("HEROES IN PLAY: {0} / 5", Subtract(Number of Players(Team Of(Event Player)), 1), Null,
+			Null), Null, Null, Top, 0, White, White, White, Visible To and String, Default Visibility);
+		Create HUD Text(All Players(All Teams), Null, Null, Custom String("LMB - Select, RMB - Cancel, Crouch - Cancel", Null, Null, Null),
+			Left, 0, White, White, White, Visible To and String, Default Visibility);
+		Create HUD Text(Event Player, Null, Null, Custom String("Melee - Draw Card, Reload - Discard All Cards", Null, Null, Null), Left,
+			1, White, White, White, Visible To and String, Default Visibility);
 	}
 }
 
