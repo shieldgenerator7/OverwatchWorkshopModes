@@ -64,7 +64,7 @@ rule("Game Setup: Card Draw Deck Raiders (Type 2)")
 	actions
 	{
 		Set Global Variable(CARDS_HEROES, Empty Array);
-		"Card Types: 2=Raider, 3=Instant Heal, 5=Instant Util, 7=Instant Attack; Times the type by 100 to indicate it's an ultimate"
+		"Card Types: 2=Raider, 3=Instant Heal, 5=Instant Util, 7=Instant Attack; Times the type by 11 to indicate it's an ultimate"
 		Set Global Variable(CARDS_TYPES, Empty Array);
 		"Solder - Raider"
 		Modify Global Variable(CARDS_HEROES, Append To Array, Hero(Soldier: 76));
@@ -96,6 +96,9 @@ rule("Game Setup: Card Draw Deck Instant Heal (Type 3)")
 		"Soldier - Instant Heal"
 		Modify Global Variable(CARDS_HEROES, Append To Array, Hero(Soldier: 76));
 		Modify Global Variable(CARDS_TYPES, Append To Array, 3);
+		"Zenyatta - Instant Heal (ULT)"
+		Modify Global Variable(CARDS_HEROES, Append To Array, Hero(Zenyatta));
+		Modify Global Variable(CARDS_TYPES, Append To Array, 33);
 	}
 }
 
@@ -676,6 +679,13 @@ rule("King.refreshHand() (makes hand card visual effects)")
 				Create In-World Text(Event Player, Custom String("{0} - 'RAIDER'", Hero Icon String(Hero(Bastion)), Null, Null), Value In Array(
 					Player Variable(Event Player, playerHandPosList), Add(Player Variable(Event Player, loopVar2), -1.000)), 2, Do Not Clip,
 					String, White, Default Visibility);
+			"Zenyatta"
+			Else If(Compare(Value In Array(Player Variable(Event Player, playerCards), Player Variable(Event Player, loopVar2)), ==, Hero(
+					Zenyatta)));
+				"Zenyatta - Transcendance (ULT)"
+				Create In-World Text(Event Player, Custom String("{0} Transcendance (ULT)", Hero Icon String(Hero(Zenyatta)), Null, Null),
+					Value In Array(Player Variable(Event Player, playerHandPosList), Add(Player Variable(Event Player, loopVar2), -1.000)), 2,
+					Do Not Clip, String, Yellow, Default Visibility);
 			"Sombra"
 			Else If(Compare(Value In Array(Player Variable(Event Player, playerCards), Player Variable(Event Player, loopVar2)), ==, Hero(
 					Sombra)));
@@ -1164,6 +1174,30 @@ rule("Doomfist - Instant Attack")
 		Wait(0.250, Ignore Condition);
 		Start Holding Button(Event Player, Secondary Fire);
 		Wait(2.500, Ignore Condition);
+		Kill(Event Player, Null);
+	}
+}
+
+rule("Zenyatta - Instant Heal (ULT)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Zenyatta;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+		Player Variable(Event Player, pieceType) == 33;
+		Is On Ground(Event Player) == True;
+	}
+
+	actions
+	{
+		Start Holding Button(Event Player, Ultimate);
+		Wait(7, Ignore Condition);
 		Kill(Event Player, Null);
 	}
 }
