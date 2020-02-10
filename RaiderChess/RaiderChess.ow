@@ -54,7 +54,7 @@ rule("Game Setup")
 	}
 }
 
-rule("Game Setup: Card Draw Deck Raiders (Type 2)")
+rule("Game Setup: Card Draw Deck Setup")
 {
 	event
 	{
@@ -66,6 +66,18 @@ rule("Game Setup: Card Draw Deck Raiders (Type 2)")
 		Set Global Variable(CARDS_HEROES, Empty Array);
 		"Card Types: 2=Raider, 3=Instant Heal, 5=Instant Util, 7=Instant Attack; Times the type by 11 to indicate it's an ultimate"
 		Set Global Variable(CARDS_TYPES, Empty Array);
+	}
+}
+
+rule("Game Setup: Card Draw Deck Raiders (Type 2)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
 		"Solder - Raider"
 		Modify Global Variable(CARDS_HEROES, Append To Array, Hero(Soldier: 76));
 		Modify Global Variable(CARDS_TYPES, Append To Array, 2);
