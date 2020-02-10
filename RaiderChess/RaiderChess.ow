@@ -781,6 +781,31 @@ rule("King Draw Card (Melee)")
 	}
 }
 
+rule("King Discard Hand (Reload)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == False;
+		Is Button Held(Event Player, Reload) == True;
+	}
+
+	actions
+	{
+		For Player Variable(Event Player, loopVar, Count Of(Player Variable(Event Player, playerCards)), 0, -1.000);
+			Set Player Variable(Event Player, playerSelectedCardIndex, 0);
+			Call Subroutine(removeCard);
+		End;
+		Call Subroutine(refreshHand);
+	}
+}
+
 rule("Soldier Run")
 {
 	event
