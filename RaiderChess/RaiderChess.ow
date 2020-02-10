@@ -620,16 +620,20 @@ rule("King.refreshHand() (makes hand card visual effects)")
 		Set Player Variable(Event Player, playerCardEffectIds, Empty Array);
 		"Add an effect for each card"
 		For Player Variable(Event Player, loopVar2, 0, Count Of(Player Variable(Event Player, playerCards)), 1);
-			If(Compare(Value In Array(Player Variable(Event Player, playerCardTypes), Player Variable(Event Player, loopVar2)), ==, 2));
+			If(Compare(Modulo(Value In Array(Player Variable(Event Player, playerCardTypes), Player Variable(Event Player, loopVar2)), 2), ==,
+				0));
 				Create Effect(Event Player, Ring, White, Value In Array(Player Variable(Event Player, playerHandPosList), Player Variable(
 					Event Player, loopVar2)), 1.500, None);
-			Else If(Compare(Value In Array(Player Variable(Event Player, playerCardTypes), Player Variable(Event Player, loopVar2)), ==, 3));
+			Else If(Compare(Modulo(Value In Array(Player Variable(Event Player, playerCardTypes), Player Variable(Event Player, loopVar2)), 3),
+					==, 0));
 				Create Effect(Event Player, Ring, Yellow, Value In Array(Player Variable(Event Player, playerHandPosList), Player Variable(
 					Event Player, loopVar2)), 1.500, None);
-			Else If(Compare(Value In Array(Player Variable(Event Player, playerCardTypes), Player Variable(Event Player, loopVar2)), ==, 5));
+			Else If(Compare(Modulo(Value In Array(Player Variable(Event Player, playerCardTypes), Player Variable(Event Player, loopVar2)), 5),
+					==, 0));
 				Create Effect(Event Player, Ring, Blue, Value In Array(Player Variable(Event Player, playerHandPosList), Player Variable(
 					Event Player, loopVar2)), 1.500, None);
-			Else If(Compare(Value In Array(Player Variable(Event Player, playerCardTypes), Player Variable(Event Player, loopVar2)), ==, 7));
+			Else If(Compare(Modulo(Value In Array(Player Variable(Event Player, playerCardTypes), Player Variable(Event Player, loopVar2)), 7),
+					==, 0));
 				Create Effect(Event Player, Ring, Red, Value In Array(Player Variable(Event Player, playerHandPosList), Player Variable(
 					Event Player, loopVar2)), 1.500, None);
 			End;
@@ -713,19 +717,19 @@ rule("King.refreshTargetEffect() (makes selector visual effects)")
 		If(Compare(Player Variable(Event Player, playerInputMode), ==, 0));
 			Create Effect(All Players(All Teams), Sphere, White, Player Variable(Event Player, playerTargetSquare), 2, Position and Radius);
 		Else;
-			If(Compare(Value In Array(Player Variable(Event Player, playerCardTypes), Player Variable(Event Player, playerSelectedCardIndex)),
-				==, 2));
+			If(Compare(Modulo(Value In Array(Player Variable(Event Player, playerCardTypes), Player Variable(Event Player,
+				playerSelectedCardIndex)), 2), ==, 0));
 				Create Effect(All Players(All Teams), Sphere, Green, Player Variable(Event Player, playerTargetSquareLine), 2,
 					Position and Radius);
-			Else If(Compare(Value In Array(Player Variable(Event Player, playerCardTypes), Player Variable(Event Player,
-					playerSelectedCardIndex)), ==, 3));
+			Else If(Compare(Modulo(Value In Array(Player Variable(Event Player, playerCardTypes), Player Variable(Event Player,
+					playerSelectedCardIndex)), 3), ==, 0));
 				Create Effect(All Players(All Teams), Sphere, Yellow, Player Variable(Event Player, playerTargetSquareGrid), 2,
 					Position and Radius);
-			Else If(Compare(Value In Array(Player Variable(Event Player, playerCardTypes), Player Variable(Event Player,
-					playerSelectedCardIndex)), ==, 5));
+			Else If(Compare(Modulo(Value In Array(Player Variable(Event Player, playerCardTypes), Player Variable(Event Player,
+					playerSelectedCardIndex)), 5), ==, 0));
 				Create Effect(All Players(All Teams), Sphere, Blue, Player Variable(Event Player, playerTargetSquareGrid), 2, Position and Radius);
-			Else If(Compare(Value In Array(Player Variable(Event Player, playerCardTypes), Player Variable(Event Player,
-					playerSelectedCardIndex)), ==, 7));
+			Else If(Compare(Modulo(Value In Array(Player Variable(Event Player, playerCardTypes), Player Variable(Event Player,
+					playerSelectedCardIndex)), 7), ==, 0));
 				Create Effect(All Players(All Teams), Sphere, Red, Player Variable(Event Player, playerTargetSquareGrid), 2, Position and Radius);
 			End;
 		End;
