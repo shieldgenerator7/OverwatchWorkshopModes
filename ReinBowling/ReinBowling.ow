@@ -18,7 +18,7 @@ rule("Game Setup")
 	actions
 	{
 		Global.SAFE_POINT = Vector(8, 0, 0);
-		Global.SAFE_RADIUS = 4;
+		Global.SAFE_RADIUS = 8;
 		Create Effect(All Players(All Teams), Ring, Yellow, Global.SAFE_POINT, Global.SAFE_RADIUS, Visible To);
 	}
 }
@@ -103,6 +103,7 @@ rule("Player Enter Safe Area")
 	{
 		Clear Status(Event Player, Burning);
 		Stop Damage Over Time(Event Player.dotID);
+		Heal(Event Player, Event Player, 200);
 	}
 }
 
