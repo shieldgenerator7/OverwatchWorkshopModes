@@ -4,6 +4,7 @@ variables
 		0: king1
 		1: king2
 		2: i
+		3: startCamPos
 }
 
 subroutines
@@ -177,7 +178,14 @@ rule("EndRound()")
 
 	actions
 	{
+		If(Attacker != Null);
+			Global.startCamPos = Eye Position(Attacker);
+		Else;
+			Global.startCamPos = Eye Position(Victim);
+		End;
+		Start Camera(All Players(All Teams), (Eye Position(Victim) + Global.startCamPos) / 2, Eye Position(Victim), 0);
 		Wait(2, Ignore Condition);
 		Call Subroutine(SetupRound);
+		Stop Camera(All Players(All Teams));
 	}
 }
