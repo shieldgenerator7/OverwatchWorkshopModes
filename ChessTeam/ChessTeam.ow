@@ -8,8 +8,9 @@ variables
 
 subroutines
 {
-	0: SetupBoard
-	1: PopulateWithAI
+	0: SetupRound
+	1: SetupBoard
+	2: PopulateWithAI
 }
 
 rule("Game Setup")
@@ -22,7 +23,6 @@ rule("Game Setup")
 	actions
 	{
 		Call Subroutine(PopulateWithAI);
-		Call Subroutine(SetupBoard);
 		Set Match Time(0);
 	}
 }
@@ -42,7 +42,25 @@ rule("Game Setup (Post-Start)")
 	actions
 	{
 		Wait(2, Ignore Condition);
+		Call Subroutine(SetupRound);
+	}
+}
+
+rule("SetupRound()")
+{
+	event
+	{
+		Subroutine;
+		SetupRound;
+	}
+
+	actions
+	{
 		Call Subroutine(SetupBoard);
+		Enable Built-In Game Mode Respawning(All Players(All Teams));
+		Disable Built-In Game Mode Respawning(Global.king1);
+		Disable Built-In Game Mode Respawning(Global.king2);
+		Disable Built-In Game Mode Scoring;
 	}
 }
 
