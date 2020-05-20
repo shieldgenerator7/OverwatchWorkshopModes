@@ -236,6 +236,7 @@ rule("EndRound()")
 			Global.startCamPos = Eye Position(Victim);
 		End;
 		Start Camera(All Players(All Teams), (Eye Position(Victim) + Global.startCamPos) / 2, Eye Position(Victim), 0);
+		Big Message(All Players(All Teams), Custom String("{1} {0} has been defeated!", Victim, Global.TITLE_LIST[Victim.titleIndex]));
 		Wait(2, Ignore Condition);
 		Call Subroutine(SetupRound);
 		Stop Camera(All Players(All Teams));
