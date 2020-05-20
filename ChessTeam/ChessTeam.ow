@@ -86,6 +86,7 @@ rule("SetupRound()")
 		Disable Built-In Game Mode Respawning(Global.king1);
 		Disable Built-In Game Mode Respawning(Global.king2);
 		Disable Built-In Game Mode Scoring;
+		Disable Built-In Game Mode Completion;
 		Call Subroutine(StartRoundIntro);
 	}
 }
@@ -279,5 +280,41 @@ rule("Player Spawn In: Give random title")
 	{
 		Event Player.titleIndex = Random Integer(0, Count Of(Global.TITLE_LIST) - 1);
 		Event Player.titleIndex %= Count Of(Global.TITLE_LIST);
+	}
+}
+
+rule("King 1 Left")
+{
+	event
+	{
+		Player Left Match;
+		Team 1;
+		All;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Hero Of(Event Player), Team 1, -1, Position Of(Event Player), Facing Direction Of(Event Player));
+		If(Event Player == Global.king1);
+			Global.king1 = Random Value In Array(All Players(Team 1));
+		End;
+	}
+}
+
+rule("King 2 Left")
+{
+	event
+	{
+		Player Left Match;
+		Team 2;
+		All;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Hero Of(Event Player), Team 2, -1, Position Of(Event Player), Facing Direction Of(Event Player));
+		If(Event Player == Global.king2);
+			Global.king2 = Random Value In Array(All Players(Team 2));
+		End;
 	}
 }
