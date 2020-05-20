@@ -22,6 +22,7 @@ settings
 		{
 			Allow Hero Switching: Off
 			Respawn As Random Hero: On
+			Respawn Time Scalar: 0%
 		}
 	}
 
