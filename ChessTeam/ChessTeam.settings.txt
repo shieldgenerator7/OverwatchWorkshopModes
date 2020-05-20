@@ -44,6 +44,87 @@ settings
 			Ability Cooldown Time: 25%
 			Healing Received: 50%
 			Ultimate Generation: 200%
+
+			Ashe
+			{
+				Coach Gun Knockback Scalar Enemy: 200%
+				Coach Gun Knockback Scalar Self: 200%
+			}
+
+			Brigitte
+			{
+				Shield Bash Knockback Scalar: 200%
+				Whip Shot Knockback Scalar: 200%
+			}
+
+			D.Va
+			{
+				Boosters Knockback Scalar: 200%
+				Call Mech Knockback Scalar: 200%
+				Self Destruct Knockback Scalar: 200%
+			}
+
+			Doomfist
+			{
+				Meteor Strike Knockback Scalar: 200%
+				Rising Uppercut Knockback Scalar: 200%
+				Rocket Punch Knockback Scalar: 200%
+			}
+
+			Junkrat
+			{
+				Concussion Mine Knockback Scalar: 200%
+				Frag Launcher Knockback Scalar: 200%
+			}
+
+			Lúcio
+			{
+				Soundwave Knockback Scalar: 200%
+			}
+
+			Pharah
+			{
+				Concussive Blast Knockback Scalar: 200%
+				Rocket Launcher Knockback Scalar: 200%
+			}
+
+			Reinhardt
+			{
+				Charge Knockback Scalar: 200%
+				Rocket Hammer Knockback Scalar: 200%
+			}
+
+			Roadhog
+			{
+				Whole Hog Knockback Scalar: 200%
+			}
+
+			Sigma
+			{
+				Accretion Knockback Scalar: 200%
+			}
+
+			Soldier: 76
+			{
+				Helix Rockets Knockback Scalar: 200%
+			}
+
+			Winston
+			{
+				Jump Pack Knockback Scalar: 200%
+				Primal Rage Melee Knockback Scalar: 200%
+			}
+
+			Wrecking Ball
+			{
+				Grappling Claw Knockback Scalar: 200%
+				Minefield Knockback Scalar: 200%
+			}
+
+			Zarya
+			{
+				Particle Cannon Secondary Knockback Scalar: 200%
+			}
 		}
 	}
 }
