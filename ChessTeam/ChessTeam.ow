@@ -11,6 +11,7 @@ subroutines
 	0: SetupRound
 	1: SetupBoard
 	2: PopulateWithAI
+	3: EndRound
 }
 
 rule("Game Setup")
@@ -56,6 +57,8 @@ rule("SetupRound()")
 
 	actions
 	{
+		Respawn(All Dead Players(All Teams));
+		Wait(1, Ignore Condition);
 		Call Subroutine(SetupBoard);
 		Enable Built-In Game Mode Respawning(All Players(All Teams));
 		Disable Built-In Game Mode Respawning(Global.king1);
@@ -109,5 +112,62 @@ rule("PopulateWithAI()")
 		While(Count Of(All Players(Team 2)) < 6);
 			Create Dummy Bot(Random Value In Array(All Heroes), Team 2, -1, Vector(0, 0, 0), Vector(0, 0, 0));
 		End;
+	}
+}
+
+rule("King 1 Dies")
+{
+	event
+	{
+		Player Died;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Event Player == Global.king1;
+	}
+
+	actions
+	{
+		Modify Team Score(Team 2, 1);
+		Call Subroutine(EndRound);
+	}
+}
+
+rule("King 2 Dies")
+{
+	event
+	{
+		Player Died;
+		Team 2;
+		All;
+	}
+
+	conditions
+	{
+		Event Player == Global.king2;
+	}
+
+	actions
+	{
+		Modify Team Score(Team 1, 1);
+		Call Subroutine(EndRound);
+	}
+}
+
+rule("EndRound()")
+{
+	event
+	{
+		Subroutine;
+		EndRound;
+	}
+
+	actions
+	{
+		Wait(2, Ignore Condition);
+		Call Subroutine(SetupRound);
 	}
 }
