@@ -339,5 +339,54 @@ rule("Player Died")
 	actions
 	{
 		Stop Camera(Event Player);
+		Stop Forcing Throttle(Event Player);
+		Stop Facing(Event Player);
+		Stop Holding Button(Event Player, Primary Fire);
+	}
+}
+
+rule("==AI== Team 1")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 1;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Start Forcing Throttle(Event Player, 1, 1, 0, 1, 0, 1);
+		Start Facing(Event Player, Position Of(Global.king2) - Position Of(Event Player), 50, To World, Direction and Turn Rate);
+		Start Holding Button(Event Player, Primary Fire);
+	}
+}
+
+rule("==AI== Team 2")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Start Forcing Throttle(Event Player, 1, 1, 0, 1, 0, 1);
+		Start Facing(Event Player, Position Of(Global.king1) - Position Of(Event Player), 50, To World, Direction and Turn Rate);
+		Start Holding Button(Event Player, Primary Fire);
 	}
 }
