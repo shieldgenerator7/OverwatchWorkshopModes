@@ -9,6 +9,7 @@ variables
 subroutines
 {
 	0: SetupBoard
+	1: PopulateWithAI
 }
 
 rule("Game Setup")
@@ -20,6 +21,7 @@ rule("Game Setup")
 
 	actions
 	{
+		Call Subroutine(PopulateWithAI);
 		Call Subroutine(SetupBoard);
 	}
 }
@@ -49,6 +51,25 @@ rule("Setup Board()")
 		"Position Pieces 2"
 		For Global Variable(i, 0, 5, 1);
 			Teleport(Filtered Array(All Players(Team 2), Current Array Element != Global.king2)[Global.i], Vector(14, -8 + 4 * Global.i, 0));
+		End;
+	}
+}
+
+rule("PopulateWithAI()")
+{
+	event
+	{
+		Subroutine;
+		PopulateWithAI;
+	}
+
+	actions
+	{
+		While(Count Of(All Players(Team 1)) < 6);
+			Create Dummy Bot(Random Value In Array(All Heroes), Team 1, -1, Vector(0, 0, 0), Vector(0, 0, 0));
+		End;
+		While(Count Of(All Players(Team 2)) < 6);
+			Create Dummy Bot(Random Value In Array(All Heroes), Team 2, -1, Vector(0, 0, 0), Vector(0, 0, 0));
 		End;
 	}
 }
