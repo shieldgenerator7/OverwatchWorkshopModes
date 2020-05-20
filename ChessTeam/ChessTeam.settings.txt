@@ -21,6 +21,7 @@ settings
 
 		General
 		{
+			Kill Cam: Off
 			Limit Roles: 2 Of Each Role Per Team
 			Respawn Time Scalar: 10%
 		}
