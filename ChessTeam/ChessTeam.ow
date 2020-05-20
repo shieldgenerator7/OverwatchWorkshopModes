@@ -81,6 +81,7 @@ rule("SetupRound()")
 	{
 		Respawn(All Dead Players(All Teams));
 		Wait(1, Ignore Condition);
+		Set Status(All Players(All Teams), Null, Frozen, 9999);
 		Call Subroutine(SetupBoard);
 		Enable Built-In Game Mode Respawning(All Players(All Teams));
 		Disable Built-In Game Mode Respawning(Global.king1);
@@ -88,6 +89,7 @@ rule("SetupRound()")
 		Disable Built-In Game Mode Scoring;
 		Disable Built-In Game Mode Completion;
 		Call Subroutine(StartRoundIntro);
+		Clear Status(All Players(All Teams), Frozen);
 	}
 }
 
