@@ -125,6 +125,8 @@ rule("SetupBoard()")
 		Heal(All Players(All Teams), Null, 10000);
 		"Reset everyone's ult charge"
 		Set Ultimate Charge(All Players(All Teams), 0);
+		"Stop everyone's camera"
+		Stop Camera(All Players(All Teams));
 	}
 }
 
@@ -316,5 +318,20 @@ rule("King 2 Left")
 		If(Event Player == Global.king2);
 			Global.king2 = Random Value In Array(All Players(Team 2));
 		End;
+	}
+}
+
+rule("Player Died")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Stop Camera(Event Player);
 	}
 }
