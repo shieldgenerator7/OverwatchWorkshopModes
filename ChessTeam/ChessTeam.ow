@@ -127,7 +127,7 @@ rule("StartRoundIntro()")
 		Start Camera(All Players(Team 2), Eye Position(Global.king2) + Up + 2 * Facing Direction Of(Global.king2), Eye Position(
 			Global.king2), 0);
 		Big Message(All Players(Team 2), Custom String("ALL HAIL KING {0}!", Global.king2));
-		Wait(2, Ignore Condition);
+		Wait(3, Ignore Condition);
 		"Show Team 1 their Enemy King"
 		Start Camera(All Players(Team 1), Eye Position(Global.king2) + Up + 2 * Facing Direction Of(Global.king2), Eye Position(
 			Global.king2), 0);
@@ -136,7 +136,7 @@ rule("StartRoundIntro()")
 		Start Camera(All Players(Team 2), Eye Position(Global.king1) + Up + 2 * Facing Direction Of(Global.king1), Eye Position(
 			Global.king1), 0);
 		Big Message(All Players(Team 2), Custom String("DOWN WITH KING {0}!", Global.king1));
-		Wait(2, Ignore Condition);
+		Wait(3, Ignore Condition);
 		Stop Camera(All Players(All Teams));
 	}
 }
