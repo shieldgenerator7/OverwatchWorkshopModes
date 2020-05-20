@@ -5,6 +5,10 @@ variables
 		1: king2
 		2: i
 		3: startCamPos
+		4: TITLE_LIST
+
+	player:
+		0: titleIndex
 }
 
 subroutines
@@ -27,6 +31,16 @@ rule("Game Setup")
 	{
 		Call Subroutine(PopulateWithAI);
 		Set Match Time(0);
+		Create HUD Text(All Players(All Teams), Null, Null, Custom String("Press INTERACT + CROUCH to change Title"), Left, 0, White,
+			White, Green, Visible To and String, Default Visibility);
+		Global.TITLE_LIST = Empty Array;
+		Modify Global Variable(TITLE_LIST, Append To Array, Custom String("KING"));
+		Modify Global Variable(TITLE_LIST, Append To Array, Custom String("QUEEN"));
+		Modify Global Variable(TITLE_LIST, Append To Array, Custom String("EMPORER"));
+		Modify Global Variable(TITLE_LIST, Append To Array, Custom String("PRESIDENT"));
+		Modify Global Variable(TITLE_LIST, Append To Array, Custom String("DICTATOR"));
+		Modify Global Variable(TITLE_LIST, Append To Array, Custom String("RULER"));
+		Modify Global Variable(TITLE_LIST, Append To Array, Custom String("PRIME MINISTER"));
 	}
 }
 
@@ -126,20 +140,20 @@ rule("StartRoundIntro()")
 		"Show Team 1 their King"
 		Start Camera(All Players(Team 1), Eye Position(Global.king1) + Up + 2 * Facing Direction Of(Global.king1), Eye Position(
 			Global.king1), 0);
-		Big Message(All Players(Team 1), Custom String("ALL HAIL KING {0}!", Global.king1));
+		Big Message(All Players(Team 1), Custom String("ALL HAIL {1} {0}!", Global.king1, Global.TITLE_LIST[Global.king1.titleIndex]));
 		"Show Team 2 their King"
 		Start Camera(All Players(Team 2), Eye Position(Global.king2) + Up + 2 * Facing Direction Of(Global.king2), Eye Position(
 			Global.king2), 0);
-		Big Message(All Players(Team 2), Custom String("ALL HAIL KING {0}!", Global.king2));
+		Big Message(All Players(Team 2), Custom String("ALL HAIL {1} {0}!", Global.king2, Global.TITLE_LIST[Global.king2.titleIndex]));
 		Wait(3, Ignore Condition);
 		"Show Team 1 their Enemy King"
 		Start Camera(All Players(Team 1), Eye Position(Global.king2) + Up + 2 * Facing Direction Of(Global.king2), Eye Position(
 			Global.king2), 0);
-		Big Message(All Players(Team 1), Custom String("DOWN WITH KING {0}!", Global.king2));
+		Big Message(All Players(Team 1), Custom String("DOWN WITH {1} {0}!", Global.king2, Global.TITLE_LIST[Global.king2.titleIndex]));
 		"Show Team 2 their Enemy King"
 		Start Camera(All Players(Team 2), Eye Position(Global.king1) + Up + 2 * Facing Direction Of(Global.king1), Eye Position(
 			Global.king1), 0);
-		Big Message(All Players(Team 2), Custom String("DOWN WITH KING {0}!", Global.king1));
+		Big Message(All Players(Team 2), Custom String("DOWN WITH {1} {0}!", Global.king1, Global.TITLE_LIST[Global.king1.titleIndex]));
 		Wait(3, Ignore Condition);
 		Stop Camera(All Players(All Teams));
 	}
@@ -225,5 +239,44 @@ rule("EndRound()")
 		Wait(2, Ignore Condition);
 		Call Subroutine(SetupRound);
 		Stop Camera(All Players(All Teams));
+	}
+}
+
+rule("Player Change Title")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Interact) == True;
+		Is Button Held(Event Player, Crouch) == True;
+	}
+
+	actions
+	{
+		Event Player.titleIndex += 1;
+		Event Player.titleIndex %= Count Of(Global.TITLE_LIST);
+		Small Message(Event Player, Custom String("New Title: {1} {0}", Event Player, Global.TITLE_LIST[Event Player.titleIndex]));
+	}
+}
+
+rule("Player Spawn In: Give random title")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Event Player.titleIndex = Random Integer(0, Count Of(Global.TITLE_LIST) - 1);
+		Event Player.titleIndex %= Count Of(Global.TITLE_LIST);
 	}
 }
