@@ -23,10 +23,30 @@ rule("Game Setup")
 	{
 		Call Subroutine(PopulateWithAI);
 		Call Subroutine(SetupBoard);
+		Set Match Time(0);
 	}
 }
 
-rule("Setup Board()")
+rule("Game Setup (Post-Start)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+	}
+
+	actions
+	{
+		Wait(2, Ignore Condition);
+		Call Subroutine(SetupBoard);
+	}
+}
+
+rule("SetupBoard()")
 {
 	event
 	{
