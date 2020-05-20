@@ -22,6 +22,7 @@ settings
 		{
 			Allow Hero Switching: Off
 			Respawn As Random Hero: On
+			Respawn Time Scalar: 0%
 		}
 	}
 
@@ -52,5 +53,309 @@ settings
 				Ultimate Ability Earthshatter: Off
 			}
 		}
+	}
+}
+
+variables
+{
+	global:
+		0: reinhardt
+		1: SAFE_POINT
+		2: SAFE_RADIUS
+
+	player:
+		0: dotID
+}
+
+subroutines
+{
+	0: PopulateWithAI
+}
+
+rule("Game Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.SAFE_POINT = Vector(8, 0, 0);
+		Global.SAFE_RADIUS = 8;
+		Create Effect(All Players(All Teams), Ring, Yellow, Global.SAFE_POINT, Global.SAFE_RADIUS, Visible To);
+		Call Subroutine(PopulateWithAI);
+	}
+}
+
+rule("Player Spawn In")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Set Primary Fire Enabled(Event Player, False);
+		Set Secondary Fire Enabled(Event Player, False);
+		Teleport(Event Player, Global.SAFE_POINT);
+	}
+}
+
+rule("Player Respawn")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != Hero(Reinhardt);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Global.SAFE_POINT);
+	}
+}
+
+rule("Player Exit Safe Area")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != Hero(Reinhardt);
+		Distance Between(Position Of(Event Player), Global.SAFE_POINT) > Global.SAFE_RADIUS;
+	}
+
+	actions
+	{
+		Set Status(Event Player, Players On Hero(Hero(Reinhardt), All Teams), Burning, 9999);
+		Start Damage Over Time(Event Player, Players On Hero(Hero(Reinhardt), All Teams), 9999, 2000);
+		Event Player.dotID = Last Damage Over Time ID;
+	}
+}
+
+rule("Player Enter Safe Area")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != Hero(Reinhardt);
+		Distance Between(Position Of(Event Player), Global.SAFE_POINT) <= Global.SAFE_RADIUS;
+	}
+
+	actions
+	{
+		Clear Status(Event Player, Burning);
+		Stop Damage Over Time(Event Player.dotID);
+		Heal(Event Player, Event Player, 200);
+	}
+}
+
+rule("Player Died")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != Hero(Reinhardt);
+	}
+
+	actions
+	{
+		Clear Status(Event Player, Burning);
+		Stop Damage Over Time(Event Player.dotID);
+	}
+}
+
+rule("PopulateWithAI()")
+{
+	event
+	{
+		Subroutine;
+		PopulateWithAI;
+	}
+
+	actions
+	{
+		While(Count Of(All Players(All Teams)) < 12);
+			Create Dummy Bot(Random Value In Array(All Heroes), All Teams, -1, Global.SAFE_POINT, Right);
+		End;
+	}
+}
+
+rule("Create a Rein")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Count Of(Players On Hero(Hero(Reinhardt), All Teams)) == 0;
+	}
+
+	actions
+	{
+		Global.reinhardt = Random Value In Array(All Players(All Teams));
+		Start Forcing Player To Be Hero(Global.reinhardt, Hero(Reinhardt));
+		Stop Forcing Player To Be Hero(Global.reinhardt);
+	}
+}
+
+rule("Rein Spawn In")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Vector(-18, 0, 0));
+		Set Facing(Event Player, Left, To World);
+	}
+}
+
+rule("Rein Dies")
+{
+	event
+	{
+		Player Died;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reinhardt);
+	}
+
+	actions
+	{
+		Stop Forcing Player To Be Hero(Event Player);
+	}
+}
+
+rule("Double Rein Surprise")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Count Of(Players On Hero(Hero(Reinhardt), All Teams)) > 1;
+	}
+
+	actions
+	{
+		Kill(Filtered Array(Players On Hero(Hero(Reinhardt), All Teams), Current Array Element != Global.reinhardt), Null);
+	}
+}
+
+rule("Rein Spawn In ==AI==")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Is Alive(Event Player) == True;
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Wait(2, Ignore Condition);
+		Set Facing(Event Player, Position Of(Player Closest To Reticle(Event Player, All Teams)) - Position Of(Event Player), To World);
+		Press Button(Event Player, Ability 1);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Player Exit Safe Area ==AI==")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != Hero(Reinhardt);
+		Distance Between(Position Of(Event Player), Global.SAFE_POINT) > Global.SAFE_RADIUS;
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Facing(Event Player, Global.SAFE_POINT, To World);
+		Start Throttle In Direction(Event Player, Global.SAFE_POINT - Position Of(Event Player), 1, To World, Replace existing throttle,
+			Direction and Magnitude);
+	}
+}
+
+rule("Player Enter Safe Area ==AI==")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != Hero(Reinhardt);
+		Distance Between(Position Of(Event Player), Global.SAFE_POINT) <= Global.SAFE_RADIUS / 2;
+	}
+
+	actions
+	{
+		Stop Throttle In Direction(Event Player);
 	}
 }
