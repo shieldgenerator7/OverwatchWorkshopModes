@@ -1,0 +1,54 @@
+variables
+{
+	global:
+		0: king1
+		1: king2
+		2: i
+}
+
+subroutines
+{
+	0: SetupBoard
+}
+
+rule("Game Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Call Subroutine(SetupBoard);
+	}
+}
+
+rule("Setup Board()")
+{
+	event
+	{
+		Subroutine;
+		SetupBoard;
+	}
+
+	actions
+	{
+		"Select King 1"
+		Global.king1 = Random Value In Array(All Players(Team 1));
+		"Position King 1"
+		Teleport(Global.king1, Vector(-18, 0, 0));
+		"Position Pieces 1"
+		For Global Variable(i, 0, 5, 1);
+			Teleport(Filtered Array(All Players(Team 1), Current Array Element != Global.king1)[Global.i], Vector(-14, 8 - 4 * Global.i, 0));
+		End;
+		"Select King 2"
+		Global.king2 = Random Value In Array(All Players(Team 2));
+		"Position King 2"
+		Teleport(Global.king2, Vector(18, 0, 0));
+		"Position Pieces 2"
+		For Global Variable(i, 0, 5, 1);
+			Teleport(Filtered Array(All Players(Team 2), Current Array Element != Global.king2)[Global.i], Vector(14, -8 + 4 * Global.i, 0));
+		End;
+	}
+}

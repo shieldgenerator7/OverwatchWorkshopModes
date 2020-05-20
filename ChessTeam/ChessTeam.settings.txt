@@ -1,0 +1,39 @@
+settings
+{
+	lobby
+	{
+		Max Spectators: 12
+	}
+
+	modes
+	{
+		Team Deathmatch
+		{
+			Mercy Resurrect Counteracts Kills: Off
+			Score To Win: 10
+
+			enabled maps
+			{
+				Workshop Island
+				Workshop Island Night
+			}
+		}
+
+		General
+		{
+			Limit Roles: 2 Of Each Role Per Team
+			Respawn Time Scalar: 10%
+		}
+	}
+
+	heroes
+	{
+		General
+		{
+			Ability Cooldown Time: 50%
+			Healing Received: 50%
+			Health: 200%
+			Ultimate Generation: 200%
+		}
+	}
+}
