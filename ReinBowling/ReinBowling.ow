@@ -1,6 +1,7 @@
 variables
 {
 	global:
+		0: reinhardt
 		1: SAFE_POINT
 		2: SAFE_RADIUS
 
@@ -147,5 +148,110 @@ rule("PopulateWithAI()")
 		While(Count Of(All Players(All Teams)) < 12);
 			Create Dummy Bot(Random Value In Array(All Heroes), All Teams, -1, Global.SAFE_POINT, Right);
 		End;
+	}
+}
+
+rule("Create a Rein")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Game In Progress == True;
+		Count Of(Players On Hero(Hero(Reinhardt), All Teams)) == 0;
+	}
+
+	actions
+	{
+		Global.reinhardt = Random Value In Array(All Players(All Teams));
+		Start Forcing Player To Be Hero(Global.reinhardt, Hero(Reinhardt));
+		Stop Forcing Player To Be Hero(Global.reinhardt);
+	}
+}
+
+rule("Rein Spawn In")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Vector(-18, 0, 0));
+		Set Facing(Event Player, Left, To World);
+	}
+}
+
+rule("Rein Dies")
+{
+	event
+	{
+		Player Died;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reinhardt);
+	}
+
+	actions
+	{
+		Stop Forcing Player To Be Hero(Event Player);
+	}
+}
+
+rule("Double Rein Surprise")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Count Of(Players On Hero(Hero(Reinhardt), All Teams)) > 1;
+	}
+
+	actions
+	{
+		Kill(Filtered Array(Players On Hero(Hero(Reinhardt), All Teams), Current Array Element != Global.reinhardt), Null);
+	}
+}
+
+rule("Rein Spawn In ==AI==")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Is Alive(Event Player) == True;
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Wait(2, Ignore Condition);
+		Press Button(Event Player, Ability 1);
+		Loop If Condition Is True;
 	}
 }
