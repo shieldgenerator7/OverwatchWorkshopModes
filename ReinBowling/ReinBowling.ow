@@ -251,6 +251,7 @@ rule("Rein Spawn In ==AI==")
 	actions
 	{
 		Wait(2, Ignore Condition);
+		Set Facing(Event Player, Position Of(Player Closest To Reticle(Event Player, All Teams)) - Position Of(Event Player), To World);
 		Press Button(Event Player, Ability 1);
 		Loop If Condition Is True;
 	}
