@@ -8,6 +8,11 @@ variables
 		0: dotID
 }
 
+subroutines
+{
+	0: PopulateWithAI
+}
+
 rule("Game Setup")
 {
 	event
@@ -20,6 +25,7 @@ rule("Game Setup")
 		Global.SAFE_POINT = Vector(8, 0, 0);
 		Global.SAFE_RADIUS = 8;
 		Create Effect(All Players(All Teams), Ring, Yellow, Global.SAFE_POINT, Global.SAFE_RADIUS, Visible To);
+		Call Subroutine(PopulateWithAI);
 	}
 }
 
@@ -125,5 +131,21 @@ rule("Player Died")
 	{
 		Clear Status(Event Player, Burning);
 		Stop Damage Over Time(Event Player.dotID);
+	}
+}
+
+rule("PopulateWithAI()")
+{
+	event
+	{
+		Subroutine;
+		PopulateWithAI;
+	}
+
+	actions
+	{
+		While(Count Of(All Players(All Teams)) < 12);
+			Create Dummy Bot(Random Value In Array(All Heroes), All Teams, -1, Global.SAFE_POINT, Right);
+		End;
 	}
 }
