@@ -1,5 +1,10 @@
 settings
 {
+	main
+	{
+		Description: "Team Chess. Protect your King and target the enemy's King. Only King deaths count towards the score. First to defeat the enemy King 10 times wins! by ShieldGnrtr7"
+	}
+
 	lobby
 	{
 		Max Spectators: 12
