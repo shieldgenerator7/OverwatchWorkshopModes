@@ -7,6 +7,8 @@ settings
 
 	lobby
 	{
+		Allow Players Who Are In Queue: Yes
+		Match Voice Chat: Enabled
 		Max Spectators: 12
 	}
 
@@ -14,8 +16,9 @@ settings
 	{
 		Team Deathmatch
 		{
+			Game Length In Minutes: 15
 			Mercy Resurrect Counteracts Kills: Off
-			Score To Win: 10
+			Score To Win: 200
 
 			enabled maps
 			{
@@ -26,8 +29,10 @@ settings
 
 		General
 		{
+			Allow Hero Switching: Off
+			Hero Limit: Off
 			Kill Cam: Off
-			Limit Roles: 2 Of Each Role Per Team
+			Respawn As Random Hero: On
 			Respawn Time Scalar: 10%
 		}
 	}
@@ -36,7 +41,7 @@ settings
 	{
 		General
 		{
-			Ability Cooldown Time: 50%
+			Ability Cooldown Time: 25%
 			Healing Received: 50%
 			Health: 200%
 			Ultimate Generation: 200%
