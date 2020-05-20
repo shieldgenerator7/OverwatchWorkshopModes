@@ -106,6 +106,10 @@ rule("SetupBoard()")
 		End;
 		"Set facing Team 2"
 		Set Facing(All Players(Team 2), Right, To World);
+		"Heal Everyone"
+		Heal(All Players(All Teams), Null, 10000);
+		"Reset everyone's ult charge"
+		Set Ultimate Charge(All Players(All Teams), 0);
 	}
 }
 
