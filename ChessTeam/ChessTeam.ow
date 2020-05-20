@@ -62,7 +62,7 @@ rule("SetupBoard()")
 		Teleport(Global.king1, Vector(-18, 0, 0));
 		"Position Pieces 1"
 		For Global Variable(i, 0, 5, 1);
-			Teleport(Filtered Array(All Players(Team 1), Current Array Element != Global.king1)[Global.i], Vector(-14, 8 - 4 * Global.i, 0));
+			Teleport(Filtered Array(All Players(Team 1), Current Array Element != Global.king1)[Global.i], Vector(-14, 0, 8 - 4 * Global.i));
 		End;
 		"Select King 2"
 		Global.king2 = Random Value In Array(All Players(Team 2));
@@ -70,7 +70,7 @@ rule("SetupBoard()")
 		Teleport(Global.king2, Vector(18, 0, 0));
 		"Position Pieces 2"
 		For Global Variable(i, 0, 5, 1);
-			Teleport(Filtered Array(All Players(Team 2), Current Array Element != Global.king2)[Global.i], Vector(14, -8 + 4 * Global.i, 0));
+			Teleport(Filtered Array(All Players(Team 2), Current Array Element != Global.king2)[Global.i], Vector(14, 0, -8 + 4 * Global.i));
 		End;
 	}
 }
