@@ -364,8 +364,12 @@ rule("==AI== Team 1")
 
 	actions
 	{
+		While(Is True For Any(All Players(All Teams), Has Status(Current Array Element, Frozen) == True) == True);
+			Wait(1, Ignore Condition);
+		End;
 		Start Forcing Throttle(Event Player, 1, 1, 0, 1, 0, 1);
-		Start Facing(Event Player, Position Of(Global.king2) - Position Of(Event Player), 50, To World, Direction and Turn Rate);
+		Start Facing(Event Player, Position Of(Closest Player To(Position Of(Event Player), Team 2)) - Position Of(Event Player), 180,
+			To World, Direction and Turn Rate);
 		Start Holding Button(Event Player, Primary Fire);
 	}
 }
@@ -387,8 +391,15 @@ rule("==AI== Team 2")
 
 	actions
 	{
+		While(Is True For Any(All Players(All Teams), Has Status(Current Array Element, Frozen) == True) == True);
+			Wait(1, Ignore Condition);
+		End;
 		Start Forcing Throttle(Event Player, 1, 1, 0, 1, 0, 1);
-		Start Facing(Event Player, Position Of(Global.king1) - Position Of(Event Player), 50, To World, Direction and Turn Rate);
+		Start Facing(Event Player, Position Of(Closest Player To(Position Of(Event Player), Team 1)) - Position Of(Event Player), 180,
+			To World, Direction and Turn Rate);
 		Start Holding Button(Event Player, Primary Fire);
+		While(Is True For Any(All Players(All Teams), Has Status(Current Array Element, Frozen) == True) == True);
+			Wait(1, Ignore Condition);
+		End;
 	}
 }
