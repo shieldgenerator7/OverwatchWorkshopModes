@@ -44,10 +44,10 @@ rule("Game Setup (Post-Start)")
 	{
 		Wait(2, Ignore Condition);
 		Call Subroutine(SetupRound);
-		Create Icon(All Players(All Teams), Eye Position(Global.king1), Diamond, Visible To and Position, Yellow, True);
+		Create Icon(All Players(All Teams), Eye Position(Global.king1), Diamond, Visible To and Position, Yellow, False);
 		Create Effect(All Players(All Teams), Ring, Yellow, Global.king1, 1, Visible To Position and Radius);
 		Create Effect(All Players(All Teams), Ring, Yellow, Global.king1, 0.500, Visible To Position and Radius);
-		Create Icon(All Players(All Teams), Eye Position(Global.king2), Diamond, Visible To and Position, Yellow, True);
+		Create Icon(All Players(All Teams), Eye Position(Global.king2), Diamond, Visible To and Position, Yellow, False);
 		Create Effect(All Players(All Teams), Ring, Yellow, Global.king2, 1, Visible To Position and Radius);
 		Create Effect(All Players(All Teams), Ring, Yellow, Global.king2, 0.500, Visible To Position and Radius);
 	}
