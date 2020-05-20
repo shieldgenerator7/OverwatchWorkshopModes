@@ -255,3 +255,48 @@ rule("Rein Spawn In ==AI==")
 		Loop If Condition Is True;
 	}
 }
+
+rule("Player Exit Safe Area ==AI==")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != Hero(Reinhardt);
+		Distance Between(Position Of(Event Player), Global.SAFE_POINT) > Global.SAFE_RADIUS;
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Facing(Event Player, Global.SAFE_POINT, To World);
+		Start Throttle In Direction(Event Player, Global.SAFE_POINT - Position Of(Event Player), 1, To World, Replace existing throttle,
+			Direction and Magnitude);
+	}
+}
+
+rule("Player Enter Safe Area ==AI==")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != Hero(Reinhardt);
+		Distance Between(Position Of(Event Player), Global.SAFE_POINT) <= Global.SAFE_RADIUS / 2;
+	}
+
+	actions
+	{
+		Stop Throttle In Direction(Event Player);
+	}
+}
