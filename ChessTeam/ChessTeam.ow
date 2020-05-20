@@ -13,6 +13,7 @@ subroutines
 	1: SetupBoard
 	2: PopulateWithAI
 	3: EndRound
+	4: StartRoundIntro
 }
 
 rule("Game Setup")
@@ -71,6 +72,7 @@ rule("SetupRound()")
 		Disable Built-In Game Mode Respawning(Global.king1);
 		Disable Built-In Game Mode Respawning(Global.king2);
 		Disable Built-In Game Mode Scoring;
+		Call Subroutine(StartRoundIntro);
 	}
 }
 
@@ -104,6 +106,38 @@ rule("SetupBoard()")
 		End;
 		"Set facing Team 2"
 		Set Facing(All Players(Team 2), Right, To World);
+	}
+}
+
+rule("StartRoundIntro()")
+{
+	event
+	{
+		Subroutine;
+		StartRoundIntro;
+	}
+
+	actions
+	{
+		"Show Team 1 their King"
+		Start Camera(All Players(Team 1), Eye Position(Global.king1) + Up + 2 * Facing Direction Of(Global.king1), Eye Position(
+			Global.king1), 0);
+		Big Message(All Players(Team 1), Custom String("ALL HAIL KING {0}!", Global.king1));
+		"Show Team 2 their King"
+		Start Camera(All Players(Team 2), Eye Position(Global.king2) + Up + 2 * Facing Direction Of(Global.king2), Eye Position(
+			Global.king2), 0);
+		Big Message(All Players(Team 2), Custom String("ALL HAIL KING {0}!", Global.king2));
+		Wait(2, Ignore Condition);
+		"Show Team 1 their Enemy King"
+		Start Camera(All Players(Team 1), Eye Position(Global.king2) + Up + 2 * Facing Direction Of(Global.king2), Eye Position(
+			Global.king2), 0);
+		Big Message(All Players(Team 1), Custom String("DOWN WITH KING {0}!", Global.king2));
+		"Show Team 2 their Enemy King"
+		Start Camera(All Players(Team 2), Eye Position(Global.king1) + Up + 2 * Facing Direction Of(Global.king1), Eye Position(
+			Global.king1), 0);
+		Big Message(All Players(Team 2), Custom String("DOWN WITH KING {0}!", Global.king1));
+		Wait(2, Ignore Condition);
+		Stop Camera(All Players(All Teams));
 	}
 }
 
