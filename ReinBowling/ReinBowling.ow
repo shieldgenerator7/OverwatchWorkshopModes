@@ -211,6 +211,7 @@ rule("Rein Dies")
 	actions
 	{
 		Stop Forcing Player To Be Hero(Event Player);
+		Modify Player Score(Event Player, 1);
 	}
 }
 
