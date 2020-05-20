@@ -1,0 +1,56 @@
+settings
+{
+	lobby
+	{
+		Allow Players Who Are In Queue: Yes
+		Match Voice Chat: Enabled
+		Max Spectators: 12
+	}
+
+	modes
+	{
+		Deathmatch
+		{
+			enabled maps
+			{
+				Workshop Island
+				Workshop Island Night
+			}
+		}
+
+		General
+		{
+			Allow Hero Switching: Off
+			Respawn As Random Hero: On
+		}
+	}
+
+	heroes
+	{
+		General
+		{
+			Ability Cooldown Time: 500%
+			Ammunition Clip Size Scalar: 25%
+			Damage Dealt: 10%
+			Damage Received: 10%
+			Healing Dealt: 500%
+			Healing Received: 500%
+			Health: 500%
+			Primary Fire: Off
+
+			Reinhardt
+			{
+				Barrier Field: Off
+				Charge Cooldown Time: 0%
+				Charge Knockback Scalar: 300%
+				Damage Dealt: 10%
+				Damage Received: 10%
+				Fire Strike: Off
+				Healing Received: 500%
+				Health: 500%
+				Quick Melee: Off
+				Ultimate Ability Earthshatter: Off
+			}
+		}
+	}
+}

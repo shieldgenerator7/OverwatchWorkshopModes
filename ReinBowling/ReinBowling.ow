@@ -1,0 +1,128 @@
+variables
+{
+	global:
+		1: SAFE_POINT
+		2: SAFE_RADIUS
+
+	player:
+		0: dotID
+}
+
+rule("Game Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.SAFE_POINT = Vector(8, 0, 0);
+		Global.SAFE_RADIUS = 4;
+		Create Effect(All Players(All Teams), Ring, Yellow, Global.SAFE_POINT, Global.SAFE_RADIUS, Visible To);
+	}
+}
+
+rule("Player Spawn In")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Set Primary Fire Enabled(Event Player, False);
+		Set Secondary Fire Enabled(Event Player, False);
+		Teleport(Event Player, Global.SAFE_POINT);
+	}
+}
+
+rule("Player Respawn")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != Hero(Reinhardt);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Global.SAFE_POINT);
+	}
+}
+
+rule("Player Exit Safe Area")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != Hero(Reinhardt);
+		Distance Between(Position Of(Event Player), Global.SAFE_POINT) > Global.SAFE_RADIUS;
+	}
+
+	actions
+	{
+		Set Status(Event Player, Players On Hero(Hero(Reinhardt), All Teams), Burning, 9999);
+		Start Damage Over Time(Event Player, Players On Hero(Hero(Reinhardt), All Teams), 9999, 2000);
+		Event Player.dotID = Last Damage Over Time ID;
+	}
+}
+
+rule("Player Enter Safe Area")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != Hero(Reinhardt);
+		Distance Between(Position Of(Event Player), Global.SAFE_POINT) <= Global.SAFE_RADIUS;
+	}
+
+	actions
+	{
+		Clear Status(Event Player, Burning);
+		Stop Damage Over Time(Event Player.dotID);
+	}
+}
+
+rule("Player Died")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != Hero(Reinhardt);
+	}
+
+	actions
+	{
+		Clear Status(Event Player, Burning);
+		Stop Damage Over Time(Event Player.dotID);
+	}
+}
