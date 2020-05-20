@@ -43,7 +43,6 @@ settings
 		{
 			Ability Cooldown Time: 25%
 			Healing Received: 50%
-			Health: 200%
 			Ultimate Generation: 200%
 		}
 	}

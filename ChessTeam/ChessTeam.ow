@@ -127,6 +127,12 @@ rule("SetupBoard()")
 		Set Ultimate Charge(All Players(All Teams), 0);
 		"Stop everyone's camera"
 		Stop Camera(All Players(All Teams));
+		"Set everyone normal"
+		Set Max Health(All Players(All Teams), 50);
+		"Set King 1 High Health"
+		Set Max Health(Global.king1, 300);
+		"Set King 2 High Health"
+		Set Max Health(Global.king2, 300);
 	}
 }
 
@@ -241,8 +247,8 @@ rule("EndRound()")
 		Start Camera(All Players(All Teams), (Eye Position(Victim) + Global.startCamPos) / 2, Eye Position(Victim), 0);
 		Big Message(All Players(All Teams), Custom String("{1} {0} has been defeated!", Victim, Global.TITLE_LIST[Victim.titleIndex]));
 		Wait(2, Ignore Condition);
-		Call Subroutine(SetupRound);
 		Stop Camera(All Players(All Teams));
+		Call Subroutine(SetupRound);
 	}
 }
 
