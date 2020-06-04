@@ -29,8 +29,6 @@ settings
 	{
 		General
 		{
-			Movement Speed: 105%
-
 			Mercy
 			{
 				Guardian Angel: Off
