@@ -1,0 +1,96 @@
+variables
+{
+	global:
+		0: MAP_RADIUS
+}
+
+rule("Game Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.MAP_RADIUS = 380;
+	}
+}
+
+rule("Skip Assembly")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Assembling Heroes == True;
+	}
+
+	actions
+	{
+		Set Match Time(0);
+	}
+}
+
+rule("Player Spawn in")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Vector(Random Integer(Global.MAP_RADIUS * -1, Global.MAP_RADIUS), 0, Random Integer(Global.MAP_RADIUS * -1,
+			Global.MAP_RADIUS)));
+		Start Forcing Player To Be Hero(Event Player, Hero(Mercy));
+	}
+}
+
+rule("==TEST== Player Reset")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Interact) == True;
+		Is Button Held(Event Player, Crouch) == True;
+	}
+
+	actions
+	{
+		Kill(Event Player, Event Player);
+	}
+}
+
+rule("==TEST== Player Join Match, get POS HUD")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Create HUD Text(Event Player, Custom String("POS: {0}", Position Of(Event Player)), Null, Null, Left, 0, White, White, White,
+			Visible To and String, Default Visibility);
+	}
+}

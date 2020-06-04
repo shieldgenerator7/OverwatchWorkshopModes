@@ -1,0 +1,37 @@
+settings
+{
+	lobby
+	{
+		Allow Players Who Are In Queue: Yes
+		Match Voice Chat: Enabled
+		Max Spectators: 12
+	}
+
+	modes
+	{
+		Deathmatch
+		{
+			enabled maps
+			{
+				Workshop Expanse
+				Workshop Expanse Night
+			}
+		}
+
+		General
+		{
+			Hero Limit: Off
+		}
+	}
+
+	heroes
+	{
+		General
+		{
+			Mercy
+			{
+				Weapons Enabled: Caduceus Blaster Only
+			}
+		}
+	}
+}
