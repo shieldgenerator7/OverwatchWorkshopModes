@@ -2,6 +2,15 @@ variables
 {
 	global:
 		0: MAP_RADIUS
+		1: lootPosList
+		2: i
+		3: LOOT_COUNT
+		4: lootEffectIdList
+		5: LOOT_RADIUS
+
+	player:
+		0: lootSelectIndex
+		1: i
 }
 
 rule("Game Setup")
@@ -14,6 +23,16 @@ rule("Game Setup")
 	actions
 	{
 		Global.MAP_RADIUS = 380;
+		Global.LOOT_COUNT = 10;
+		Global.LOOT_RADIUS = 1;
+		Global.lootPosList = Empty Array;
+		Global.lootEffectIdList = Empty Array;
+		For Global Variable(i, 0, Global.LOOT_COUNT, 1);
+			Modify Global Variable(lootPosList, Append To Array, Vector(Random Integer(Global.MAP_RADIUS * -1, Global.MAP_RADIUS), 0,
+				Random Integer(Global.MAP_RADIUS * -1, Global.MAP_RADIUS)));
+			Create Effect(All Players(All Teams), Sphere, Yellow, Global.lootPosList[Global.i], Global.LOOT_RADIUS, Visible To);
+			Modify Global Variable(lootEffectIdList, Append To Array, Last Created Entity);
+		End;
 	}
 }
 
@@ -92,5 +111,36 @@ rule("==TEST== Player Join Match, get POS HUD")
 	{
 		Create HUD Text(Event Player, Custom String("POS: {0}", Position Of(Event Player)), Null, Null, Left, 0, White, White, White,
 			Visible To and String, Default Visibility);
+	}
+}
+
+rule("Player Collects Loot")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Interact) == True;
+	}
+
+	actions
+	{
+		Event Player.lootSelectIndex = -1;
+		For Player Variable(Event Player, i, 0, Count Of(Global.lootPosList), 1);
+			If(Distance Between(Position Of(Event Player), Global.lootPosList[Event Player.i]) <= Global.LOOT_RADIUS);
+				Event Player.lootSelectIndex = Event Player.i;
+				Break;
+			End;
+		End;
+		Abort If(Event Player.lootSelectIndex < 0);
+		Small Message(Event Player, Custom String("PICKED UP LOOT @ {0}", Global.lootPosList[Event Player.lootSelectIndex]));
+		Modify Global Variable(lootPosList, Remove From Array By Index, Event Player.lootSelectIndex);
+		Destroy Effect(Global.lootEffectIdList[Event Player.lootSelectIndex]);
+		Modify Global Variable(lootEffectIdList, Remove From Array By Index, Event Player.lootSelectIndex);
 	}
 }
