@@ -31,7 +31,11 @@ settings
 		{
 			Mercy
 			{
-				Weapons Enabled: Caduceus Blaster Only
+				Guardian Angel: Off
+				Health: 50%
+				Resurrect: Off
+				Ultimate Ability Valkyrie: Off
+				Weapons Enabled: Caduceus Staff Only
 			}
 		}
 	}
