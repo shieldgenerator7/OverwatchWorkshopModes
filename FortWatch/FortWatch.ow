@@ -57,6 +57,11 @@ rule("Game Setup")
 			Modify Global Variable(lootHeroList, Append To Array, Random Value In Array(All Heroes));
 		End;
 		Call Subroutine(ResetRing);
+		For Global Variable(i, 0, 12, 1);
+			Create Dummy Bot(Random Value In Array(All Heroes), All Teams, -1, Vector(Random Integer(Global.MAP_RADIUS * -1,
+				Global.MAP_RADIUS), 0, Random Integer(Global.MAP_RADIUS * -1, Global.MAP_RADIUS)), Direction From Angles(Random Integer(0,
+				360), 0));
+		End;
 	}
 }
 
@@ -138,6 +143,7 @@ rule("Player Spawn in")
 		Teleport(Event Player, Vector(Random Integer(Global.MAP_RADIUS * -1, Global.MAP_RADIUS), 0, Random Integer(Global.MAP_RADIUS * -1,
 			Global.MAP_RADIUS)));
 		Start Forcing Player To Be Hero(Event Player, Hero(Mercy));
+		Disable Built-In Game Mode Respawning(Event Player);
 	}
 }
 
@@ -238,8 +244,9 @@ rule("Player Stands Over Loot")
 		End;
 		Abort If(Event Player.lootSelectIndex < 0);
 		Destroy HUD Text(Event Player.lootPreviewHUDId);
-		Create HUD Text(Event Player, Custom String("HERO: {0}", Global.lootHeroList[Event Player.lootSelectIndex]), Null, Custom String(
-			"Press Interact to pickup"), Top, 0, White, White, White, Visible To and String, Default Visibility);
+		Create HUD Text(Event Player, Custom String("HERO: {1} {0}", Global.lootHeroList[Event Player.lootSelectIndex], Hero Icon String(
+			Global.lootHeroList[Event Player.lootSelectIndex])), Null, Custom String("Press Interact to pickup"), Top, 0, White, White,
+			White, Visible To and String, Default Visibility);
 		Event Player.lootPreviewHUDId = Last Text ID;
 	}
 }
@@ -387,5 +394,23 @@ rule("Players Outside Ring Get Damaged")
 		Damage(Event Player, Null, Global.RING_DAMAGE_PER_SECOND);
 		Wait(1, Ignore Condition);
 		Loop If Condition Is True;
+	}
+}
+
+rule("Last Player Alive = Win")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Count Of(All Living Players(All Teams)) == 1;
+	}
+
+	actions
+	{
+		Declare Player Victory(All Living Players(All Teams));
 	}
 }
