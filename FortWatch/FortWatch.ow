@@ -12,6 +12,7 @@ variables
 	player:
 		0: lootSelectIndex
 		1: i
+		2: lootPreviewHUDId
 }
 
 rule("Game Setup")
@@ -148,5 +149,58 @@ rule("Player Collects Loot")
 		Modify Global Variable(lootEffectIdList, Remove From Array By Index, Event Player.lootSelectIndex);
 		Start Forcing Player To Be Hero(Event Player, Global.lootHeroList[Event Player.lootSelectIndex]);
 		Modify Global Variable(lootHeroList, Remove From Array By Index, Event Player.lootSelectIndex);
+	}
+}
+
+rule("Player Stands Over Loot")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is True For Any(Global.lootPosList, Distance Between(Position Of(Event Player), Current Array Element) <= Global.LOOT_RADIUS)
+			== True;
+	}
+
+	actions
+	{
+		Event Player.lootSelectIndex = -1;
+		For Player Variable(Event Player, i, 0, Count Of(Global.lootPosList), 1);
+			If(Distance Between(Position Of(Event Player), Global.lootPosList[Event Player.i]) <= Global.LOOT_RADIUS);
+				Event Player.lootSelectIndex = Event Player.i;
+				Break;
+			End;
+		End;
+		Abort If(Event Player.lootSelectIndex < 0);
+		Destroy HUD Text(Event Player.lootPreviewHUDId);
+		Create HUD Text(Event Player, Custom String("HERO: {0}", Global.lootHeroList[Event Player.lootSelectIndex]), Null, Custom String(
+			"Press Interact to pickup"), Top, 0, White, White, White, Visible To and String, Default Visibility);
+		Event Player.lootPreviewHUDId = Last Text ID;
+	}
+}
+
+rule("Player Stands Over Loot (End)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is True For Any(Global.lootPosList, Distance Between(Position Of(Event Player), Current Array Element) <= Global.LOOT_RADIUS)
+			== False;
+	}
+
+	actions
+	{
+		Destroy HUD Text(Event Player.lootPreviewHUDId);
 	}
 }
