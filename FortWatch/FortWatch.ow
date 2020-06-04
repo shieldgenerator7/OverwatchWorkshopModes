@@ -17,6 +17,7 @@ variables
 		13: ringEffectId
 		14: newRingEffectId
 		15: ringPauseTime
+		16: RING_DAMAGE_PER_SECOND
 
 	player:
 		0: lootSelectIndex
@@ -40,12 +41,9 @@ rule("Game Setup")
 	actions
 	{
 		Global.MAP_RADIUS = 380;
-		Global.LOOT_COUNT = 10;
+		Global.LOOT_COUNT = 100;
 		Global.LOOT_RADIUS = 1;
-		Global.ringPos = 1;
-		Global.ringRadius = 1;
-		Global.newRingPos = 1;
-		Global.newRingRadius = 1;
+		Global.RING_DAMAGE_PER_SECOND = 2;
 		Global.RING_MOVE_DURATION = 10;
 		Global.RING_PAUSE_DURATION = 5;
 		Global.lootPosList = Empty Array;
@@ -95,7 +93,7 @@ rule("Generate Next RIng")
 
 	actions
 	{
-		Global.newRingRadius = Global.ringRadius * 0.700;
+		Global.newRingRadius = Global.ringRadius * 0.500;
 		Global.newRingPos = Vector(Random Integer((Global.ringRadius - Global.newRingRadius) * -1,
 			Global.ringRadius - Global.newRingRadius), 0, Random Integer((Global.ringRadius - Global.newRingRadius) * -1,
 			Global.ringRadius - Global.newRingRadius)) + Global.ringPos;
@@ -367,5 +365,27 @@ rule("==TEST== Host Player Reset RIng")
 	actions
 	{
 		Call Subroutine(ResetRing);
+	}
+}
+
+rule("Players Outside Ring Get Damaged")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Position Of(Event Player), Global.ringPos) > Global.ringRadius;
+	}
+
+	actions
+	{
+		Damage(Event Player, Null, Global.RING_DAMAGE_PER_SECOND);
+		Wait(1, Ignore Condition);
+		Loop If Condition Is True;
 	}
 }
