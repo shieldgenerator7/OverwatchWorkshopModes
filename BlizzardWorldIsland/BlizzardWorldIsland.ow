@@ -33,14 +33,14 @@ rule("Game Setup")
 		Global.platformPosList = Empty Array;
 		Global.platformRadiusList = Empty Array;
 		"Island Platform Base"
-		Modify Global Variable(platformPosList, Append To Array, Vector(58, -5, 154));
-		Modify Global Variable(platformRadiusList, Append To Array, 15);
+		disabled Modify Global Variable(platformPosList, Append To Array, Vector(58, -5, 154));
+		disabled Modify Global Variable(platformRadiusList, Append To Array, 15);
 		"Island Platform Hut 1"
-		Modify Global Variable(platformPosList, Append To Array, Vector(66, -2.400, 148.500));
-		Modify Global Variable(platformRadiusList, Append To Array, 3);
+		disabled Modify Global Variable(platformPosList, Append To Array, Vector(66, -2.400, 148.500));
+		disabled Modify Global Variable(platformRadiusList, Append To Array, 3);
 		"Island Platform Hut 2"
-		Modify Global Variable(platformPosList, Append To Array, Vector(59, -1.200, 161));
-		Modify Global Variable(platformRadiusList, Append To Array, 5);
+		disabled Modify Global Variable(platformPosList, Append To Array, Vector(59, -1.200, 161));
+		disabled Modify Global Variable(platformRadiusList, Append To Array, 5);
 		"Show visuals for all platforms"
 		disabled For Global Variable(_i_, 1, Count Of(Global.platformPosList), 1);
 		disabled Create Effect(All Players(All Teams), Light Shaft, White, Global.platformPosList[Global._i_],
