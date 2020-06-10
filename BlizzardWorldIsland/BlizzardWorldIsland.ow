@@ -33,6 +33,12 @@ rule("Game Setup")
 		"Island Platform Base"
 		Modify Global Variable(platformPosList, Append To Array, Vector(58, -5, 154));
 		Modify Global Variable(platformRadiusList, Append To Array, 15);
+		"Island Platform Hut 1"
+		Modify Global Variable(platformPosList, Append To Array, Vector(66, -2.400, 148.500));
+		Modify Global Variable(platformRadiusList, Append To Array, 3);
+		"Island Platform Hut 2"
+		Modify Global Variable(platformPosList, Append To Array, Vector(59, -1.200, 161));
+		Modify Global Variable(platformRadiusList, Append To Array, 5);
 	}
 }
 
