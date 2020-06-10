@@ -8,13 +8,17 @@ settings
 	lobby
 	{
 		Allow Players Who Are In Queue: Yes
+		Map Rotation: After A Game
 		Match Voice Chat: Enabled
+		Return To Lobby: Never
 	}
 
 	modes
 	{
 		Deathmatch
 		{
+			Score To Win: 50
+
 			enabled maps
 			{
 				Blizzard World
@@ -33,7 +37,7 @@ settings
 	{
 		General
 		{
-			Ability Cooldown Time: 0%
+			Ability Cooldown Time: 25%
 			Healing Dealt: 50%
 			Health: 200%
 			No Ammunition Requirement: On
@@ -63,5 +67,25 @@ settings
 				Pharah
 			}
 		}
+	}
+}
+
+rule("If player is not in island area, teleport them")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is On Ground(Event Player) == True;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Vector(58, 15, 154));
 	}
 }
