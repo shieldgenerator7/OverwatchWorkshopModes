@@ -1,0 +1,155 @@
+variables
+{
+	global:
+		2: testPlatformPos
+		3: testPlatformRadius
+}
+
+rule("Game Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.testPlatformPos = Vector(58, -5, 154);
+		Global.testPlatformRadius = 20;
+	}
+}
+
+rule("==TEST== Player Teleport")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Crouch) == True;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Position Of(Event Player) + Facing Direction Of(Event Player) * 10);
+	}
+}
+
+rule("==TEST== Player Spawn (Position HUD)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Create HUD Text(All Players(All Teams), Custom String("POS: {0}", Position Of(Event Player)), Null, Null, Left, 0, White, White,
+			White, Visible To and String, Default Visibility);
+	}
+}
+
+rule("Player lands on platform")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		"If the player's horizontal position is in the platform's radius"
+		Distance Between(Vector(X Component Of(Position Of(Event Player)), 0, Z Component Of(Position Of(Event Player))), Vector(
+			X Component Of(Global.testPlatformPos), 0, Z Component Of(Global.testPlatformPos))) <= Global.testPlatformRadius;
+		"If the player's vertical position is really close to the platform's vertical position"
+		Absolute Value(Y Component Of(Position Of(Event Player)) - Y Component Of(Global.testPlatformPos)) <= True;
+	}
+
+	actions
+	{
+		If(Y Component Of(Velocity Of(Event Player)) < 0);
+			Apply Impulse(Event Player, Up, 0.100, To World, Cancel Contrary Motion);
+			Apply Impulse(Event Player, Down, 0.100, To World, Incorporate Contrary Motion);
+			"Bounce the player up"
+			disabled Apply Impulse(Event Player, Vector(0, Y Component Of(Velocity Of(Event Player)) * -1, 0), 0, To World,
+				Incorporate Contrary Motion);
+		End;
+		Set Gravity(Event Player, 0);
+		Teleport(Event Player, Vector(X Component Of(Position Of(Event Player)), Y Component Of(Global.testPlatformPos), Z Component Of(
+			Position Of(Event Player))));
+	}
+}
+
+rule("Player Spawns In, Teleport to Island")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Vector(58, 15, 154));
+	}
+}
+
+disabled rule("Player Spawns In, Teleport to Island")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Vector(58, 15, 154));
+	}
+}
+
+rule("== TEST== Manual teleport to island")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Interact) == True;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Vector(58, 15, 154));
+	}
+}
