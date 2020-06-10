@@ -39,6 +39,10 @@ rule("Game Setup")
 		"Show visuals for first platform (Island Platform Base)"
 		disabled Create Effect(All Players(All Teams), Light Shaft, White, Global.platformPosList[2], Global.platformRadiusList[2],
 			Visible To Position and Radius);
+		Create In-World Text(All Players(All Teams), Custom String("Created by ShieldGnrtr7#2909"), Vector(58, 30, 154), 3, Do Not Clip,
+			Visible To, Blue, Default Visibility);
+		Create In-World Text(All Players(All Teams), Custom String("Last Updated 2020-06-10"), Vector(58, 30, 157), 2, Do Not Clip,
+			Visible To, Green, Default Visibility);
 	}
 }
 
