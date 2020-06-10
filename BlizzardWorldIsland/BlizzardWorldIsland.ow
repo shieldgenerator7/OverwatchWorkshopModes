@@ -3,6 +3,7 @@ variables
 	global:
 		2: testPlatformPos
 		3: testPlatformRadius
+		4: PLATFORM_LAND_THRESHOLD_Y
 }
 
 rule("Game Setup")
@@ -16,6 +17,7 @@ rule("Game Setup")
 	{
 		Global.testPlatformPos = Vector(58, -5, 154);
 		Global.testPlatformRadius = 20;
+		Global.PLATFORM_LAND_THRESHOLD_Y = 0.400;
 	}
 }
 
@@ -48,10 +50,6 @@ rule("==TEST== Player Spawn (Position HUD)")
 		All;
 	}
 
-	conditions
-	{
-	}
-
 	actions
 	{
 		Create HUD Text(Event Player, Custom String("POS: {0}", Position Of(Event Player)), Null, Null, Left, 0, White, White, White,
@@ -74,7 +72,8 @@ rule("Player lands on platform")
 		Distance Between(Vector(X Component Of(Position Of(Event Player)), 0, Z Component Of(Position Of(Event Player))), Vector(
 			X Component Of(Global.testPlatformPos), 0, Z Component Of(Global.testPlatformPos))) <= Global.testPlatformRadius;
 		"If the player's vertical position is really close to the platform's vertical position"
-		Absolute Value(Y Component Of(Position Of(Event Player)) - Y Component Of(Global.testPlatformPos)) <= True;
+		Absolute Value(Y Component Of(Position Of(Event Player)) - Y Component Of(Global.testPlatformPos))
+			<= Global.PLATFORM_LAND_THRESHOLD_Y;
 	}
 
 	actions
@@ -150,4 +149,49 @@ rule("== TEST== Manual teleport to island")
 	{
 		Teleport(Event Player, Vector(58, 15, 154));
 	}
+rule("Player is no longer on platform horizontally")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		"Player is not already on a platform"
+		Event Player.platFormIndex >= 0;
+		"If the player's horizontal position is in the platform's radius"
+		Distance Between(Vector(X Component Of(Position Of(Event Player)), 0, Z Component Of(Position Of(Event Player))), Vector(
+			X Component Of(Global.testPlatformPos), 0, Z Component Of(Global.testPlatformPos))) > Global.testPlatformRadius;
+	}
+
+	actions
+	{
+	}
+}
+
+rule("Player is no longer on platform vertically")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		"Player is not already on a platform"
+		Event Player.platFormIndex >= 0;
+		"If the player's vertical position is really close to the platform's vertical position"
+		Absolute Value(Y Component Of(Position Of(Event Player)) - Y Component Of(Global.testPlatformPos))
+			> Global.PLATFORM_LAND_THRESHOLD_Y;
+	}
+
+	actions
+	{
+	}
+}
 }
