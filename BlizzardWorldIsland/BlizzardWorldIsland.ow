@@ -4,7 +4,6 @@ variables
 		0: platformPosList
 		1: platformRadiusList
 		2: PLATFORM_LAND_THRESHOLD_Y
-		3: _i_
 
 	player:
 		0: platformIndex
@@ -30,31 +29,15 @@ rule("Game Setup")
 	actions
 	{
 		Global.PLATFORM_LAND_THRESHOLD_Y = 0.400;
-		Global.platformPosList = Empty Array;
-		Global.platformRadiusList = Empty Array;
-		"Island Platform Base"
-		disabled Modify Global Variable(platformPosList, Append To Array, Vector(58, -5, 154));
-		disabled Modify Global Variable(platformRadiusList, Append To Array, 15);
-		"Island Platform Hut 1"
-		disabled Modify Global Variable(platformPosList, Append To Array, Vector(66, -2.400, 148.500));
-		disabled Modify Global Variable(platformRadiusList, Append To Array, 3);
-		"Island Platform Hut 2"
-		disabled Modify Global Variable(platformPosList, Append To Array, Vector(59, -1.200, 161));
-		disabled Modify Global Variable(platformRadiusList, Append To Array, 5);
-		"Show visuals for all platforms"
-		disabled For Global Variable(_i_, 1, Count Of(Global.platformPosList), 1);
-		disabled Create Effect(All Players(All Teams), Light Shaft, White, Global.platformPosList[Global._i_],
-			Global.platformRadiusList[Global._i_], Visible To Position and Radius);
-		disabled End;
 		Global.platformPosList = Array(Vector(58, -5, 154), Vector(65.769, -3.279, 148.106), Vector(59.429, -1.961, 161.150));
 		Global.platformRadiusList = Array(15, 3, 3);
 		"Show visuals for first platform (Island Platform Base)"
 		Create Effect(All Players(All Teams), Ring, White, Global.platformPosList[0], Global.platformRadiusList[0], Visible To);
 		"Show visuals for first platform (Island Platform Base)"
-		Create Effect(All Players(All Teams), Light Shaft, White, Global.platformPosList[1], Global.platformRadiusList[1],
+		disabled Create Effect(All Players(All Teams), Light Shaft, White, Global.platformPosList[1], Global.platformRadiusList[1],
 			Visible To Position and Radius);
 		"Show visuals for first platform (Island Platform Base)"
-		Create Effect(All Players(All Teams), Light Shaft, White, Global.platformPosList[2], Global.platformRadiusList[2],
+		disabled Create Effect(All Players(All Teams), Light Shaft, White, Global.platformPosList[2], Global.platformRadiusList[2],
 			Visible To Position and Radius);
 	}
 }
@@ -214,13 +197,8 @@ rule("Player Set Platform On")
 	actions
 	{
 		Set Gravity(Event Player, 0);
-		disabled If(Y Component Of(Velocity Of(Event Player)) < 0);
 		Apply Impulse(Event Player, Up, 0.100, To World, Cancel Contrary Motion);
 		Apply Impulse(Event Player, Down, 0.100, To World, Incorporate Contrary Motion);
-		"Bounce the player up"
-		disabled Apply Impulse(Event Player, Vector(0, Y Component Of(Velocity Of(Event Player)) * -1, 0), 0, To World,
-			Incorporate Contrary Motion);
-		disabled End;
 		Event Player.platformPos = Global.platformPosList[Event Player.platformIndex];
 		Event Player.platformRadius = Global.platformRadiusList[Event Player.platformIndex];
 		Teleport(Event Player, Vector(X Component Of(Position Of(Event Player)), Y Component Of(Event Player.platformPos), Z Component Of(
@@ -264,16 +242,6 @@ rule("Stop when not intentionally moving")
 		Apply Impulse(Event Player, Vector(X Component Of(Velocity Of(Event Player)), 0, Z Component Of(Velocity Of(Event Player))) * -1,
 			Square Root(X Component Of(Velocity Of(Event Player)) ^ 2 + Z Component Of(Velocity Of(Event Player)) ^ 2) * 0.100, To World,
 			Incorporate Contrary Motion);
-		disabled Apply Impulse(Event Player, Vector(0, 0, Z Component Of(Velocity Of(Event Player))) * -1, Absolute Value(Z Component Of(
-			Velocity Of(Event Player))), To World, Incorporate Contrary Motion);
-		disabled Set Status(Event Player, Null, Stunned, 9999);
-		disabled Clear Status(Event Player, Stunned);
-		disabled Apply Impulse(Event Player, Left, 0.100, To World, Cancel Contrary Motion);
-		disabled Apply Impulse(Event Player, Right, 0.100, To World, Cancel Contrary Motion);
-		disabled Apply Impulse(Event Player, Left, 0.100, To World, Incorporate Contrary Motion);
-		disabled Apply Impulse(Event Player, Forward, 0.100, To World, Cancel Contrary Motion);
-		disabled Apply Impulse(Event Player, Backward, 0.100, To World, Cancel Contrary Motion);
-		disabled Apply Impulse(Event Player, Forward, 0.100, To World, Incorporate Contrary Motion);
 		Wait(0.016, Ignore Condition);
 		Loop If Condition Is True;
 	}
