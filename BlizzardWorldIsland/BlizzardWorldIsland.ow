@@ -30,7 +30,7 @@ rule("Game Setup")
 	}
 }
 
-rule("==TEST== Player Teleport")
+rule("Player Spawns In, Teleport to Island, Set Vars")
 {
 	event
 	{
@@ -41,29 +41,33 @@ rule("==TEST== Player Teleport")
 
 	conditions
 	{
-		Is Button Held(Event Player, Crouch) == True;
+		Has Spawned(Event Player) == True;
 	}
 
 	actions
 	{
-		Teleport(Event Player, Position Of(Event Player) + Facing Direction Of(Event Player) * 10);
+		Teleport(Event Player, Vector(58, 15, 154));
+		Event Player.platFormIndex = -1;
 	}
 }
 
-rule("==TEST== Player Spawn (Position HUD)")
+rule("Player Respawns, Teleport to Island")
 {
 	event
 	{
-		Player Joined Match;
+		Ongoing - Each Player;
 		All;
 		All;
 	}
 
+	conditions
+	{
+		Is Alive(Event Player) == True;
+	}
+
 	actions
 	{
-		Create HUD Text(Event Player, Custom String("POS: {0}", Position Of(Event Player)), Null, Null, Left, 0, White, White, White,
-			Visible To and String, Default Visibility);
-		Event Player.platFormIndex = -1;
+		Teleport(Event Player, Vector(58, 15, 154));
 	}
 }
 
@@ -94,66 +98,6 @@ rule("Player lands on platform")
 	}
 }
 
-rule("Player Spawns In, Teleport to Island")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		All;
-	}
-
-	conditions
-	{
-		Is Alive(Event Player) == True;
-	}
-
-	actions
-	{
-		Teleport(Event Player, Vector(58, 15, 154));
-	}
-}
-
-disabled rule("Player Spawns In, Teleport to Island")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		All;
-	}
-
-	conditions
-	{
-		Has Spawned(Event Player) == True;
-	}
-
-	actions
-	{
-		Teleport(Event Player, Vector(58, 15, 154));
-	}
-}
-
-rule("== TEST== Manual teleport to island")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		All;
-	}
-
-	conditions
-	{
-		Is Button Held(Event Player, Interact) == True;
-	}
-
-	actions
-	{
-		Teleport(Event Player, Vector(58, 15, 154));
-	}
-}
-
 rule("Player jumps while on platform")
 {
 	event
@@ -171,7 +115,7 @@ rule("Player jumps while on platform")
 
 	actions
 	{
-		Apply Impulse(Event Player, Up, 5, To World, Cancel Contrary Motion);
+		Apply Impulse(Event Player, Up, 10, To World, Cancel Contrary Motion);
 		Call Subroutine(playerSetPlatformOff);
 	}
 }
@@ -263,4 +207,22 @@ rule("Player Set Platform Off")
 	}
 }
 
+rule("== TEST== Manual teleport to island")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Interact) == True;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Vector(58, 15, 154));
+	}
 }
