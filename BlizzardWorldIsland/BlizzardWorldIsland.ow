@@ -4,12 +4,14 @@ variables
 		0: platformPosList
 		1: platformRadiusList
 		2: PLATFORM_LAND_THRESHOLD_Y
+		3: _i_
 
 	player:
 		0: platformIndex
 		1: platformPos
 		2: platformRadius
 		3: _i_
+		4: pickupIndex
 }
 
 subroutines
@@ -39,6 +41,21 @@ rule("Game Setup")
 		"Island Platform Hut 2"
 		Modify Global Variable(platformPosList, Append To Array, Vector(59, -1.200, 161));
 		Modify Global Variable(platformRadiusList, Append To Array, 5);
+		"Show visuals for all platforms"
+		disabled For Global Variable(_i_, 1, Count Of(Global.platformPosList), 1);
+		disabled Create Effect(All Players(All Teams), Light Shaft, White, Global.platformPosList[Global._i_],
+			Global.platformRadiusList[Global._i_], Visible To Position and Radius);
+		disabled End;
+		Global.platformPosList = Array(Vector(58, -5, 154), Vector(65.769, -3.279, 148.106), Vector(59.429, -1.961, 161.150));
+		Global.platformRadiusList = Array(15, 3, 3);
+		"Show visuals for first platform (Island Platform Base)"
+		Create Effect(All Players(All Teams), Ring, White, Global.platformPosList[0], Global.platformRadiusList[0], Visible To);
+		"Show visuals for first platform (Island Platform Base)"
+		Create Effect(All Players(All Teams), Light Shaft, White, Global.platformPosList[1], Global.platformRadiusList[1],
+			Visible To Position and Radius);
+		"Show visuals for first platform (Island Platform Base)"
+		Create Effect(All Players(All Teams), Light Shaft, White, Global.platformPosList[2], Global.platformRadiusList[2],
+			Visible To Position and Radius);
 	}
 }
 
@@ -128,6 +145,7 @@ rule("Player jumps while on platform")
 	{
 		Event Player.platformIndex >= 0;
 		Is Button Held(Event Player, Jump) == True;
+		Hero Of(Event Player) != Hero(Pharah);
 	}
 
 	actions
@@ -238,6 +256,7 @@ rule("Stop when not intentionally moving")
 	{
 		Throttle Of(Event Player) == Vector(0, 0, 0);
 		(X Component Of(Velocity Of(Event Player)) != 0 || Z Component Of(Velocity Of(Event Player)) != 0) == True;
+		disabled Absolute Value(Square Root(0 ^ 0)) == True;
 	}
 
 	actions
@@ -245,6 +264,16 @@ rule("Stop when not intentionally moving")
 		Apply Impulse(Event Player, Vector(X Component Of(Velocity Of(Event Player)), 0, Z Component Of(Velocity Of(Event Player))) * -1,
 			Square Root(X Component Of(Velocity Of(Event Player)) ^ 2 + Z Component Of(Velocity Of(Event Player)) ^ 2) * 0.100, To World,
 			Incorporate Contrary Motion);
+		disabled Apply Impulse(Event Player, Vector(0, 0, Z Component Of(Velocity Of(Event Player))) * -1, Absolute Value(Z Component Of(
+			Velocity Of(Event Player))), To World, Incorporate Contrary Motion);
+		disabled Set Status(Event Player, Null, Stunned, 9999);
+		disabled Clear Status(Event Player, Stunned);
+		disabled Apply Impulse(Event Player, Left, 0.100, To World, Cancel Contrary Motion);
+		disabled Apply Impulse(Event Player, Right, 0.100, To World, Cancel Contrary Motion);
+		disabled Apply Impulse(Event Player, Left, 0.100, To World, Incorporate Contrary Motion);
+		disabled Apply Impulse(Event Player, Forward, 0.100, To World, Cancel Contrary Motion);
+		disabled Apply Impulse(Event Player, Backward, 0.100, To World, Cancel Contrary Motion);
+		disabled Apply Impulse(Event Player, Forward, 0.100, To World, Incorporate Contrary Motion);
 		Wait(0.016, Ignore Condition);
 		Loop If Condition Is True;
 	}
@@ -267,5 +296,251 @@ rule("== TEST== Manual teleport to island")
 	actions
 	{
 		Teleport(Event Player, Vector(58, 15, 154));
+	}
+}
+
+rule("==TEST== Pickup platform (make one if none found)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Host Player == True;
+		Is Button Held(Event Player, Ultimate) == True;
+	}
+
+	actions
+	{
+		Event Player.pickupIndex = -1;
+		For Player Variable(Event Player, _i_, 1, Count Of(Global.platformPosList), 1);
+			If(Distance Between(Vector(X Component Of(Position Of(Event Player)), 0, Z Component Of(Position Of(Event Player))), Vector(
+				X Component Of(Global.platformPosList[Event Player._i_]), 0, Z Component Of(Global.platformPosList[Event Player._i_])))
+				<= Global.platformRadiusList[Event Player._i_] && Absolute Value(Y Component Of(Position Of(Event Player)) - Y Component Of(
+				Global.platformPosList[Event Player._i_])) <= Global.PLATFORM_LAND_THRESHOLD_Y * 3);
+				Event Player.pickupIndex = Event Player._i_;
+				Break;
+			End;
+		End;
+		If(Event Player.pickupIndex < 0);
+			"Island Platform Base"
+			Modify Global Variable(platformPosList, Append To Array, Position Of(Event Player));
+			Modify Global Variable(platformRadiusList, Append To Array, 5);
+			Event Player.pickupIndex = Count Of(Global.platformPosList) - 1;
+			Small Message(All Players(All Teams), Custom String("Created Platform {0}", Event Player.pickupIndex));
+		Else;
+			Teleport(Event Player, Global.platformPosList[Event Player.pickupIndex]);
+			Small Message(Event Player, Custom String("Picked up Platform {0}", Event Player.pickupIndex));
+		End;
+	}
+}
+
+rule("==TEST== Move platform while picked up")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Host Player == True;
+		Hero Of(Event Player) == Hero(Pharah);
+		Event Player.pickupIndex >= 1;
+	}
+
+	actions
+	{
+		Global.platformPosList[Event Player.pickupIndex] = Position Of(Event Player);
+		Wait(0.016, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("==TEST== Put down platform")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Host Player == True;
+		Is Button Held(Event Player, Ability 2) == True;
+	}
+
+	actions
+	{
+		Small Message(All Players(All Teams), Custom String("Put down Platform {0}", Event Player.pickupIndex));
+		Event Player.pickupIndex = -1;
+	}
+}
+
+rule("==TEST== Make Pharah immune to gravity")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		Pharah;
+	}
+
+	conditions
+	{
+		Host Player == True;
+		Hero Of(Event Player) == Hero(Pharah);
+	}
+
+	actions
+	{
+		Set Gravity(Event Player, 0);
+		Event Player.pickupIndex = -1;
+	}
+}
+
+rule("==TEST== Pharah: crouch to go down")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Host Player == True;
+		Hero Of(Event Player) == Hero(Pharah);
+		Is Button Held(Event Player, Crouch) == True;
+	}
+
+	actions
+	{
+		Set Gravity(Event Player, 0);
+		Apply Impulse(Event Player, Down, 1, To World, Cancel Contrary Motion);
+	}
+}
+
+rule("==TEST== Pharah: crouch to go down (stop)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Host Player == True;
+		Hero Of(Event Player) == Hero(Pharah);
+		Is Button Held(Event Player, Crouch) == False;
+	}
+
+	actions
+	{
+		Set Gravity(Event Player, 0);
+		Apply Impulse(Event Player, Up, 1, To World, Incorporate Contrary Motion);
+	}
+}
+
+rule("==TEST== Pharah: space to go up")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Host Player == True;
+		Hero Of(Event Player) == Hero(Pharah);
+		Is Button Held(Event Player, Jump) == True;
+	}
+
+	actions
+	{
+		Set Gravity(Event Player, 0);
+		Apply Impulse(Event Player, Up, 1, To World, Cancel Contrary Motion);
+	}
+}
+
+rule("==TEST== Pharah: space to go up (stop)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Host Player == True;
+		Hero Of(Event Player) == Hero(Pharah);
+		Is Button Held(Event Player, Jump) == False;
+	}
+
+	actions
+	{
+		Set Gravity(Event Player, 0);
+		Apply Impulse(Event Player, Down, 1, To World, Incorporate Contrary Motion);
+	}
+}
+
+rule("==TEST== Turn into echo")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Pharah;
+	}
+
+	conditions
+	{
+		Host Player == True;
+		Hero Of(Event Player) == Hero(Pharah);
+		Is Communicating Any Voice line(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Gravity(Event Player, 100);
+		Start Forcing Player To Be Hero(Event Player, Hero(Echo));
+	}
+}
+
+rule("==TEST== Turn into pharah")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Echo;
+	}
+
+	conditions
+	{
+		Host Player == True;
+		Hero Of(Event Player) == Hero(Echo);
+		Is Button Held(Event Player, Ultimate) == True;
+	}
+
+	actions
+	{
+		Set Gravity(Event Player, 0);
+		Start Forcing Player To Be Hero(Event Player, Hero(Pharah));
 	}
 }
