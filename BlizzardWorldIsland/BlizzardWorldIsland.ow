@@ -43,6 +43,7 @@ rule("Game Setup")
 			Visible To, Blue, Default Visibility);
 		Create In-World Text(All Players(All Teams), Custom String("Last Updated 2020-06-10"), Vector(58, 30, 157), 2, Do Not Clip,
 			Visible To, Green, Default Visibility);
+		Disable Inspector Recording;
 	}
 }
 
@@ -271,7 +272,7 @@ rule("== TEST== Manual teleport to island")
 	}
 }
 
-rule("==TEST== Pickup platform (make one if none found)")
+disabled rule("==TEST== Pickup platform (make one if none found)")
 {
 	event
 	{
@@ -311,7 +312,7 @@ rule("==TEST== Pickup platform (make one if none found)")
 	}
 }
 
-rule("==TEST== Move platform while picked up")
+disabled rule("==TEST== Move platform while picked up")
 {
 	event
 	{
@@ -335,7 +336,7 @@ rule("==TEST== Move platform while picked up")
 	}
 }
 
-rule("==TEST== Put down platform")
+disabled rule("==TEST== Put down platform")
 {
 	event
 	{
@@ -357,7 +358,7 @@ rule("==TEST== Put down platform")
 	}
 }
 
-rule("==TEST== Make Pharah immune to gravity")
+disabled rule("==TEST== Make Pharah immune to gravity")
 {
 	event
 	{
@@ -379,7 +380,7 @@ rule("==TEST== Make Pharah immune to gravity")
 	}
 }
 
-rule("==TEST== Pharah: crouch to go down")
+disabled rule("==TEST== Pharah: crouch to go down")
 {
 	event
 	{
@@ -402,7 +403,7 @@ rule("==TEST== Pharah: crouch to go down")
 	}
 }
 
-rule("==TEST== Pharah: crouch to go down (stop)")
+disabled rule("==TEST== Pharah: crouch to go down (stop)")
 {
 	event
 	{
@@ -425,7 +426,7 @@ rule("==TEST== Pharah: crouch to go down (stop)")
 	}
 }
 
-rule("==TEST== Pharah: space to go up")
+disabled rule("==TEST== Pharah: space to go up")
 {
 	event
 	{
@@ -448,7 +449,7 @@ rule("==TEST== Pharah: space to go up")
 	}
 }
 
-rule("==TEST== Pharah: space to go up (stop)")
+disabled rule("==TEST== Pharah: space to go up (stop)")
 {
 	event
 	{
@@ -471,7 +472,7 @@ rule("==TEST== Pharah: space to go up (stop)")
 	}
 }
 
-rule("==TEST== Turn into echo")
+disabled rule("==TEST== Turn into echo")
 {
 	event
 	{
@@ -494,7 +495,7 @@ rule("==TEST== Turn into echo")
 	}
 }
 
-rule("==TEST== Turn into pharah")
+disabled rule("==TEST== Turn into pharah")
 {
 	event
 	{
