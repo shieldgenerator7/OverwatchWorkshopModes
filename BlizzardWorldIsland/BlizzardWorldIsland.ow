@@ -4,6 +4,15 @@ variables
 		2: testPlatformPos
 		3: testPlatformRadius
 		4: PLATFORM_LAND_THRESHOLD_Y
+
+	player:
+		0: platFormIndex
+}
+
+subroutines
+{
+	0: playerSetPlatformOn
+	1: playerSetPlatformOff
 }
 
 rule("Game Setup")
@@ -54,6 +63,7 @@ rule("==TEST== Player Spawn (Position HUD)")
 	{
 		Create HUD Text(Event Player, Custom String("POS: {0}", Position Of(Event Player)), Null, Null, Left, 0, White, White, White,
 			Visible To and String, Default Visibility);
+		Event Player.platFormIndex = -1;
 	}
 }
 
@@ -68,6 +78,8 @@ rule("Player lands on platform")
 
 	conditions
 	{
+		"Player is not already on a platform"
+		Event Player.platFormIndex < 0;
 		"If the player's horizontal position is in the platform's radius"
 		Distance Between(Vector(X Component Of(Position Of(Event Player)), 0, Z Component Of(Position Of(Event Player))), Vector(
 			X Component Of(Global.testPlatformPos), 0, Z Component Of(Global.testPlatformPos))) <= Global.testPlatformRadius;
@@ -78,16 +90,7 @@ rule("Player lands on platform")
 
 	actions
 	{
-		If(Y Component Of(Velocity Of(Event Player)) < 0);
-			Apply Impulse(Event Player, Up, 0.100, To World, Cancel Contrary Motion);
-			Apply Impulse(Event Player, Down, 0.100, To World, Incorporate Contrary Motion);
-			"Bounce the player up"
-			disabled Apply Impulse(Event Player, Vector(0, Y Component Of(Velocity Of(Event Player)) * -1, 0), 0, To World,
-				Incorporate Contrary Motion);
-		End;
-		Set Gravity(Event Player, 0);
-		Teleport(Event Player, Vector(X Component Of(Position Of(Event Player)), Y Component Of(Global.testPlatformPos), Z Component Of(
-			Position Of(Event Player))));
+		Call Subroutine(playerSetPlatformOn);
 	}
 }
 
@@ -149,6 +152,30 @@ rule("== TEST== Manual teleport to island")
 	{
 		Teleport(Event Player, Vector(58, 15, 154));
 	}
+}
+
+rule("Player jumps while on platform")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.platFormIndex >= 0;
+		Is Button Held(Event Player, Jump) == True;
+	}
+
+	actions
+	{
+		Apply Impulse(Event Player, Up, 5, To World, Cancel Contrary Motion);
+		Call Subroutine(playerSetPlatformOff);
+	}
+}
+
 rule("Player is no longer on platform horizontally")
 {
 	event
@@ -169,6 +196,7 @@ rule("Player is no longer on platform horizontally")
 
 	actions
 	{
+		Call Subroutine(playerSetPlatformOff);
 	}
 }
 
@@ -192,6 +220,47 @@ rule("Player is no longer on platform vertically")
 
 	actions
 	{
+		Call Subroutine(playerSetPlatformOff);
 	}
 }
+
+rule("Player Set Platform On")
+{
+	event
+	{
+		Subroutine;
+		playerSetPlatformOn;
+	}
+
+	actions
+	{
+		Set Gravity(Event Player, 0);
+		disabled If(Y Component Of(Velocity Of(Event Player)) < 0);
+		Apply Impulse(Event Player, Up, 0.100, To World, Cancel Contrary Motion);
+		Apply Impulse(Event Player, Down, 0.100, To World, Incorporate Contrary Motion);
+		"Bounce the player up"
+		disabled Apply Impulse(Event Player, Vector(0, Y Component Of(Velocity Of(Event Player)) * -1, 0), 0, To World,
+			Incorporate Contrary Motion);
+		disabled End;
+		Teleport(Event Player, Vector(X Component Of(Position Of(Event Player)), Y Component Of(Global.testPlatformPos), Z Component Of(
+			Position Of(Event Player))));
+		Event Player.platFormIndex = 0;
+	}
+}
+
+rule("Player Set Platform Off")
+{
+	event
+	{
+		Subroutine;
+		playerSetPlatformOff;
+	}
+
+	actions
+	{
+		Set Gravity(Event Player, 100);
+		Event Player.platFormIndex = -1;
+	}
+}
+
 }
