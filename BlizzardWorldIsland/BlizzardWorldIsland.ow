@@ -43,21 +43,19 @@ rule("==TEST== Player Spawn (Position HUD)")
 {
 	event
 	{
-		Ongoing - Each Player;
+		Player Joined Match;
 		All;
 		All;
 	}
 
 	conditions
 	{
-		Is Alive(Event Player) == True;
-		Has Spawned(Event Player) == True;
 	}
 
 	actions
 	{
-		Create HUD Text(All Players(All Teams), Custom String("POS: {0}", Position Of(Event Player)), Null, Null, Left, 0, White, White,
-			White, Visible To and String, Default Visibility);
+		Create HUD Text(Event Player, Custom String("POS: {0}", Position Of(Event Player)), Null, Null, Left, 0, White, White, White,
+			Visible To and String, Default Visibility);
 	}
 }
 
