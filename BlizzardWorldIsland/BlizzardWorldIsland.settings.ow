@@ -1,0 +1,61 @@
+settings
+{
+	lobby
+	{
+		Max FFA Players: 8
+	}
+
+	modes
+	{
+		Deathmatch
+		{
+			enabled maps
+			{
+				Blizzard World
+				Blizzard World Winter
+			}
+		}
+
+		General
+		{
+			Limit Roles: 2 Of Each Role Per Team
+			Respawn As Random Hero: On
+		}
+	}
+
+	heroes
+	{
+		General
+		{
+			Ability Cooldown Time: 0%
+			Healing Dealt: 50%
+			Health: 200%
+			No Ammunition Requirement: On
+			Spawn With Ultimate Ready: On
+			Ultimate Generation: 500%
+			Ultimate Generation - Combat: 500%
+			Ultimate Generation - Passive: 500%
+
+			Echo
+			{
+				Flight Cooldown Time: 0%
+				Focusing Beam: Off
+				Sticky Bombs: Off
+				Ultimate Ability Duplicate: Off
+			}
+
+			Pharah
+			{
+				Concussive Blast: Off
+				Hover Jets: Off
+				Jump Jet: Off
+			}
+
+			disabled heroes
+			{
+				Echo
+				Pharah
+			}
+		}
+	}
+}
