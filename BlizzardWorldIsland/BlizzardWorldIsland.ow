@@ -517,3 +517,26 @@ disabled rule("==TEST== Turn into pharah")
 		Start Forcing Player To Be Hero(Event Player, Hero(Pharah));
 	}
 }
+
+rule("==AI== Dummy Bot Spawn In")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Start Holding Button(Event Player, Primary Fire);
+	}
+}
+
+}
