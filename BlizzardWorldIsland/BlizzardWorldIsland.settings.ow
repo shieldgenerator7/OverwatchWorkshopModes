@@ -1,8 +1,14 @@
 settings
 {
+	main
+	{
+		Description: "Tiny OW Island but the Island is Tiny"
+	}
+
 	lobby
 	{
-		Max FFA Players: 8
+		Allow Players Who Are In Queue: Yes
+		Match Voice Chat: Enabled
 	}
 
 	modes
