@@ -3,13 +3,13 @@ variables
 	global:
 		0: platformPosList
 		1: platformRadiusList
-		2: testPlatformPos
-		3: testPlatformRadius
-		4: PLATFORM_LAND_THRESHOLD_Y
+		2: PLATFORM_LAND_THRESHOLD_Y
 
 	player:
 		0: platformIndex
-		2: _i_
+		1: platformPos
+		2: platformRadius
+		3: _i_
 }
 
 subroutines
@@ -27,8 +27,6 @@ rule("Game Setup")
 
 	actions
 	{
-		Global.testPlatformPos = Vector(58, -5, 154);
-		Global.testPlatformRadius = 20;
 		Global.PLATFORM_LAND_THRESHOLD_Y = 0.400;
 		Global.platformPosList = Empty Array;
 		Global.platformRadiusList = Empty Array;
@@ -79,6 +77,38 @@ rule("Player Respawns, Teleport to Island")
 	}
 }
 
+rule("Player lands on platform in list")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		"Player is not already on a platform"
+		Event Player.platformIndex < 0;
+	}
+
+	actions
+	{
+		For Player Variable(Event Player, _i_, 0, Count Of(Global.platformPosList), 1);
+			If(Distance Between(Vector(X Component Of(Position Of(Event Player)), 0, Z Component Of(Position Of(Event Player))), Vector(
+				X Component Of(Global.platformPosList[Event Player._i_]), 0, Z Component Of(Global.platformPosList[Event Player._i_])))
+				<= Global.platformRadiusList[Event Player._i_] && Absolute Value(Y Component Of(Position Of(Event Player)) - Y Component Of(
+				Global.platformPosList[Event Player._i_])) <= Global.PLATFORM_LAND_THRESHOLD_Y);
+				Event Player.platformIndex = Event Player._i_;
+				Call Subroutine(playerSetPlatformOn);
+				Break;
+			End;
+		End;
+		Wait(0.016, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
 rule("Player jumps while on platform")
 {
 	event
@@ -116,7 +146,7 @@ rule("Player is no longer on platform horizontally")
 		Event Player.platformIndex >= 0;
 		"If the player's horizontal position is in the platform's radius"
 		Distance Between(Vector(X Component Of(Position Of(Event Player)), 0, Z Component Of(Position Of(Event Player))), Vector(
-			X Component Of(Global.testPlatformPos), 0, Z Component Of(Global.testPlatformPos))) > Global.testPlatformRadius;
+			X Component Of(Event Player.platformPos), 0, Z Component Of(Event Player.platformPos))) > Event Player.platformRadius;
 	}
 
 	actions
@@ -139,7 +169,7 @@ rule("Player is no longer on platform vertically")
 		"Player is not already on a platform"
 		Event Player.platformIndex >= 0;
 		"If the player's vertical position is really close to the platform's vertical position"
-		Absolute Value(Y Component Of(Position Of(Event Player)) - Y Component Of(Global.testPlatformPos))
+		Absolute Value(Y Component Of(Position Of(Event Player)) - Y Component Of(Event Player.platformPos))
 			> Global.PLATFORM_LAND_THRESHOLD_Y;
 	}
 
@@ -167,8 +197,10 @@ rule("Player Set Platform On")
 		disabled Apply Impulse(Event Player, Vector(0, Y Component Of(Velocity Of(Event Player)) * -1, 0), 0, To World,
 			Incorporate Contrary Motion);
 		disabled End;
-		Teleport(Event Player, Vector(X Component Of(Position Of(Event Player)), Y Component Of(
-			Global.platformPosList[Event Player.platformIndex]), Z Component Of(Position Of(Event Player))));
+		Event Player.platformPos = Global.platformPosList[Event Player.platformIndex];
+		Event Player.platformRadius = Global.platformRadiusList[Event Player.platformIndex];
+		Teleport(Event Player, Vector(X Component Of(Position Of(Event Player)), Y Component Of(Event Player.platformPos), Z Component Of(
+			Position Of(Event Player))));
 	}
 }
 
@@ -204,37 +236,5 @@ rule("== TEST== Manual teleport to island")
 	actions
 	{
 		Teleport(Event Player, Vector(58, 15, 154));
-	}
-}
-
-rule("Player lands on platform in list")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		All;
-	}
-
-	conditions
-	{
-		"Player is not already on a platform"
-		Event Player.platformIndex < 0;
-	}
-
-	actions
-	{
-		For Player Variable(Event Player, _i_, 0, Count Of(Global.platformPosList), 1);
-			If(Distance Between(Vector(X Component Of(Position Of(Event Player)), 0, Z Component Of(Position Of(Event Player))), Vector(
-				X Component Of(Global.platformPosList[Event Player._i_]), 0, Z Component Of(Global.platformPosList[Event Player._i_])))
-				<= Global.platformRadiusList[Event Player._i_] && Absolute Value(Y Component Of(Position Of(Event Player)) - Y Component Of(
-				Global.platformPosList[Event Player._i_])) <= Global.PLATFORM_LAND_THRESHOLD_Y);
-				Event Player.platformIndex = Event Player._i_;
-				Call Subroutine(playerSetPlatformOn);
-				Break;
-			End;
-		End;
-		Wait(0.016, Ignore Condition);
-		Loop If Condition Is True;
 	}
 }
