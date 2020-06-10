@@ -225,6 +225,31 @@ rule("Player Set Platform Off")
 	}
 }
 
+rule("Stop when not intentionally moving")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Throttle Of(Event Player) == Vector(0, 0, 0);
+		(X Component Of(Velocity Of(Event Player)) != 0 || Z Component Of(Velocity Of(Event Player)) != 0) == True;
+	}
+
+	actions
+	{
+		Apply Impulse(Event Player, Vector(X Component Of(Velocity Of(Event Player)), 0, Z Component Of(Velocity Of(Event Player))) * -1,
+			Square Root(X Component Of(Velocity Of(Event Player)) ^ 2 + Z Component Of(Velocity Of(Event Player)) ^ 2) * 0.100, To World,
+			Incorporate Contrary Motion);
+		Wait(0.016, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
 rule("== TEST== Manual teleport to island")
 {
 	event
