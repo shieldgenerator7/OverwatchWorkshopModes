@@ -42,9 +42,9 @@ settings
 			Health: 200%
 			No Ammunition Requirement: On
 			Spawn With Ultimate Ready: On
-			Ultimate Generation: 500%
-			Ultimate Generation - Combat: 500%
-			Ultimate Generation - Passive: 500%
+			Ultimate Generation: 300%
+			Ultimate Generation - Combat: 300%
+			Ultimate Generation - Passive: 300%
 
 			Echo
 			{
