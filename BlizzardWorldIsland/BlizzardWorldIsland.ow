@@ -45,9 +45,9 @@ rule("Game Setup")
 		Create In-World Text(All Players(All Teams), Custom String("Last Updated 2020-06-10"), Vector(58, 30, 157), 2, Do Not Clip,
 			Visible To, Green, Default Visibility);
 		Disable Inspector Recording;
-		For Global Variable(_i_, 0, 3, 1);
-			Create Dummy Bot(Random Value In Array(All Heroes), All Teams, -1, Vector(0, 0, 0), Vector(0, 0, 0));
-		End;
+		disabled For Global Variable(_i_, 0, 3, 1);
+		disabled Create Dummy Bot(Random Value In Array(All Heroes), All Teams, -1, Vector(0, 0, 0), Vector(0, 0, 0));
+		disabled End;
 	}
 }
 
@@ -522,7 +522,7 @@ disabled rule("==TEST== Turn into pharah")
 	}
 }
 
-rule("==AI== Dummy Bot Spawn In")
+disabled rule("==AI== Dummy Bot Spawn In")
 {
 	event
 	{
