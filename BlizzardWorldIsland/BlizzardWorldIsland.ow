@@ -15,6 +15,7 @@ variables
 		2: platformRadius
 		3: _i_
 		4: pickupIndex
+		5: ultTargetList
 }
 
 subroutines
@@ -598,8 +599,11 @@ rule("Rein Earthshatter")
 
 	actions
 	{
-		Set Status(Filtered Array(Players in View Angle(Event Player, All Teams, 45),
-			Current Array Element.platformIndex == Event Player.platformIndex), Event Player, Knocked Down, 5);
 		Set Ultimate Charge(Event Player, 0);
+		Event Player.ultTargetList = Filtered Array(Players in View Angle(Event Player, All Teams, 45),
+			Current Array Element.platformIndex == Event Player.platformIndex);
+		Set Status(Event Player.ultTargetList, Event Player, Knocked Down, 5);
+		Damage(Event Player.ultTargetList, Event Player, 50);
+		Apply Impulse(Event Player.ultTargetList, Up, 3, To World, Cancel Contrary Motion);
 	}
 }
