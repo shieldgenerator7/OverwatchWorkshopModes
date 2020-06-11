@@ -256,6 +256,26 @@ rule("Stop when not intentionally moving")
 	}
 }
 
+rule("If player is not in island area, teleport them")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Position Of(Event Player), Global.platformPosList[0]) > Global.platformPosList[0] * 5;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Vector(58, 15, 154));
+	}
+}
+
 rule("== TEST== Manual teleport to island")
 {
 	event
@@ -540,25 +560,5 @@ disabled rule("==AI== Dummy Bot Spawn In")
 	actions
 	{
 		Start Holding Button(Event Player, Primary Fire);
-	}
-}
-
-rule("If player is not in island area, teleport them")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		All;
-	}
-
-	conditions
-	{
-		Is On Ground(Event Player) == True;
-	}
-
-	actions
-	{
-		Teleport(Event Player, Vector(58, 15, 154));
 	}
 }
