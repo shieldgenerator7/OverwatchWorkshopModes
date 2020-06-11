@@ -5,6 +5,8 @@ variables
 		1: platformRadiusList
 		2: PLATFORM_LAND_THRESHOLD_Y
 		3: _i_
+		4: minPlatformY
+		5: maxPlatformY
 
 	player:
 		0: platformIndex
@@ -48,6 +50,11 @@ rule("Game Setup")
 		disabled For Global Variable(_i_, 0, 3, 1);
 		disabled Create Dummy Bot(Random Value In Array(All Heroes), All Teams, -1, Vector(0, 0, 0), Vector(0, 0, 0));
 		disabled End;
+		"Calculate minPlatformY and maxPlatformY"
+		For Global Variable(_i_, 0, Count Of(Global.platformPosList), 1);
+			Modify Global Variable(minPlatformY, Min, Y Component Of(Global.platformPosList[Global._i_]));
+			Modify Global Variable(maxPlatformY, Max, Y Component Of(Global.platformPosList[Global._i_]));
+		End;
 	}
 }
 
@@ -105,6 +112,8 @@ rule("Player lands on platform in list")
 	{
 		"Player is not already on a platform"
 		Event Player.platformIndex < 0;
+		Y Component Of(Position Of(Event Player)) >= Global.minPlatformY;
+		Y Component Of(Position Of(Event Player)) <= Global.maxPlatformY;
 	}
 
 	actions
