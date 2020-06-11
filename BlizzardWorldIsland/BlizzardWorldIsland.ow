@@ -7,6 +7,7 @@ variables
 		3: _i_
 		4: minPlatformY
 		5: maxPlatformY
+		6: heroDisableUltimateList
 
 	player:
 		0: platformIndex
@@ -55,6 +56,7 @@ rule("Game Setup")
 			Modify Global Variable(minPlatformY, Min, Y Component Of(Global.platformPosList[Global._i_]));
 			Modify Global Variable(maxPlatformY, Max, Y Component Of(Global.platformPosList[Global._i_]));
 		End;
+		Global.heroDisableUltimateList = Array(Hero(Reinhardt));
 	}
 }
 
@@ -96,6 +98,11 @@ rule("Player Respawns, Teleport to Island")
 	actions
 	{
 		Teleport(Event Player, Vector(58, 15, 154));
+		If(Array Contains(Global.heroDisableUltimateList, Hero Of(Event Player)) == True);
+			Disallow Button(Event Player, Ultimate);
+		Else;
+			Allow Button(Event Player, Ultimate);
+		End;
 	}
 }
 
@@ -569,5 +576,30 @@ disabled rule("==AI== Dummy Bot Spawn In")
 	actions
 	{
 		Start Holding Button(Event Player, Primary Fire);
+	}
+}
+
+rule("Rein Earthshatter")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Is Button Held(Event Player, Ultimate) == True;
+		Event Player.platformIndex >= 0;
+		Ultimate Charge Percent(Event Player) == 100;
+	}
+
+	actions
+	{
+		Set Status(Filtered Array(Players in View Angle(Event Player, All Teams, 45),
+			Current Array Element.platformIndex == Event Player.platformIndex), Event Player, Knocked Down, 5);
+		Set Ultimate Charge(Event Player, 0);
 	}
 }
