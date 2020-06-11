@@ -69,23 +69,3 @@ settings
 		}
 	}
 }
-
-rule("If player is not in island area, teleport them")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		All;
-	}
-
-	conditions
-	{
-		Is On Ground(Event Player) == True;
-	}
-
-	actions
-	{
-		Teleport(Event Player, Vector(58, 15, 154));
-	}
-}
