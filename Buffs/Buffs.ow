@@ -116,7 +116,8 @@ rule("Rein tracks damage opponents")
 
 	actions
 	{
-		Event Player._reinTrailTargetList_ = All Living Players(Opposite Team Of(Team Of(Event Player)));
+		Event Player._reinTrailTargetList_ = Filtered Array(All Living Players(Opposite Team Of(Team Of(Event Player))),
+			Current Array Element != Event Player);
 		"For all enemy players,"
 		For Player Variable(Event Player, _i_, 0, Count Of(Event Player._reinTrailTargetList_), 1);
 			Event Player._reinTrailTarget_ = Event Player._reinTrailTargetList_[Event Player._i_];
