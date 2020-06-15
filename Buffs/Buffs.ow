@@ -31,8 +31,8 @@ rule("Game Setup")
 	actions
 	{
 		Global.REIN_TRAIL_RADIUS = 1;
-		Global.REIN_TRAIL_DPS = 40;
-		Global.REIN_TRAIL_DURATION = 10;
+		Global.REIN_TRAIL_DPS = 250;
+		Global.REIN_TRAIL_DURATION = 7;
 	}
 }
 
@@ -83,7 +83,6 @@ rule("Rein Charge - Make Trail")
 		End;
 		Wait(0.100, Ignore Condition);
 		Loop If Condition Is True;
-		Set Facing(Event Player, Facing Direction Of(Event Player) * -1, To World);
 		Wait(Global.REIN_TRAIL_DURATION, Ignore Condition);
 		While(Count Of(Event Player.reinTrailPoints) > 0);
 			Destroy Effect(Event Player.reinTrailEffectIds[0]);
