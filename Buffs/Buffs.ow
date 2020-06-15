@@ -8,6 +8,7 @@ variables
 	player:
 		0: reinTrailPoints
 		3: reinTrailEffectIds
+		5: _reinTrailLeft_
 }
 
 rule("Game Setup")
@@ -19,7 +20,7 @@ rule("Game Setup")
 
 	actions
 	{
-		Global.REIN_TRAIL_RADIUS = 2;
+		Global.REIN_TRAIL_RADIUS = 1;
 		Global.REIN_TRAIL_DPS = 40;
 		Global.REIN_TRAIL_DURATION = 5;
 	}
@@ -43,9 +44,17 @@ rule("Rein Charge - Make Trail")
 	actions
 	{
 		Modify Player Variable(Event Player, reinTrailPoints, Append To Array, Position Of(Event Player));
-		Create Effect(All Players(All Teams), Ring, Red, Event Player.reinTrailPoints[Count Of(Event Player.reinTrailPoints) - 1],
-			Global.REIN_TRAIL_RADIUS, None);
-		Modify Player Variable(Event Player, reinTrailEffectIds, Append To Array, Last Created Entity);
+		Event Player._reinTrailLeft_ = Global.REIN_TRAIL_RADIUS * Direction From Angles(Horizontal Facing Angle Of(Event Player) + 90, 0);
+		If(Count Of(Event Player.reinTrailPoints) > 1);
+			Create Beam Effect(All Players(All Teams), Bad Beam, Event Player.reinTrailPoints[Count Of(Event Player.reinTrailPoints)
+				- 2] + Event Player._reinTrailLeft_, Event Player.reinTrailPoints[Count Of(Event Player.reinTrailPoints)
+				- 1] + Event Player._reinTrailLeft_, Red, Visible To);
+			Modify Player Variable(Event Player, reinTrailEffectIds, Append To Array, Last Created Entity);
+			Create Beam Effect(All Players(All Teams), Bad Beam, Event Player.reinTrailPoints[Count Of(Event Player.reinTrailPoints)
+				- 2] - Event Player._reinTrailLeft_, Event Player.reinTrailPoints[Count Of(Event Player.reinTrailPoints)
+				- 1] - Event Player._reinTrailLeft_, Red, Visible To);
+			Modify Player Variable(Event Player, reinTrailEffectIds, Append To Array, Last Created Entity);
+		End;
 		Wait(0.160, Ignore Condition);
 		Loop If Condition Is True;
 		Set Facing(Event Player, Facing Direction Of(Event Player) * -1, To World);
@@ -54,10 +63,13 @@ rule("Rein Charge - Make Trail")
 		While(Count Of(Event Player.reinTrailPoints) > 0);
 			Destroy Effect(Event Player.reinTrailEffectIds[0]);
 			Modify Player Variable(Event Player, reinTrailEffectIds, Remove From Array By Index, 0);
+			Destroy Effect(Event Player.reinTrailEffectIds[0]);
+			Modify Player Variable(Event Player, reinTrailEffectIds, Remove From Array By Index, 0);
 			Modify Player Variable(Event Player, reinTrailPoints, Remove From Array By Index, 0);
 			Wait(0.250, Ignore Condition);
 		End;
 		Event Player.reinTrailPoints = Empty Array;
 		Event Player.reinTrailEffectIds = Empty Array;
+		Event Player._reinTrailLeft_ = Vector(0, 0, 0);
 	}
 }
