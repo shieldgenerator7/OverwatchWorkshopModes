@@ -1,0 +1,63 @@
+variables
+{
+	global:
+		0: REIN_TRAIL_RADIUS
+		1: REIN_TRAIL_DPS
+		2: REIN_TRAIL_DURATION
+
+	player:
+		0: reinTrailPoints
+		3: reinTrailEffectIds
+}
+
+rule("Game Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.REIN_TRAIL_RADIUS = 2;
+		Global.REIN_TRAIL_DPS = 40;
+		Global.REIN_TRAIL_DURATION = 5;
+	}
+}
+
+rule("Rein Charge - Make Trail")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Is Using Ability 1(Event Player) == True;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, reinTrailPoints, Append To Array, Position Of(Event Player));
+		Create Effect(All Players(All Teams), Ring, Red, Event Player.reinTrailPoints[Count Of(Event Player.reinTrailPoints) - 1],
+			Global.REIN_TRAIL_RADIUS, None);
+		Modify Player Variable(Event Player, reinTrailEffectIds, Append To Array, Last Created Entity);
+		Wait(0.160, Ignore Condition);
+		Loop If Condition Is True;
+		Set Facing(Event Player, Facing Direction Of(Event Player) * -1, To World);
+		Small Message(Event Player, Custom String("Rein Stopped Charging"));
+		Wait(Global.REIN_TRAIL_DURATION, Ignore Condition);
+		While(Count Of(Event Player.reinTrailPoints) > 0);
+			Destroy Effect(Event Player.reinTrailEffectIds[0]);
+			Modify Player Variable(Event Player, reinTrailEffectIds, Remove From Array By Index, 0);
+			Modify Player Variable(Event Player, reinTrailPoints, Remove From Array By Index, 0);
+			Wait(0.250, Ignore Condition);
+		End;
+		Event Player.reinTrailPoints = Empty Array;
+		Event Player.reinTrailEffectIds = Empty Array;
+	}
+}
