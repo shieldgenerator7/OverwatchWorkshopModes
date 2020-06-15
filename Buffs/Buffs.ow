@@ -7,12 +7,12 @@ variables
 
 	player:
 		0: reinTrailPoints
-		3: reinTrailEffectIds
-		4: _i_
+		1: reinTrailEffectIds
+		4: _reinTrailTargetList_
 		5: _reinTrailLeft_
-		6: reinTrailTargetList
-		7: _reinTrailTarget_
-		8: _result_
+		6: _reinTrailTarget_
+		7: _result_
+		8: _i_
 		9: _j_
 }
 
@@ -101,10 +101,10 @@ rule("Rein tracks damage opponents")
 
 	actions
 	{
-		Event Player.reinTrailTargetList = All Living Players(Opposite Team Of(Team Of(Event Player)));
+		Event Player._reinTrailTargetList_ = All Living Players(Opposite Team Of(Team Of(Event Player)));
 		"For all enemy players,"
-		For Player Variable(Event Player, _i_, 0, Count Of(Event Player.reinTrailTargetList), 1);
-			Event Player._reinTrailTarget_ = Event Player.reinTrailTargetList[Event Player._i_];
+		For Player Variable(Event Player, _i_, 0, Count Of(Event Player._reinTrailTargetList_), 1);
+			Event Player._reinTrailTarget_ = Event Player._reinTrailTargetList_[Event Player._i_];
 			"If that player is on the trail,"
 			Call Subroutine(ReinTrailContainsTarget);
 			If(Event Player._result_ == True);
