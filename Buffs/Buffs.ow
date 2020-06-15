@@ -101,29 +101,17 @@ rule("Rein tracks damage opponents")
 
 	actions
 	{
+		Event Player.reinTrailTargetList = All Living Players(Opposite Team Of(Team Of(Event Player)));
 		"For all enemy players,"
-		For Player Variable(Event Player, _i_, 0, Count Of(All Living Players(Opposite Team Of(Team Of(Event Player)))), 1);
-			Event Player._reinTrailTarget_ = All Living Players(Opposite Team Of(Team Of(Event Player)))[Event Player._i_];
-			"If the enemy is already in the trail target list,"
-			If(Array Contains(Event Player.reinTrailTargetList, Event Player._reinTrailTarget_) == True);
-				"But is no longer on the trail,"
-				Call Subroutine(ReinTrailContainsTarget);
-				If(Event Player._result_ == False);
-					"Remove player from target list"
-					Modify Player Variable(Event Player, reinTrailTargetList, Remove From Array By Value, Event Player._reinTrailTarget_);
-				End;
-			"Else if player is not in trail target list,"
-			Else;
-				"But is currently on the trail,"
-				Call Subroutine(ReinTrailContainsTarget);
-				If(Event Player._result_ == True);
-					"Add player to target list"
-					Modify Player Variable(Event Player, reinTrailTargetList, Append To Array, Event Player._reinTrailTarget_);
-				End;
+		For Player Variable(Event Player, _i_, 0, Count Of(Event Player.reinTrailTargetList), 1);
+			Event Player._reinTrailTarget_ = Event Player.reinTrailTargetList[Event Player._i_];
+			"If that player is on the trail,"
+			Call Subroutine(ReinTrailContainsTarget);
+			If(Event Player._result_ == True);
+				"Damage that player"
+				Damage(Event Player._reinTrailTarget_, Event Player, Global.REIN_TRAIL_DPS / 10);
 			End;
 		End;
-		"Damage players in target list"
-		Damage(Event Player.reinTrailTargetList, Event Player, Global.REIN_TRAIL_DPS / 10);
 		Wait(0.100, Ignore Condition);
 		Loop If Condition Is True;
 	}
