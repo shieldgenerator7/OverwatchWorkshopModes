@@ -8,7 +8,17 @@ variables
 	player:
 		0: reinTrailPoints
 		3: reinTrailEffectIds
+		4: _i_
 		5: _reinTrailLeft_
+		6: reinTrailTargetList
+		7: _reinTrailTarget_
+		8: _result_
+		9: _j_
+}
+
+subroutines
+{
+	0: ReinTrailContainsTarget
 }
 
 rule("Game Setup")
@@ -22,7 +32,7 @@ rule("Game Setup")
 	{
 		Global.REIN_TRAIL_RADIUS = 1;
 		Global.REIN_TRAIL_DPS = 40;
-		Global.REIN_TRAIL_DURATION = 5;
+		Global.REIN_TRAIL_DURATION = 10;
 	}
 }
 
@@ -55,7 +65,7 @@ rule("Rein Charge - Make Trail")
 				- 1] - Event Player._reinTrailLeft_, Red, Visible To);
 			Modify Player Variable(Event Player, reinTrailEffectIds, Append To Array, Last Created Entity);
 		End;
-		Wait(0.160, Ignore Condition);
+		Wait(0.100, Ignore Condition);
 		Loop If Condition Is True;
 		Set Facing(Event Player, Facing Direction Of(Event Player) * -1, To World);
 		Small Message(Event Player, Custom String("Rein Stopped Charging"));
@@ -66,10 +76,97 @@ rule("Rein Charge - Make Trail")
 			Destroy Effect(Event Player.reinTrailEffectIds[0]);
 			Modify Player Variable(Event Player, reinTrailEffectIds, Remove From Array By Index, 0);
 			Modify Player Variable(Event Player, reinTrailPoints, Remove From Array By Index, 0);
-			Wait(0.250, Ignore Condition);
+			Wait(0.100, Ignore Condition);
 		End;
 		Event Player.reinTrailPoints = Empty Array;
 		Event Player.reinTrailEffectIds = Empty Array;
 		Event Player._reinTrailLeft_ = Vector(0, 0, 0);
+	}
+}
+
+rule("Rein tracks damage opponents")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Count Of(Event Player.reinTrailPoints) > 0;
+	}
+
+	actions
+	{
+		"For all enemy players,"
+		For Player Variable(Event Player, _i_, 0, Count Of(All Living Players(Opposite Team Of(Team Of(Event Player)))), 1);
+			Event Player._reinTrailTarget_ = All Living Players(Opposite Team Of(Team Of(Event Player)))[Event Player._i_];
+			"If the enemy is already in the trail target list,"
+			If(Array Contains(Event Player.reinTrailTargetList, Event Player._reinTrailTarget_) == True);
+				"But is no longer on the trail,"
+				Call Subroutine(ReinTrailContainsTarget);
+				If(Event Player._result_ == False);
+					"Remove player from target list"
+					Modify Player Variable(Event Player, reinTrailTargetList, Remove From Array By Value, Event Player._reinTrailTarget_);
+				End;
+			"Else if player is not in trail target list,"
+			Else;
+				"But is currently on the trail,"
+				Call Subroutine(ReinTrailContainsTarget);
+				If(Event Player._result_ == True);
+					"Add player to target list"
+					Modify Player Variable(Event Player, reinTrailTargetList, Append To Array, Event Player._reinTrailTarget_);
+				End;
+			End;
+		End;
+		"Damage players in target list"
+		Damage(Event Player.reinTrailTargetList, Event Player, Global.REIN_TRAIL_DPS / 10);
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("ReinTrailContainsTarget(): _result_ = true when _reinTrailTarget_ is in range of one of the reinTrailPoints")
+{
+	event
+	{
+		Subroutine;
+		ReinTrailContainsTarget;
+	}
+
+	actions
+	{
+		Event Player._result_ = False;
+		For Player Variable(Event Player, _j_, 0, Count Of(Event Player.reinTrailPoints), 1);
+			If(Distance Between(Position Of(Event Player._reinTrailTarget_), Event Player.reinTrailPoints[Event Player._j_])
+				<= Global.REIN_TRAIL_RADIUS);
+				Event Player._result_ = True;
+				Break;
+			End;
+		End;
+	}
+}
+
+rule("==TEST== Create dummy")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player == Host Player;
+		Is Button Held(Event Player, Interact) == True;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Random Value In Array(All Heroes), All Teams, -1, Position Of(Event Player), Facing Direction Of(Event Player));
 	}
 }
