@@ -3,6 +3,27 @@ settings
 	modes
 	{
 		Deathmatch
+		{
+			enabled maps
+			{
+				Black Forest
+				Black Forest Winter
+				Castillo
+				Château Guillard
+				Château Guillard Halloween
+				Ecopoint: Antarctica
+				Ecopoint: Antarctica Winter
+				Eichenwalde
+				Eichenwalde Halloween
+				Necropolis
+				Petra
+				Workshop Chamber
+				Workshop Expanse
+				Workshop Expanse Night
+				Workshop Island
+				Workshop Island Night
+			}
+		}
 
 		General
 		{
