@@ -1,0 +1,34 @@
+settings
+{
+	modes
+	{
+		Deathmatch
+
+		General
+		{
+			Limit Roles: 2 Of Each Role Per Team
+		}
+	}
+
+	heroes
+	{
+		General
+		{
+			Widowmaker
+			{
+				Grappling Hook Cooldown Time: 10%
+				No Ammunition Requirement: On
+				No Automatic Fire: On
+				Quick Melee: Off
+				Receive Headshots Only: On
+				Venom Mine: Off
+			}
+
+			enabled heroes
+			{
+				Widowmaker
+			}
+		}
+	}
+}
+

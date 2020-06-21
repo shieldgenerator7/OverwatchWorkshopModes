@@ -1,0 +1,42 @@
+rule("Game Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Player is killed - go invisible")
+{
+	event
+	{
+		Player Dealt Final Blow;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Set Invisible(Victim, All);
+	}
+}
+
+rule("Player shoots - become visible")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Firing Primary(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Invisible(Event Player, None);
+	}
+}
