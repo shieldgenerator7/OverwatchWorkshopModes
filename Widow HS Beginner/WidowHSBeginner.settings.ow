@@ -1,5 +1,10 @@
 settings
 {
+	main
+	{
+		Description: "When you respawn you are invisible until you take a shot."
+	}
+
 	modes
 	{
 		Deathmatch
