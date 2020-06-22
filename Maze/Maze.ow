@@ -1,0 +1,76 @@
+variables
+{
+	global:
+		0: WALL_HEIGHT_VECTOR
+		1: wallListA
+		2: wallListB
+		3: wallEffectListA
+		4: wallEffectListB
+		5: _targetPlayer_
+		6: wallsHaveCollision
+		7: WALL_FORCE_MULTIPLIER
+		8: _i_
+}
+
+rule("Game Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.WALL_HEIGHT_VECTOR = Vector(0, 3, 0);
+		Global.wallListA = Array(Vector(0, 0, 0));
+		Global.wallListB = Array(Vector(5, 0, 5));
+		Global.wallEffectListA = Empty Array;
+		Global.wallEffectListB = Empty Array;
+		For Global Variable(_i_, 0, Count Of(Global.wallListA), 1);
+			Create Beam Effect(All Players(All Teams), Grapple Beam, Global.wallListA[Global._i_],
+				Global.wallListB[Global._i_] + Global.WALL_HEIGHT_VECTOR, White, Visible To);
+			Modify Global Variable(wallEffectListA, Append To Array, Last Created Entity);
+			Create Beam Effect(All Players(All Teams), Grapple Beam, Global.wallListB[Global._i_],
+				Global.wallListA[Global._i_] + Global.WALL_HEIGHT_VECTOR, White, Visible To);
+			Modify Global Variable(wallEffectListB, Append To Array, Last Created Entity);
+		End;
+		Global.wallsHaveCollision = True;
+		Global.WALL_FORCE_MULTIPLIER = 2;
+	}
+}
+
+rule("Test all walls for a player")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Count Of(Global.wallListA) > 0;
+		Global.wallsHaveCollision == True;
+	}
+
+	actions
+	{
+		For Global Variable(_i_, 0, Count Of(Global.wallListA), 1);
+			Global._targetPlayer_ = Ray Cast Hit Player(Global.wallListA[Global._i_], Global.wallListB[Global._i_] + Global.WALL_HEIGHT_VECTOR,
+				All Players(All Teams), Null, False);
+			If(Global._targetPlayer_ != Null);
+				Apply Impulse(Global._targetPlayer_, Velocity Of(Global._targetPlayer_) * -1, Speed Of(Global._targetPlayer_)
+					* Global.WALL_FORCE_MULTIPLIER, To World, Incorporate Contrary Motion);
+				Continue;
+			End;
+			Global._targetPlayer_ = Ray Cast Hit Player(Global.wallListB[Global._i_], Global.wallListA[Global._i_] + Global.WALL_HEIGHT_VECTOR,
+				All Players(All Teams), Null, False);
+			If(Global._targetPlayer_ != Null);
+				Apply Impulse(Global._targetPlayer_, Velocity Of(Global._targetPlayer_) * -1, Speed Of(Global._targetPlayer_)
+					* Global.WALL_FORCE_MULTIPLIER, To World, Incorporate Contrary Motion);
+				Continue;
+			End;
+		End;
+		Wait(0.020, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
