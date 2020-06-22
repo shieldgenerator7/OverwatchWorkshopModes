@@ -7,21 +7,8 @@ settings
 
 	modes
 	{
-		disabled Assault
-		{
-			Limit Roles: 2 Of Each Role Per Team
-		}
-
-		disabled Control
-		{
-			Limit Roles: 2 Of Each Role Per Team
-		}
-
 		Deathmatch
 		{
-			Hero Limit: Off
-			Score To Win: 20
-
 			enabled maps
 			{
 				Workshop Island
@@ -29,14 +16,13 @@ settings
 			}
 		}
 
-		disabled Escort
+		General
 		{
-			Limit Roles: 2 Of Each Role Per Team
+			Hero Limit: Off
+			Score To Win: 20
 		}
+	}
+}
 
-		disabled Hybrid
-		{
-			Limit Roles: 2 Of Each Role Per Team
-		}
 	}
 }
