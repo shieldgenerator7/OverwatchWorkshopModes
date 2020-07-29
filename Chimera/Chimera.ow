@@ -73,7 +73,12 @@ rule("Player spawn in - Spawn AI dummy bodies")
 		Disallow Button(Event Player, Ability 2);
 		Set Status(Event Player.bot1, Event Player, Unkillable, 9999);
 		Wait(0.250, Ignore Condition);
+		disabled Damage(Event Player.bot1, Null, Max Health(Event Player.bot1) - 1);
+		disabled Set Healing Received(Event Player.bot1, 0.001);
 		Set Status(Event Player.bot1, Event Player, Phased Out, 9999);
+		Create HUD Text(Event Player, Custom String("abil ult: {0}", Ultimate Charge Percent(Event Player.bot1)), Null, Null, Left, 0,
+			White, White, White, Visible To and String, Default Visibility);
+		disabled Call Subroutine(GiveControlToBot1);
 	}
 }
 
