@@ -1,5 +1,10 @@
 settings
 {
+	main
+	{
+		Description: "You have the weapons of one hero and the abilities of another. You are a Chimera. Can you defeat the other Chimeras and declare yourself the Supreme Chimera?"
+	}
+
 	lobby
 	{
 		Allow Players Who Are In Queue: Yes
@@ -11,6 +16,12 @@ settings
 	modes
 	{
 		Elimination
+		{
+			enabled maps
+			{
+				Workshop Island
+			}
+		}
 
 		General
 		{
@@ -20,3 +31,14 @@ settings
 	}
 }
 
+	{
+		Throttle Of(Event Player) != Vector(0, 0, 0);
+		Event Player.hostPlayer == Null;
+	}
+
+	actions
+	{
+		Start Throttle In Direction(Event Player.bot1, Throttle Of(Event Player), 1, To Player, Replace existing throttle,
+			Direction and Magnitude);
+	}
+}
