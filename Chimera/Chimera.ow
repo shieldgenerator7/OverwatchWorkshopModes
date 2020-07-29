@@ -26,7 +26,7 @@ rule("Game Setup")
 	{
 		Create Dummy Bot(Random Value In Array(All Heroes), Team 2, -1, Vector(0, 0, 0), Vector(0, 0, 0));
 		Global.HEROES_REQUIRE_FIRE_ABILITY1 = Array(Hero(Junkrat));
-		Global.HEROES_REQUIRE_FIRE_ABILITY2 = Array(Hero(Mei), Hero(Moira));
+		Global.HEROES_REQUIRE_FIRE_ABILITY2 = Array(Hero(Mei), Hero(Moira), Hero(Reaper));
 		Global.HEROES_REQUIRE_FIRE_ULT = Array(Hero(Symmetra), Hero(Baptiste));
 		Global.HEROES_MOVE_ABILITY1 = Array(Hero(Ashe), Hero(Bastion), Hero(D.Va), Hero(Doomfist), Hero(Echo), Hero(Genji), Hero(Junkrat),
 			Hero(McCree), Hero(Mei), Hero(Mercy), Hero(Moira), Hero(Orisa), Hero(Pharah), Hero(Reaper), Hero(Reinhardt), Hero(Soldier: 76),
@@ -401,7 +401,7 @@ rule("If Bot phased bc of ability, make Player phased")
 	{
 		Event Player.hostPlayer != Null;
 		Is Using Ability 1(Event Player) == True;
-		(Hero Of(Event Player) == Hero(Reaper) || Hero Of(Event Player) == Hero(Moira)) == True;
+		Array Contains(Global.HEROES_PHASE_ABILITY1, Hero Of(Event Player.bot1)) == True;
 	}
 
 	actions
