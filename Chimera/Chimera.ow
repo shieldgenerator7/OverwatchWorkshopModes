@@ -1,5 +1,9 @@
 variables
 {
+	global:
+		0: HEROES_REQUIRE_FIRE_ABILITY1
+		1: HEROES_REQUIRE_FIRE_ABILITY2
+
 	player:
 		0: hostPlayer
 		1: bodyAbility
@@ -15,6 +19,9 @@ rule("Game Setup")
 	actions
 	{
 		Create Dummy Bot(Random Value In Array(All Heroes), Team 2, -1, Vector(0, 0, 0), Vector(0, 0, 0));
+		Global.HEROES_REQUIRE_FIRE_ABILITY2 = Empty Array;
+		Modify Global Variable(HEROES_REQUIRE_FIRE_ABILITY2, Append To Array, Hero(Mei));
+		Modify Global Variable(HEROES_REQUIRE_FIRE_ABILITY2, Append To Array, Hero(Moira));
 	}
 }
 
@@ -71,6 +78,52 @@ rule("Player uses Ability 1")
 	}
 }
 
+rule("Player uses Ability 1 (Primary Fire)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.hostPlayer == Null;
+		Array Contains(Global.HEROES_REQUIRE_FIRE_ABILITY1, Hero Of(Event Player.bodyAbility)) == True;
+		Is Using Ability 1(Event Player.bodyAbility) == True;
+		Is Button Held(Event Player, Primary Fire) == True;
+	}
+
+	actions
+	{
+		Press Button(Event Player.bodyAbility, Primary Fire);
+	}
+}
+
+rule("Player uses Ability 1 (Secondary Fire)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.hostPlayer == Null;
+		Array Contains(Global.HEROES_REQUIRE_FIRE_ABILITY1, Hero Of(Event Player.bodyAbility)) == True;
+		Is Using Ability 1(Event Player.bodyAbility) == True;
+		Is Button Held(Event Player, Secondary Fire) == True;
+	}
+
+	actions
+	{
+		Press Button(Event Player.bodyAbility, Secondary Fire);
+	}
+}
+
 rule("Player uses Ability 2")
 {
 	event
@@ -89,6 +142,52 @@ rule("Player uses Ability 2")
 	actions
 	{
 		Press Button(Event Player.bodyAbility, Ability 2);
+	}
+}
+
+rule("Player uses Ability 2 (Primary Fire)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.hostPlayer == Null;
+		Array Contains(Global.HEROES_REQUIRE_FIRE_ABILITY2, Hero Of(Event Player.bodyAbility)) == True;
+		Is Using Ability 2(Event Player.bodyAbility) == True;
+		Is Button Held(Event Player, Primary Fire) == True;
+	}
+
+	actions
+	{
+		Press Button(Event Player.bodyAbility, Primary Fire);
+	}
+}
+
+rule("Player uses Ability 2 (Secondary Fire)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.hostPlayer == Null;
+		Array Contains(Global.HEROES_REQUIRE_FIRE_ABILITY2, Hero Of(Event Player.bodyAbility)) == True;
+		Is Using Ability 2(Event Player.bodyAbility) == True;
+		Is Button Held(Event Player, Secondary Fire) == True;
+	}
+
+	actions
+	{
+		Press Button(Event Player.bodyAbility, Secondary Fire);
 	}
 }
 
