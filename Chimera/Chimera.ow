@@ -6,7 +6,7 @@ variables
 
 	player:
 		0: hostPlayer
-		1: bodyAbility
+		1: bot1
 }
 
 rule("Game Setup")
@@ -44,16 +44,16 @@ rule("Player spawn in - Spawn AI dummy bodies")
 	{
 		Create Dummy Bot(Random Value In Array(All Heroes), Team Of(Event Player), -1, Position Of(Event Player), Facing Direction Of(
 			Event Player));
-		Event Player.bodyAbility = Players In Slot(Slot Of(Event Player) + 1, Team Of(Event Player));
-		Event Player.bodyAbility.hostPlayer = Event Player;
-		Set Invisible(Event Player.bodyAbility, All);
-		Start Facing(Event Player.bodyAbility, Facing Direction Of(Event Player), 100, To World, Direction and Turn Rate);
-		Attach Players(Event Player.bodyAbility, Event Player, Vector(0, 0, 0));
+		Event Player.bot1 = Players In Slot(Slot Of(Event Player) + 1, Team Of(Event Player));
+		Event Player.bot1.hostPlayer = Event Player;
+		Set Invisible(Event Player.bot1, All);
+		Start Facing(Event Player.bot1, Facing Direction Of(Event Player), 100, To World, Direction and Turn Rate);
+		Attach Players(Event Player.bot1, Event Player, Vector(0, 0, 0));
 		Disallow Button(Event Player, Ability 1);
 		Disallow Button(Event Player, Ability 2);
-		Set Status(Event Player.bodyAbility, Event Player, Unkillable, 9999);
+		Set Status(Event Player.bot1, Event Player, Unkillable, 9999);
 		Wait(0.250, Ignore Condition);
-		Set Status(Event Player.bodyAbility, Event Player, Phased Out, 9999);
+		Set Status(Event Player.bot1, Event Player, Phased Out, 9999);
 	}
 }
 
@@ -74,7 +74,7 @@ rule("Player uses Ability 1")
 
 	actions
 	{
-		Press Button(Event Player.bodyAbility, Ability 1);
+		Press Button(Event Player.bot1, Ability 1);
 	}
 }
 
@@ -90,14 +90,14 @@ rule("Player uses Ability 1 (Primary Fire)")
 	conditions
 	{
 		Event Player.hostPlayer == Null;
-		Array Contains(Global.HEROES_REQUIRE_FIRE_ABILITY1, Hero Of(Event Player.bodyAbility)) == True;
-		Is Using Ability 1(Event Player.bodyAbility) == True;
+		Array Contains(Global.HEROES_REQUIRE_FIRE_ABILITY1, Hero Of(Event Player.bot1)) == True;
+		Is Using Ability 1(Event Player.bot1) == True;
 		Is Button Held(Event Player, Primary Fire) == True;
 	}
 
 	actions
 	{
-		Press Button(Event Player.bodyAbility, Primary Fire);
+		Press Button(Event Player.bot1, Primary Fire);
 	}
 }
 
@@ -113,14 +113,14 @@ rule("Player uses Ability 1 (Secondary Fire)")
 	conditions
 	{
 		Event Player.hostPlayer == Null;
-		Array Contains(Global.HEROES_REQUIRE_FIRE_ABILITY1, Hero Of(Event Player.bodyAbility)) == True;
-		Is Using Ability 1(Event Player.bodyAbility) == True;
+		Array Contains(Global.HEROES_REQUIRE_FIRE_ABILITY1, Hero Of(Event Player.bot1)) == True;
+		Is Using Ability 1(Event Player.bot1) == True;
 		Is Button Held(Event Player, Secondary Fire) == True;
 	}
 
 	actions
 	{
-		Press Button(Event Player.bodyAbility, Secondary Fire);
+		Press Button(Event Player.bot1, Secondary Fire);
 	}
 }
 
@@ -141,7 +141,7 @@ rule("Player uses Ability 2")
 
 	actions
 	{
-		Press Button(Event Player.bodyAbility, Ability 2);
+		Press Button(Event Player.bot1, Ability 2);
 	}
 }
 
@@ -157,14 +157,14 @@ rule("Player uses Ability 2 (Primary Fire)")
 	conditions
 	{
 		Event Player.hostPlayer == Null;
-		Array Contains(Global.HEROES_REQUIRE_FIRE_ABILITY2, Hero Of(Event Player.bodyAbility)) == True;
-		Is Using Ability 2(Event Player.bodyAbility) == True;
+		Array Contains(Global.HEROES_REQUIRE_FIRE_ABILITY2, Hero Of(Event Player.bot1)) == True;
+		Is Using Ability 2(Event Player.bot1) == True;
 		Is Button Held(Event Player, Primary Fire) == True;
 	}
 
 	actions
 	{
-		Press Button(Event Player.bodyAbility, Primary Fire);
+		Press Button(Event Player.bot1, Primary Fire);
 	}
 }
 
@@ -180,14 +180,14 @@ rule("Player uses Ability 2 (Secondary Fire)")
 	conditions
 	{
 		Event Player.hostPlayer == Null;
-		Array Contains(Global.HEROES_REQUIRE_FIRE_ABILITY2, Hero Of(Event Player.bodyAbility)) == True;
-		Is Using Ability 2(Event Player.bodyAbility) == True;
+		Array Contains(Global.HEROES_REQUIRE_FIRE_ABILITY2, Hero Of(Event Player.bot1)) == True;
+		Is Using Ability 2(Event Player.bot1) == True;
 		Is Button Held(Event Player, Secondary Fire) == True;
 	}
 
 	actions
 	{
-		Press Button(Event Player.bodyAbility, Secondary Fire);
+		Press Button(Event Player.bot1, Secondary Fire);
 	}
 }
 
