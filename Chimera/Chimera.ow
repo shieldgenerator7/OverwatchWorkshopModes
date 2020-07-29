@@ -3,6 +3,12 @@ variables
 	global:
 		0: HEROES_REQUIRE_FIRE_ABILITY1
 		1: HEROES_REQUIRE_FIRE_ABILITY2
+		2: HEROES_REQUIRE_FIRE_ULT
+		3: HEROES_MOVE_ABILITY1
+		4: HEROES_MOVE_ABILITY2
+		5: HEROES_MOVE_ULT
+		6: HEROES_PHASE_ABILITY1
+		7: _TEST_BOT_
 
 	player:
 		0: hostPlayer
@@ -19,9 +25,15 @@ rule("Game Setup")
 	actions
 	{
 		Create Dummy Bot(Random Value In Array(All Heroes), Team 2, -1, Vector(0, 0, 0), Vector(0, 0, 0));
-		Global.HEROES_REQUIRE_FIRE_ABILITY2 = Empty Array;
-		Modify Global Variable(HEROES_REQUIRE_FIRE_ABILITY2, Append To Array, Hero(Mei));
-		Modify Global Variable(HEROES_REQUIRE_FIRE_ABILITY2, Append To Array, Hero(Moira));
+		Global.HEROES_REQUIRE_FIRE_ABILITY1 = Array(Hero(Junkrat));
+		Global.HEROES_REQUIRE_FIRE_ABILITY2 = Array(Hero(Mei), Hero(Moira));
+		Global.HEROES_REQUIRE_FIRE_ULT = Array(Hero(Symmetra), Hero(Baptiste));
+		Global.HEROES_MOVE_ABILITY1 = Array(Hero(Ashe), Hero(Bastion), Hero(D.Va), Hero(Doomfist), Hero(Echo), Hero(Genji), Hero(Junkrat),
+			Hero(McCree), Hero(Mei), Hero(Mercy), Hero(Moira), Hero(Orisa), Hero(Pharah), Hero(Reaper), Hero(Reinhardt), Hero(Soldier: 76),
+			Hero(Sombra), Hero(Tracer), Hero(Widowmaker), Hero(Winston), Hero(Wrecking Ball));
+		Global.HEROES_MOVE_ABILITY2 = Array(Hero(Doomfist), Hero(Pharah), Hero(Reaper), Hero(Sombra), Hero(Tracer));
+		Global.HEROES_MOVE_ULT = Array(Hero(Pharah), Hero(Sigma));
+		Global.HEROES_PHASE_ABILITY1 = Array(Hero(Mei), Hero(Moira), Hero(Reaper));
 	}
 }
 
@@ -42,13 +54,12 @@ rule("Player spawn in - Spawn AI dummy bodies")
 
 	actions
 	{
-		Create Dummy Bot(Random Value In Array(All Heroes), Team Of(Event Player), -1, Position Of(Event Player), Facing Direction Of(
-			Event Player));
+		Create Dummy Bot(Random Value In Array(All Heroes), Team Of(Event Player), -1, Vector(0, 0, 0), Facing Direction Of(Event Player));
 		Event Player.bot1 = Players In Slot(Slot Of(Event Player) + 1, Team Of(Event Player));
 		Event Player.bot1.hostPlayer = Event Player;
 		Set Invisible(Event Player.bot1, All);
 		Start Facing(Event Player.bot1, Facing Direction Of(Event Player), 100, To World, Direction and Turn Rate);
-		Attach Players(Event Player.bot1, Event Player, Vector(0, 0, 0));
+		Attach Players(Event Player, Event Player.bot1, Vector(0, 0, 0));
 		Disallow Button(Event Player, Ability 1);
 		Disallow Button(Event Player, Ability 2);
 		Set Status(Event Player.bot1, Event Player, Unkillable, 9999);
@@ -395,5 +406,48 @@ rule("If Bot phased bc of ability, make Player phased")
 		Wait(0.100, Ignore Condition);
 		Loop If Condition Is True;
 		Clear Status(Event Player.hostPlayer, Phased Out);
+	}
+}
+
+rule("Player stop moving")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Throttle Of(Event Player) == Vector(0, 0, 0);
+		Event Player.hostPlayer == Null;
+	}
+
+	actions
+	{
+		Stop Throttle In Direction(Event Player.bot1);
+	}
+}
+
+rule("Player start moving")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Throttle Of(Event Player) != Vector(0, 0, 0);
+		Event Player.hostPlayer == Null;
+	}
+
+	actions
+	{
+		Start Throttle In Direction(Event Player.bot1, Throttle Of(Event Player), 1, To Player, Replace existing throttle,
+			Direction and Magnitude);
 	}
 }
