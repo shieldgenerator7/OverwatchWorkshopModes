@@ -388,6 +388,7 @@ rule("==TEST== Dummy Bot Spawn without hostPlayer")
 	actions
 	{
 		Start Holding Button(Event Player, Primary Fire);
+		Global._TEST_BOT_ = Event Player;
 	}
 }
 
