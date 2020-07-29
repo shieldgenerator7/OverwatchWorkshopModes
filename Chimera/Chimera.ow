@@ -30,7 +30,8 @@ rule("Player spawn in - Spawn AI dummy bodies")
 
 	actions
 	{
-		Create Dummy Bot(Hero(Roadhog), Team Of(Event Player), -1, Position Of(Event Player), Facing Direction Of(Event Player));
+		Create Dummy Bot(Random Value In Array(All Heroes), Team Of(Event Player), -1, Position Of(Event Player), Facing Direction Of(
+			Event Player));
 		Event Player.bodyAbility = Players In Slot(Slot Of(Event Player) + 1, Team Of(Event Player));
 		Event Player.bodyAbility.hostPlayer = Event Player;
 		Set Invisible(Event Player.bodyAbility, All);
@@ -243,5 +244,32 @@ rule("Bot has full HP -> damage it")
 		Wait(0.100, Ignore Condition);
 		Damage(Event Player, Null, Max Health(Event Player));
 		Set Status(Event Player, Event Player.hostPlayer, Phased Out, 9999);
+	}
+}
+
+rule("If Bot phased bc of ability, make Player phased")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.hostPlayer != Null;
+		Is Using Ability 1(Event Player) == True;
+		(Hero Of(Event Player) == Hero(Reaper) || Hero Of(Event Player) == Hero(Moira)) == True;
+	}
+
+	actions
+	{
+		disabled If(Has Status(Event Player.hostPlayer, Phased Out) == False);
+		Set Status(Event Player.hostPlayer, Event Player, Phased Out, 9999);
+		disabled End;
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+		Clear Status(Event Player.hostPlayer, Phased Out);
 	}
 }
