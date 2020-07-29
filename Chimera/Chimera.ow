@@ -38,8 +38,8 @@ rule("Player spawn in - Spawn AI dummy bodies")
 		Attach Players(Event Player.bodyAbility, Event Player, Vector(0, 0, 0));
 		Disallow Button(Event Player, Ability 1);
 		Disallow Button(Event Player, Ability 2);
+		Set Status(Event Player.bodyAbility, Event Player, Unkillable, 9999);
 		Wait(0.250, Ignore Condition);
-		Damage(Event Player.bodyAbility, Null, Max Health(Event Player.bodyAbility) - 1);
 		Set Status(Event Player.bodyAbility, Event Player, Phased Out, 9999);
 	}
 }
@@ -113,21 +113,20 @@ rule("Bot heals itself")
 {
 	event
 	{
-		Player Received Healing;
+		Player Dealt Healing;
 		All;
 		All;
 	}
 
 	conditions
 	{
-		Event Was Health Pack == False;
+		Healee != Event Player.hostPlayer;
 		Event Player.hostPlayer != Null;
 	}
 
 	actions
 	{
-		Damage(Event Player, Null, Event Healing);
-		Heal(Event Player.hostPlayer, Event Player.hostPlayer, Event Healing);
+		Heal(Event Player.hostPlayer, Null, Event Healing);
 	}
 }
 
@@ -196,5 +195,29 @@ rule("Bot Ability 2 Cooldown")
 		Wait(0.250, Ignore Condition);
 		Loop If Condition Is True;
 		Set Ability Cooldown(Event Player.hostPlayer, Button(Ability 2), Ability Cooldown(Event Player, Button(Ability 2)));
+	}
+}
+
+rule("Bot has full HP -> damage it")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.hostPlayer != Null;
+		Health(Event Player) >= Max Health(Event Player);
+	}
+
+	actions
+	{
+		Clear Status(Event Player, Phased Out);
+		Wait(0.100, Ignore Condition);
+		Damage(Event Player, Null, Max Health(Event Player));
+		Set Status(Event Player, Event Player.hostPlayer, Phased Out, 9999);
 	}
 }
