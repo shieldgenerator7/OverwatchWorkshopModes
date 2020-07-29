@@ -34,7 +34,8 @@ rule("Player spawn in - Spawn AI dummy bodies")
 		Event Player.bodyAbility = Players In Slot(Slot Of(Event Player) + 1, Team Of(Event Player));
 		Event Player.bodyAbility.hostPlayer = Event Player;
 		Set Invisible(Event Player.bodyAbility, All);
-		Start Forcing Player Position(Event Player.bodyAbility, Position Of(Event Player), True);
+		Start Facing(Event Player.bodyAbility, Facing Direction Of(Event Player), 100, To World, Direction and Turn Rate);
+		Attach Players(Event Player.bodyAbility, Event Player, Vector(0, 0, 0));
 		Disallow Button(Event Player, Ability 1);
 		Disallow Button(Event Player, Ability 2);
 		Wait(0.250, Ignore Condition);
