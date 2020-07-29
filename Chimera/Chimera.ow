@@ -11,6 +11,11 @@ rule("Game Setup")
 	{
 		Ongoing - Global;
 	}
+
+	actions
+	{
+		Create Dummy Bot(Random Value In Array(All Heroes), Team 2, -1, Vector(0, 0, 0), Vector(0, 0, 0));
+	}
 }
 
 rule("Player spawn in - Spawn AI dummy bodies")
@@ -244,6 +249,26 @@ rule("Bot has full HP -> damage it")
 		Wait(0.100, Ignore Condition);
 		Damage(Event Player, Null, Max Health(Event Player));
 		Set Status(Event Player, Event Player.hostPlayer, Phased Out, 9999);
+	}
+}
+
+rule("==TEST== Dummy Bot Spawn without hostPlayer")
+{
+	event
+	{
+		Ongoing - Each Player;
+		Team 2;
+		All;
+	}
+
+	conditions
+	{
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Start Holding Button(Event Player, Primary Fire);
 	}
 }
 
