@@ -198,6 +198,30 @@ rule("Bot Ability 2 Cooldown")
 	}
 }
 
+rule("Bot ult charge goes to Player")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.hostPlayer != Null;
+		Ultimate Charge Percent(Event Player) > 1;
+	}
+
+	actions
+	{
+		Set Ultimate Charge(Event Player.hostPlayer, Ultimate Charge Percent(Event Player.hostPlayer) + 1);
+		Set Ultimate Charge(Event Player, Ultimate Charge Percent(Event Player) - 1);
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
 rule("Bot has full HP -> damage it")
 {
 	event
