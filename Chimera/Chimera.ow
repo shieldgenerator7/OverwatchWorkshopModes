@@ -13,13 +13,6 @@ variables
 	player:
 		0: hostPlayer
 		1: bot1
-		2: hasControl
-}
-
-subroutines
-{
-	0: GiveControlToBot1
-	2: GiveControlToPlayer
 }
 
 rule("Game Setup")
@@ -61,14 +54,12 @@ rule("Player spawn in - Spawn AI dummy bodies")
 
 	actions
 	{
-		Event Player.hasControl = True;
-		Create Dummy Bot(Random Value In Array(Global.HEROES_MOVE_ABILITY1), Team Of(Event Player), -1, Position Of(Event Player),
-			Facing Direction Of(Event Player));
+		Create Dummy Bot(Random Value In Array(All Heroes), Team Of(Event Player), -1, Vector(0, 0, 0), Facing Direction Of(Event Player));
 		Event Player.bot1 = Players In Slot(Slot Of(Event Player) + 1, Team Of(Event Player));
 		Event Player.bot1.hostPlayer = Event Player;
 		Set Invisible(Event Player.bot1, All);
 		Start Facing(Event Player.bot1, Facing Direction Of(Event Player), 100, To World, Direction and Turn Rate);
-		Attach Players(Event Player.bot1, Event Player, Vector(0, 0, 0));
+		Attach Players(Event Player, Event Player.bot1, Vector(0, 0, 0));
 		Disallow Button(Event Player, Ability 1);
 		Disallow Button(Event Player, Ability 2);
 		Set Status(Event Player.bot1, Event Player, Unkillable, 9999);
@@ -424,56 +415,6 @@ rule("If Bot phased bc of ability, make Player phased")
 	}
 }
 
-rule("Give Bot1 motion control")
-{
-	event
-	{
-		Subroutine;
-		GiveControlToBot1;
-	}
-
-	actions
-	{
-		Detach Players(Event Player.bot1);
-		Attach Players(Event Player, Event Player.bot1, Vector(0, 0, 0));
-		disabled Start Forcing Throttle(Global._TEST_BOT_, Z Component Of(Throttle Of(Event Player)), Z Component Of(Throttle Of(Event Player)),
-			Z Component Of(Throttle Of(Event Player)) * -1, Z Component Of(Throttle Of(Event Player)) * -1, X Component Of(Throttle Of(
-			Event Player)) * -1, X Component Of(Throttle Of(Event Player)) * -1);
-		Start Throttle In Direction(Event Player.bot1, Throttle Of(Event Player), 1, To Player, Replace existing throttle,
-			Direction and Magnitude);
-		disabled Wait(0.100, Ignore Condition);
-		disabled Loop;
-		Event Player.hasControl = False;
-	}
-}
-
-rule("Player uses Ability 1 (give control to bot1)")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		All;
-	}
-
-	conditions
-	{
-		Event Player.hostPlayer == Null;
-		Array Contains(Global.HEROES_MOVE_ABILITY1, Hero Of(Event Player.bot1)) == True;
-		Is Using Ability 1(Event Player.bot1) == True;
-	}
-
-	actions
-	{
-		If(Event Player.hasControl == True);
-			Call Subroutine(GiveControlToBot1);
-		End;
-		Wait(0.100, Ignore Condition);
-		Loop If Condition Is True;
-		Call Subroutine(GiveControlToPlayer);
-	}
-}
-
 rule("Player stop moving")
 {
 	event
@@ -487,7 +428,6 @@ rule("Player stop moving")
 	{
 		Throttle Of(Event Player) == Vector(0, 0, 0);
 		Event Player.hostPlayer == Null;
-		Event Player.hasControl == False;
 	}
 
 	actions
@@ -509,63 +449,11 @@ rule("Player start moving")
 	{
 		Throttle Of(Event Player) != Vector(0, 0, 0);
 		Event Player.hostPlayer == Null;
-		Event Player.hasControl == False;
 	}
 
 	actions
 	{
 		Start Throttle In Direction(Event Player.bot1, Throttle Of(Event Player), 1, To Player, Replace existing throttle,
 			Direction and Magnitude);
-	}
-}
-
-rule("Give Player motion control")
-{
-	event
-	{
-		Subroutine;
-		GiveControlToPlayer;
-	}
-
-	actions
-	{
-		Stop Throttle In Direction(Event Player.bot1);
-		Detach Players(Event Player);
-		Attach Players(Event Player.bot1, Event Player, Vector(0, 0, 0));
-		disabled Start Forcing Throttle(Global._TEST_BOT_, Z Component Of(Throttle Of(Event Player)), Z Component Of(Throttle Of(Event Player)),
-			Z Component Of(Throttle Of(Event Player)) * -1, Z Component Of(Throttle Of(Event Player)) * -1, X Component Of(Throttle Of(
-			Event Player)) * -1, X Component Of(Throttle Of(Event Player)) * -1);
-		disabled Start Throttle In Direction(Event Player.bot1, Throttle Of(Event Player), 1, To Player, Replace existing throttle,
-			Direction and Magnitude);
-		disabled Wait(0.100, Ignore Condition);
-		disabled Loop;
-		Event Player.hasControl = True;
-	}
-}
-
-rule("Player uses Ability 2 (give control to bot1)")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		All;
-	}
-
-	conditions
-	{
-		Event Player.hostPlayer == Null;
-		Array Contains(Global.HEROES_MOVE_ABILITY2, Hero Of(Event Player.bot1)) == True;
-		Is Using Ability 2(Event Player.bot1) == True;
-	}
-
-	actions
-	{
-		If(Event Player.hasControl == True);
-			Call Subroutine(GiveControlToBot1);
-		End;
-		Wait(0.100, Ignore Condition);
-		Loop If Condition Is True;
-		Call Subroutine(GiveControlToPlayer);
 	}
 }
