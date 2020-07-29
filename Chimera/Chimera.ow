@@ -24,21 +24,22 @@ rule("Player spawn in - Spawn AI dummy bodies")
 
 	conditions
 	{
-		Event Player.hostPlayer == Null;
+		disabled Event Player.hostPlayer == Null;
+		Is Dummy Bot(Event Player) == False;
 	}
 
 	actions
 	{
-		Create Dummy Bot(Random Value In Array(Hero(Torbjörn)), Team Of(Event Player), -1, Position Of(Event Player), Facing Direction Of(
-			Event Player));
+		Create Dummy Bot(Hero(Roadhog), Team Of(Event Player), -1, Position Of(Event Player), Facing Direction Of(Event Player));
 		Event Player.bodyAbility = Players In Slot(Slot Of(Event Player) + 1, Team Of(Event Player));
 		Event Player.bodyAbility.hostPlayer = Event Player;
-		Set Status(Event Player.bodyAbility, Event Player, Phased Out, 9999);
 		Set Invisible(Event Player.bodyAbility, All);
 		Start Forcing Player Position(Event Player.bodyAbility, Position Of(Event Player), True);
-		Damage(Event Player.bodyAbility, Null, Max Health(Event Player.bodyAbility) / 2);
 		Disallow Button(Event Player, Ability 1);
 		Disallow Button(Event Player, Ability 2);
+		Wait(0.250, Ignore Condition);
+		Damage(Event Player.bodyAbility, Null, Max Health(Event Player.bodyAbility) - 1);
+		Set Status(Event Player.bodyAbility, Event Player, Phased Out, 9999);
 	}
 }
 
