@@ -150,3 +150,51 @@ rule("==TEST== Damage player")
 		Damage(Event Player, Null, 100);
 	}
 }
+
+rule("Bot Ability 1 Cooldown")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.hostPlayer != Null;
+		Ability Cooldown(Event Player, Button(Ability 1)) > 0;
+	}
+
+	actions
+	{
+		Set Ability Cooldown(Event Player.hostPlayer, Button(Ability 1), Ability Cooldown(Event Player, Button(Ability 1)));
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+		Set Ability Cooldown(Event Player.hostPlayer, Button(Ability 1), Ability Cooldown(Event Player, Button(Ability 1)));
+	}
+}
+
+rule("Bot Ability 2 Cooldown")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.hostPlayer != Null;
+		Ability Cooldown(Event Player, Button(Ability 2)) > 0;
+	}
+
+	actions
+	{
+		Set Ability Cooldown(Event Player.hostPlayer, Button(Ability 2), Ability Cooldown(Event Player, Button(Ability 2)));
+		Wait(0.250, Ignore Condition);
+		Loop If Condition Is True;
+		Set Ability Cooldown(Event Player.hostPlayer, Button(Ability 2), Ability Cooldown(Event Player, Button(Ability 2)));
+	}
+}
