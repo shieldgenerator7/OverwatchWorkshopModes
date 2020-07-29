@@ -1,0 +1,150 @@
+variables
+{
+	player:
+		0: hostPlayer
+		1: bodyAbility
+}
+
+rule("Game Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("Player spawn in - Spawn AI dummy bodies")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.hostPlayer == Null;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Random Value In Array(Hero(Torbjörn)), Team Of(Event Player), -1, Position Of(Event Player), Facing Direction Of(
+			Event Player));
+		Event Player.bodyAbility = Players In Slot(Slot Of(Event Player) + 1, Team Of(Event Player));
+		Event Player.bodyAbility.hostPlayer = Event Player;
+		Set Status(Event Player.bodyAbility, Event Player, Phased Out, 9999);
+		Set Invisible(Event Player.bodyAbility, All);
+		Start Forcing Player Position(Event Player.bodyAbility, Position Of(Event Player), True);
+		Damage(Event Player.bodyAbility, Null, Max Health(Event Player.bodyAbility) / 2);
+		Disallow Button(Event Player, Ability 1);
+		Disallow Button(Event Player, Ability 2);
+	}
+}
+
+rule("Player uses Ability 1")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.hostPlayer == Null;
+		Is Button Held(Event Player, Ability 1) == True;
+	}
+
+	actions
+	{
+		Press Button(Event Player.bodyAbility, Ability 1);
+	}
+}
+
+rule("Player uses Ability 2")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.hostPlayer == Null;
+		Is Button Held(Event Player, Ability 2) == True;
+	}
+
+	actions
+	{
+		Press Button(Event Player.bodyAbility, Ability 2);
+	}
+}
+
+rule("Bot uses Torbjorn's E")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Torbjörn;
+	}
+
+	conditions
+	{
+		Event Player.hostPlayer != Null;
+		Is Using Ability 2(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Damage Dealt(Event Player.hostPlayer, 150);
+		Wait(5, Ignore Condition);
+		Set Damage Dealt(Event Player.hostPlayer, 100);
+	}
+}
+
+rule("Bot heals itself")
+{
+	event
+	{
+		Player Received Healing;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Was Health Pack == False;
+		Event Player.hostPlayer != Null;
+	}
+
+	actions
+	{
+		Damage(Event Player, Null, Event Healing);
+		Heal(Event Player.hostPlayer, Event Player.hostPlayer, Event Healing);
+	}
+}
+
+rule("==TEST== Damage player")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Interact) == True;
+	}
+
+	actions
+	{
+		Damage(Event Player, Null, 100);
+	}
+}

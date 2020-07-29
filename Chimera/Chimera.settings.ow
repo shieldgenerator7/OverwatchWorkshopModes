@@ -1,0 +1,22 @@
+settings
+{
+	lobby
+	{
+		Allow Players Who Are In Queue: Yes
+		Match Voice Chat: Enabled
+		Max Team 1 Players: 6
+		Max Team 2 Players: 6
+	}
+
+	modes
+	{
+		Elimination
+
+		General
+		{
+			Hero Limit: Off
+			Respawn As Random Hero: On
+		}
+	}
+}
+
