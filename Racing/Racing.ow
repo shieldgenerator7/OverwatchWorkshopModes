@@ -50,7 +50,7 @@ rule("Player Spawn In")
 	}
 }
 
-rule("Rein Charge - Make Trail")
+rule("Host - Make Track Segment")
 {
 	event
 	{
@@ -61,8 +61,8 @@ rule("Rein Charge - Make Trail")
 
 	conditions
 	{
-		Hero Of(Event Player) == Hero(Reinhardt);
-		Is Using Ability 1(Event Player) == True;
+		Is Button Held(Event Player, Button(Crouch)) == True;
+		Event Player == Host Player;
 	}
 
 	actions
@@ -70,27 +70,13 @@ rule("Rein Charge - Make Trail")
 		Modify Global Variable(trackPoints, Append To Array, Position Of(Event Player));
 		Global._trackLeft_ = Global.TRACK_RADIUS * Direction From Angles(Horizontal Facing Angle Of(Event Player) + 90, 0);
 		If(Count Of(Global.trackPoints) > 1);
-			Create Beam Effect(All Players(All Teams), Bad Beam, Global.trackPoints[Count Of(Global.trackPoints) - 2] + Global._trackLeft_,
-				Global.trackPoints[Count Of(Global.trackPoints) - 1] + Global._trackLeft_, Color(Red), Visible To);
+			Create Beam Effect(All Players(All Teams), Good Beam, Global.trackPoints[Count Of(Global.trackPoints) - 2] + Global._trackLeft_,
+				Global.trackPoints[Count Of(Global.trackPoints) - 1] + Global._trackLeft_, Color(Green), Visible To);
 			Modify Global Variable(trackEffectIds, Append To Array, Last Created Entity);
-			Create Beam Effect(All Players(All Teams), Bad Beam, Global.trackPoints[Count Of(Global.trackPoints) - 2] - Global._trackLeft_,
-				Global.trackPoints[Count Of(Global.trackPoints) - 1] - Global._trackLeft_, Color(Red), Visible To);
+			Create Beam Effect(All Players(All Teams), Good Beam, Global.trackPoints[Count Of(Global.trackPoints) - 2] - Global._trackLeft_,
+				Global.trackPoints[Count Of(Global.trackPoints) - 1] - Global._trackLeft_, Color(Green), Visible To);
 			Modify Global Variable(trackEffectIds, Append To Array, Last Created Entity);
 		End;
-		Wait(0.100, Ignore Condition);
-		Loop If Condition Is True;
-		Wait(Global.TRACK_DURATION, Ignore Condition);
-		While(Count Of(Global.trackPoints) > 0);
-			Destroy Effect(Global.trackEffectIds[0]);
-			Modify Global Variable(trackEffectIds, Remove From Array By Index, 0);
-			Destroy Effect(Global.trackEffectIds[0]);
-			Modify Global Variable(trackEffectIds, Remove From Array By Index, 0);
-			Modify Global Variable(trackPoints, Remove From Array By Index, 0);
-			Wait(0.100, Ignore Condition);
-		End;
-		Global.trackPoints = Empty Array;
-		Global.trackEffectIds = Empty Array;
-		Global._trackLeft_ = Vector(0, 0, 0);
 	}
 }
 
@@ -148,7 +134,7 @@ rule("k")
 	}
 }
 
-rule("==TEST== Create dummy")
+disabled rule("==TEST== Create dummy")
 {
 	event
 	{
