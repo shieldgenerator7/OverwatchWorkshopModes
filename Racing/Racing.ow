@@ -209,6 +209,8 @@ rule("Track speeds up players")
 			Else;
 				"Set to normal speed"
 				Global._trackTarget_.playerSpeed = 100;
+				"==TEST== Display which segment the player is at"
+				Global._trackTarget_.speedIndex = -1;
 			End;
 			Set Move Speed(Global._trackTarget_, Global._trackTarget_.playerSpeed);
 		End;
@@ -228,13 +230,13 @@ rule("k")
 	actions
 	{
 		Global._result_ = False;
-		For Global Variable(_j_, 1, Count Of(Global.trackPoints), 1);
+		For Global Variable(_j_, Global._trackTarget_.nextCheckPoint * 10 - 10, Global._trackTarget_.nextCheckPoint * 10, 1);
 			If(Absolute Value((X Component Of(Global.trackPoints[Global._j_]) - X Component Of(Global.trackPoints[Global._j_ - 1])) * (
-				Y Component Of(Global.trackPoints[Global._j_] - 1) - Y Component Of(Position Of(Global._trackTarget_))) - (Y Component Of(
-				Global.trackPoints[Global._j_]) - Y Component Of(Global.trackPoints[Global._j_ - 1])) * (X Component Of(
+				Z Component Of(Global.trackPoints[Global._j_] - 1) - Z Component Of(Position Of(Global._trackTarget_))) - (Z Component Of(
+				Global.trackPoints[Global._j_]) - Z Component Of(Global.trackPoints[Global._j_ - 1])) * (X Component Of(
 				Global.trackPoints[Global._j_] - 1) - X Component Of(Position Of(Global._trackTarget_)))) / Square Root((X Component Of(
-				Global.trackPoints[Global._j_]) - X Component Of(Global.trackPoints[Global._j_ - 1])) ^ 2 + (Y Component Of(
-				Global.trackPoints[Global._j_]) - Y Component Of(Global.trackPoints[Global._j_ - 1])) ^ 2) <= Global.TRACK_RADIUS * 1.500);
+				Global.trackPoints[Global._j_]) - X Component Of(Global.trackPoints[Global._j_ - 1])) ^ 2 + (Z Component Of(
+				Global.trackPoints[Global._j_]) - Z Component Of(Global.trackPoints[Global._j_ - 1])) ^ 2) <= Global.TRACK_RADIUS * 1.500);
 				Global._result_ = True;
 				Break;
 			End;
