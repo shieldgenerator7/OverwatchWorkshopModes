@@ -258,3 +258,23 @@ rule("Next Player Checkpoint")
 		End;
 	}
 }
+
+rule("Player gets flag")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Distance Between(Position Of(Event Player), Global.trackPoints[Event Player.nextCheckPoint * 10]) <= 2;
+	}
+
+	actions
+	{
+		Call Subroutine(NextPlayerCheckpoint);
+	}
+}
