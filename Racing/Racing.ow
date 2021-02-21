@@ -16,6 +16,8 @@ variables
 	player:
 		0: nextCheckPoint
 		1: flagEffectId
+		2: playerSpeed
+		3: speedIndex
 }
 
 subroutines
@@ -141,6 +143,11 @@ rule("Player Spawn In")
 		Create Icon(Event Player, Global.trackPoints[Event Player.nextCheckPoint * 10], Flag, Position, Color(Green), True);
 		Event Player.flagEffectId = Last Created Entity;
 		Create Effect(Event Player, Ring, Color(Green), Global.trackPoints[Event Player.nextCheckPoint * 10], 2, Position and Radius);
+		Create HUD Text(Event Player, Custom String("SPEED: {0}", Event Player.playerSpeed), Null, Null, Left, 0, Color(White), Color(
+			White), Color(White), String, Default Visibility);
+		Event Player.playerSpeed = 100;
+		Create HUD Text(Event Player, Custom String(">>index: {0}", Event Player.speedIndex), Null, Null, Left, 0, Color(White), Color(
+			White), Color(White), String, Default Visibility);
 	}
 }
 
@@ -174,7 +181,7 @@ rule("Host - Make Track Segment")
 	}
 }
 
-rule("Rein tracks damage opponents")
+rule("Track speeds up players")
 {
 	event
 	{
@@ -196,11 +203,14 @@ rule("Rein tracks damage opponents")
 			Call Subroutine(ReinTrailContainsTarget);
 			If(Global._result_ == True);
 				"Give that player speed"
-				Set Move Speed(Global._trackTarget_, 150);
+				Global._trackTarget_.playerSpeed = 150;
+				"==TEST== Display which segment the player is at"
+				Global._trackTarget_.speedIndex = Global._j_;
 			Else;
 				"Set to normal speed"
-				Set Move Speed(Global._trackTarget_, 100);
+				Global._trackTarget_.playerSpeed = 100;
 			End;
+			Set Move Speed(Global._trackTarget_, Global._trackTarget_.playerSpeed);
 		End;
 		Wait(0.100, Ignore Condition);
 		Loop If Condition Is True;
@@ -218,8 +228,13 @@ rule("k")
 	actions
 	{
 		Global._result_ = False;
-		For Global Variable(_j_, 0, Count Of(Global.trackPoints), 1);
-			If(Distance Between(Position Of(Global._trackTarget_), Global.trackPoints[Global._j_]) <= Global.TRACK_RADIUS);
+		For Global Variable(_j_, 1, Count Of(Global.trackPoints), 1);
+			If(Absolute Value((X Component Of(Global.trackPoints[Global._j_]) - X Component Of(Global.trackPoints[Global._j_ - 1])) * (
+				Y Component Of(Global.trackPoints[Global._j_] - 1) - Y Component Of(Position Of(Global._trackTarget_))) - (Y Component Of(
+				Global.trackPoints[Global._j_]) - Y Component Of(Global.trackPoints[Global._j_ - 1])) * (X Component Of(
+				Global.trackPoints[Global._j_] - 1) - X Component Of(Position Of(Global._trackTarget_)))) / Square Root((X Component Of(
+				Global.trackPoints[Global._j_]) - X Component Of(Global.trackPoints[Global._j_ - 1])) ^ 2 + (Y Component Of(
+				Global.trackPoints[Global._j_]) - Y Component Of(Global.trackPoints[Global._j_ - 1])) ^ 2) <= Global.TRACK_RADIUS * 1.500);
 				Global._result_ = True;
 				Break;
 			End;
