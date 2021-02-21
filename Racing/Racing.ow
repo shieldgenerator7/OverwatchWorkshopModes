@@ -95,7 +95,8 @@ rule("Display Track Segments")
 			Abort;
 		End;
 		For Global Variable(_i_, 1, Count Of(Global.trackPoints), 1);
-			Global._trackLeft_ = Global.TRACK_RADIUS * Direction From Angles(90, 0);
+			Global._trackLeft_ = Global.TRACK_RADIUS * Direction From Angles(Angle Between Vectors(
+				Global.trackPoints[Global._i_ + 1] - Global.trackPoints[Global._i_ - 1], Right) + 90, 0);
 			Create Beam Effect(All Players(All Teams), Good Beam, Global.trackPoints[Global._i_ - 1] + Global._trackLeft_,
 				Global.trackPoints[Global._i_] + Global._trackLeft_, Color(Green), Visible To);
 			Modify Global Variable(trackEffectIds, Append To Array, Last Created Entity);
