@@ -12,6 +12,12 @@ variables
 		9: _result_
 		10: _i_
 		11: _j_
+		13: _x2_
+		14: _z2_
+		15: _x1_
+		16: _z1_
+		17: _x0_
+		18: _z0_
 
 	player:
 		0: nextCheckPoint
@@ -231,12 +237,15 @@ rule("k")
 	{
 		Global._result_ = False;
 		For Global Variable(_j_, Global._trackTarget_.nextCheckPoint * 10 - 10, Global._trackTarget_.nextCheckPoint * 10, 1);
-			If(Absolute Value((X Component Of(Global.trackPoints[Global._j_]) - X Component Of(Global.trackPoints[Global._j_ - 1])) * (
-				Z Component Of(Global.trackPoints[Global._j_] - 1) - Z Component Of(Position Of(Global._trackTarget_))) - (Z Component Of(
-				Global.trackPoints[Global._j_]) - Z Component Of(Global.trackPoints[Global._j_ - 1])) * (X Component Of(
-				Global.trackPoints[Global._j_] - 1) - X Component Of(Position Of(Global._trackTarget_)))) / Square Root((X Component Of(
-				Global.trackPoints[Global._j_]) - X Component Of(Global.trackPoints[Global._j_ - 1])) ^ 2 + (Z Component Of(
-				Global.trackPoints[Global._j_]) - Z Component Of(Global.trackPoints[Global._j_ - 1])) ^ 2) <= Global.TRACK_RADIUS * 1.500);
+			Global._x2_ = X Component Of(Global.trackPoints[Global._j_]);
+			Global._z2_ = Z Component Of(Global.trackPoints[Global._j_]);
+			Global._x1_ = X Component Of(Global.trackPoints[Global._j_ - 1]);
+			Global._z1_ = Z Component Of(Global.trackPoints[Global._j_ - 1]);
+			Global._x0_ = X Component Of(Position Of(Global._trackTarget_));
+			Global._z0_ = Z Component Of(Position Of(Global._trackTarget_));
+			If(Absolute Value((Global._x2_ - Global._x1_) * (Global._z1_ - Global._z0_) - (Global._z2_ - Global._z1_) * (
+				Global._x1_ - Global._x0_)) / Square Root((Global._x2_ - Global._x1_) ^ 2 + (Global._z2_ - Global._z1_) ^ 2)
+				<= Global.TRACK_RADIUS * 1.500);
 				Global._result_ = True;
 				Break;
 			End;
