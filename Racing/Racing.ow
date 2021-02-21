@@ -99,15 +99,22 @@ rule("Display Track Segments")
 		If(Count Of(Global.trackPoints) <= 1);
 			Abort;
 		End;
+		For Global Variable(_i_, 0, Count Of(Global.trackPoints), 1);
+			Destroy Effect(Global.trackEffectIds[Global._i_]);
+		End;
+		Global.trackEffectIds = Empty Array;
 		For Global Variable(_i_, 1, Count Of(Global.trackPoints), 1);
-			Global._trackLeft_ = Global.TRACK_RADIUS * Direction From Angles(Angle Between Vectors(
-				Global.trackPoints[Global._i_ + 1] - Global.trackPoints[Global._i_ - 1], Forward) + 90, 0);
-			disabled Create Beam Effect(All Players(All Teams), Good Beam, Global.trackPoints[Global._i_ - 1] + Global._trackLeft_,
-				Global.trackPoints[Global._i_] + Global._trackLeft_, Color(Green), Visible To);
-			Modify Global Variable(trackEffectIds, Append To Array, Last Created Entity);
-			Create Beam Effect(All Players(All Teams), Good Beam, Global.trackPoints[Global._i_ - 1] - Global._trackLeft_,
-				Global.trackPoints[Global._i_] - Global._trackLeft_, Color(Green), Visible To);
-			Modify Global Variable(trackEffectIds, Append To Array, Last Created Entity);
+			If(Is True For Any(All Players(All Teams),
+				Current Array Element.nextCheckPoint * 10 + 5 >= Global._i_ && Current Array Element.nextCheckPoint * 10 - 10 <= Global._i_));
+				Global._trackLeft_ = Global.TRACK_RADIUS * Direction From Angles(Angle Between Vectors(
+					Global.trackPoints[Global._i_ + 1] - Global.trackPoints[Global._i_ - 1], Forward) + 90, 0);
+				Create Beam Effect(All Players(All Teams), Good Beam, Global.trackPoints[Global._i_ - 1] + Global._trackLeft_,
+					Global.trackPoints[Global._i_] + Global._trackLeft_, Color(Green), Visible To);
+				Modify Global Variable(trackEffectIds, Append To Array, Last Created Entity);
+				Create Beam Effect(All Players(All Teams), Good Beam, Global.trackPoints[Global._i_ - 1] - Global._trackLeft_,
+					Global.trackPoints[Global._i_] - Global._trackLeft_, Color(Green), Visible To);
+				Modify Global Variable(trackEffectIds, Append To Array, Last Created Entity);
+			End;
 		End;
 	}
 }
@@ -276,5 +283,6 @@ rule("Player gets flag")
 	actions
 	{
 		Call Subroutine(NextPlayerCheckpoint);
+		Call Subroutine(DisplayTrackSegments);
 	}
 }
