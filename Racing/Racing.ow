@@ -1,0 +1,174 @@
+variables
+{
+	global:
+		0: TRACK_RADIUS
+		1: TRACK_DPS
+		2: TRACK_DURATION
+
+	player:
+		0: trackPoints
+		1: trackEffectIds
+		4: _trackTargetList_
+		5: _trackLeft_
+		6: _trackTarget_
+		7: _result_
+		8: _i_
+		9: _j_
+}
+
+subroutines
+{
+	0: ReinTrailContainsTarget
+}
+
+rule("Game Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.TRACK_RADIUS = 1;
+		Global.TRACK_DPS = 250;
+		Global.TRACK_DURATION = 7;
+	}
+}
+
+rule("Player Spawn In")
+{
+	event
+	{
+		Player Joined Match;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Event Player.trackPoints = Empty Array;
+		Event Player.trackEffectIds = Empty Array;
+	}
+}
+
+rule("Rein Charge - Make Trail")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Is Using Ability 1(Event Player) == True;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, trackPoints, Append To Array, Position Of(Event Player));
+		Event Player._trackLeft_ = Global.TRACK_RADIUS * Direction From Angles(Horizontal Facing Angle Of(Event Player) + 90, 0);
+		If(Count Of(Event Player.trackPoints) > 1);
+			Create Beam Effect(All Players(All Teams), Bad Beam, Event Player.trackPoints[Count Of(Event Player.trackPoints)
+				- 2] + Event Player._trackLeft_, Event Player.trackPoints[Count Of(Event Player.trackPoints) - 1] + Event Player._trackLeft_,
+				Color(Red), Visible To);
+			Modify Player Variable(Event Player, trackEffectIds, Append To Array, Last Created Entity);
+			Create Beam Effect(All Players(All Teams), Bad Beam, Event Player.trackPoints[Count Of(Event Player.trackPoints)
+				- 2] - Event Player._trackLeft_, Event Player.trackPoints[Count Of(Event Player.trackPoints) - 1] - Event Player._trackLeft_,
+				Color(Red), Visible To);
+			Modify Player Variable(Event Player, trackEffectIds, Append To Array, Last Created Entity);
+		End;
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+		Wait(Global.TRACK_DURATION, Ignore Condition);
+		While(Count Of(Event Player.trackPoints) > 0);
+			Destroy Effect(Event Player.trackEffectIds[0]);
+			Modify Player Variable(Event Player, trackEffectIds, Remove From Array By Index, 0);
+			Destroy Effect(Event Player.trackEffectIds[0]);
+			Modify Player Variable(Event Player, trackEffectIds, Remove From Array By Index, 0);
+			Modify Player Variable(Event Player, trackPoints, Remove From Array By Index, 0);
+			Wait(0.100, Ignore Condition);
+		End;
+		Event Player.trackPoints = Empty Array;
+		Event Player.trackEffectIds = Empty Array;
+		Event Player._trackLeft_ = Vector(0, 0, 0);
+	}
+}
+
+rule("Rein tracks damage opponents")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Reinhardt);
+		Count Of(Event Player.trackPoints) > 0;
+	}
+
+	actions
+	{
+		Event Player._trackTargetList_ = Filtered Array(All Living Players(Opposite Team Of(Team Of(Event Player))),
+			Current Array Element != Event Player);
+		"For all enemy players,"
+		For Player Variable(Event Player, _i_, 0, Count Of(Event Player._trackTargetList_), 1);
+			Event Player._trackTarget_ = Event Player._trackTargetList_[Event Player._i_];
+			"If that player is on the trail,"
+			Call Subroutine(ReinTrailContainsTarget);
+			If(Event Player._result_ == True);
+				"Damage that player"
+				Damage(Event Player._trackTarget_, Event Player, Global.TRACK_DPS / 10);
+			End;
+		End;
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("k")
+{
+	event
+	{
+		Subroutine;
+		ReinTrailContainsTarget;
+	}
+
+	actions
+	{
+		Event Player._result_ = False;
+		For Player Variable(Event Player, _j_, 0, Count Of(Event Player.trackPoints), 1);
+			If(Distance Between(Position Of(Event Player._trackTarget_), Event Player.trackPoints[Event Player._j_]) <= Global.TRACK_RADIUS);
+				Event Player._result_ = True;
+				Break;
+			End;
+		End;
+	}
+}
+
+rule("==TEST== Create dummy")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player == Host Player;
+		Is Button Held(Event Player, Button(Interact)) == True;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Random Value In Array(All Heroes), All Teams, -1, Position Of(Event Player), Facing Direction Of(Event Player));
+	}
+}
