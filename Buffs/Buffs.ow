@@ -74,11 +74,11 @@ rule("Rein Charge - Make Trail")
 		If(Count Of(Event Player.reinTrailPoints) > 1);
 			Create Beam Effect(All Players(All Teams), Bad Beam, Event Player.reinTrailPoints[Count Of(Event Player.reinTrailPoints)
 				- 2] + Event Player._reinTrailLeft_, Event Player.reinTrailPoints[Count Of(Event Player.reinTrailPoints)
-				- 1] + Event Player._reinTrailLeft_, Red, Visible To);
+				- 1] + Event Player._reinTrailLeft_, Color(Red), Visible To);
 			Modify Player Variable(Event Player, reinTrailEffectIds, Append To Array, Last Created Entity);
 			Create Beam Effect(All Players(All Teams), Bad Beam, Event Player.reinTrailPoints[Count Of(Event Player.reinTrailPoints)
 				- 2] - Event Player._reinTrailLeft_, Event Player.reinTrailPoints[Count Of(Event Player.reinTrailPoints)
-				- 1] - Event Player._reinTrailLeft_, Red, Visible To);
+				- 1] - Event Player._reinTrailLeft_, Color(Red), Visible To);
 			Modify Player Variable(Event Player, reinTrailEffectIds, Append To Array, Last Created Entity);
 		End;
 		Wait(0.100, Ignore Condition);
@@ -165,7 +165,7 @@ rule("==TEST== Create dummy")
 	conditions
 	{
 		Event Player == Host Player;
-		Is Button Held(Event Player, Interact) == True;
+		Is Button Held(Event Player, Button(Interact)) == True;
 	}
 
 	actions
