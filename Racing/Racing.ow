@@ -4,16 +4,14 @@ variables
 		0: TRACK_RADIUS
 		1: TRACK_DPS
 		2: TRACK_DURATION
-
-	player:
-		0: trackPoints
-		1: trackEffectIds
-		4: _trackTargetList_
-		5: _trackLeft_
-		6: _trackTarget_
-		7: _result_
-		8: _i_
-		9: _j_
+		3: trackPoints
+		4: trackEffectIds
+		5: _trackTargetList_
+		6: _trackLeft_
+		7: _trackTarget_
+		9: _result_
+		10: _i_
+		11: _j_
 }
 
 subroutines
@@ -47,8 +45,8 @@ rule("Player Spawn In")
 
 	actions
 	{
-		Event Player.trackPoints = Empty Array;
-		Event Player.trackEffectIds = Empty Array;
+		Global.trackPoints = Empty Array;
+		Global.trackEffectIds = Empty Array;
 	}
 }
 
@@ -69,32 +67,30 @@ rule("Rein Charge - Make Trail")
 
 	actions
 	{
-		Modify Player Variable(Event Player, trackPoints, Append To Array, Position Of(Event Player));
-		Event Player._trackLeft_ = Global.TRACK_RADIUS * Direction From Angles(Horizontal Facing Angle Of(Event Player) + 90, 0);
-		If(Count Of(Event Player.trackPoints) > 1);
-			Create Beam Effect(All Players(All Teams), Bad Beam, Event Player.trackPoints[Count Of(Event Player.trackPoints)
-				- 2] + Event Player._trackLeft_, Event Player.trackPoints[Count Of(Event Player.trackPoints) - 1] + Event Player._trackLeft_,
-				Color(Red), Visible To);
-			Modify Player Variable(Event Player, trackEffectIds, Append To Array, Last Created Entity);
-			Create Beam Effect(All Players(All Teams), Bad Beam, Event Player.trackPoints[Count Of(Event Player.trackPoints)
-				- 2] - Event Player._trackLeft_, Event Player.trackPoints[Count Of(Event Player.trackPoints) - 1] - Event Player._trackLeft_,
-				Color(Red), Visible To);
-			Modify Player Variable(Event Player, trackEffectIds, Append To Array, Last Created Entity);
+		Modify Global Variable(trackPoints, Append To Array, Position Of(Event Player));
+		Global._trackLeft_ = Global.TRACK_RADIUS * Direction From Angles(Horizontal Facing Angle Of(Event Player) + 90, 0);
+		If(Count Of(Global.trackPoints) > 1);
+			Create Beam Effect(All Players(All Teams), Bad Beam, Global.trackPoints[Count Of(Global.trackPoints) - 2] + Global._trackLeft_,
+				Global.trackPoints[Count Of(Global.trackPoints) - 1] + Global._trackLeft_, Color(Red), Visible To);
+			Modify Global Variable(trackEffectIds, Append To Array, Last Created Entity);
+			Create Beam Effect(All Players(All Teams), Bad Beam, Global.trackPoints[Count Of(Global.trackPoints) - 2] - Global._trackLeft_,
+				Global.trackPoints[Count Of(Global.trackPoints) - 1] - Global._trackLeft_, Color(Red), Visible To);
+			Modify Global Variable(trackEffectIds, Append To Array, Last Created Entity);
 		End;
 		Wait(0.100, Ignore Condition);
 		Loop If Condition Is True;
 		Wait(Global.TRACK_DURATION, Ignore Condition);
-		While(Count Of(Event Player.trackPoints) > 0);
-			Destroy Effect(Event Player.trackEffectIds[0]);
-			Modify Player Variable(Event Player, trackEffectIds, Remove From Array By Index, 0);
-			Destroy Effect(Event Player.trackEffectIds[0]);
-			Modify Player Variable(Event Player, trackEffectIds, Remove From Array By Index, 0);
-			Modify Player Variable(Event Player, trackPoints, Remove From Array By Index, 0);
+		While(Count Of(Global.trackPoints) > 0);
+			Destroy Effect(Global.trackEffectIds[0]);
+			Modify Global Variable(trackEffectIds, Remove From Array By Index, 0);
+			Destroy Effect(Global.trackEffectIds[0]);
+			Modify Global Variable(trackEffectIds, Remove From Array By Index, 0);
+			Modify Global Variable(trackPoints, Remove From Array By Index, 0);
 			Wait(0.100, Ignore Condition);
 		End;
-		Event Player.trackPoints = Empty Array;
-		Event Player.trackEffectIds = Empty Array;
-		Event Player._trackLeft_ = Vector(0, 0, 0);
+		Global.trackPoints = Empty Array;
+		Global.trackEffectIds = Empty Array;
+		Global._trackLeft_ = Vector(0, 0, 0);
 	}
 }
 
@@ -110,21 +106,21 @@ rule("Rein tracks damage opponents")
 	conditions
 	{
 		Hero Of(Event Player) == Hero(Reinhardt);
-		Count Of(Event Player.trackPoints) > 0;
+		Count Of(Global.trackPoints) > 0;
 	}
 
 	actions
 	{
-		Event Player._trackTargetList_ = Filtered Array(All Living Players(Opposite Team Of(Team Of(Event Player))),
+		Global._trackTargetList_ = Filtered Array(All Living Players(Opposite Team Of(Team Of(Event Player))),
 			Current Array Element != Event Player);
 		"For all enemy players,"
-		For Player Variable(Event Player, _i_, 0, Count Of(Event Player._trackTargetList_), 1);
-			Event Player._trackTarget_ = Event Player._trackTargetList_[Event Player._i_];
+		For Global Variable(_i_, 0, Count Of(Global._trackTargetList_), 1);
+			Global._trackTarget_ = Global._trackTargetList_[Global._i_];
 			"If that player is on the trail,"
 			Call Subroutine(ReinTrailContainsTarget);
-			If(Event Player._result_ == True);
+			If(Global._result_ == True);
 				"Damage that player"
-				Damage(Event Player._trackTarget_, Event Player, Global.TRACK_DPS / 10);
+				Damage(Global._trackTarget_, Event Player, Global.TRACK_DPS / 10);
 			End;
 		End;
 		Wait(0.100, Ignore Condition);
@@ -142,10 +138,10 @@ rule("k")
 
 	actions
 	{
-		Event Player._result_ = False;
-		For Player Variable(Event Player, _j_, 0, Count Of(Event Player.trackPoints), 1);
-			If(Distance Between(Position Of(Event Player._trackTarget_), Event Player.trackPoints[Event Player._j_]) <= Global.TRACK_RADIUS);
-				Event Player._result_ = True;
+		Global._result_ = False;
+		For Global Variable(_j_, 0, Count Of(Global.trackPoints), 1);
+			If(Distance Between(Position Of(Global._trackTarget_), Global.trackPoints[Global._j_]) <= Global.TRACK_RADIUS);
+				Global._result_ = True;
 				Break;
 			End;
 		End;
