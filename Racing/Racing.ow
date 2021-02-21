@@ -178,29 +178,28 @@ rule("Rein tracks damage opponents")
 {
 	event
 	{
-		Ongoing - Each Player;
-		All;
-		Reinhardt;
+		Ongoing - Global;
 	}
 
 	conditions
 	{
-		Hero Of(Event Player) == Hero(Reinhardt);
 		Count Of(Global.trackPoints) > 0;
 	}
 
 	actions
 	{
-		Global._trackTargetList_ = Filtered Array(All Living Players(Opposite Team Of(Team Of(Event Player))),
-			Current Array Element != Event Player);
+		Global._trackTargetList_ = All Players(All Teams);
 		"For all enemy players,"
 		For Global Variable(_i_, 0, Count Of(Global._trackTargetList_), 1);
 			Global._trackTarget_ = Global._trackTargetList_[Global._i_];
 			"If that player is on the trail,"
 			Call Subroutine(ReinTrailContainsTarget);
 			If(Global._result_ == True);
-				"Damage that player"
-				Damage(Global._trackTarget_, Event Player, Global.TRACK_DPS / 10);
+				"Give that player speed"
+				Set Move Speed(Global._trackTarget_, 150);
+			Else;
+				"Set to normal speed"
+				Set Move Speed(Global._trackTarget_, 100);
 			End;
 		End;
 		Wait(0.100, Ignore Condition);
