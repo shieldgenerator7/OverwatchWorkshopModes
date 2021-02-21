@@ -17,6 +17,7 @@ variables
 subroutines
 {
 	0: ReinTrailContainsTarget
+	1: DisplayTrackSegments
 }
 
 rule("Game Setup")
@@ -76,6 +77,32 @@ rule("Game Setup")
 			26.611, 5, -39.585), Vector(27.045, 4.015, -36.379), Vector(26.771, 4.015, -30.708), Vector(27.135, 3.901, -26.890), Vector(
 			27.663, 3.239, -23.080), Vector(28.278, 0.983, -14.875), Vector(26.767, 0.920, -11.989), Vector(24.211, 0.905, -10.010),
 			Vector(20.854, 0.896, -8.384), Vector(16.711, 0.890, -6.993), Vector(9.761, 1, -7.176), Vector(-0.986, 0.016, -9.394));
+		Call Subroutine(DisplayTrackSegments);
+	}
+}
+
+rule("Display Track Segments")
+{
+	event
+	{
+		Subroutine;
+		DisplayTrackSegments;
+	}
+
+	actions
+	{
+		If(Count Of(Global.trackPoints) <= 1);
+			Abort;
+		End;
+		For Global Variable(_i_, 1, Count Of(Global.trackPoints), 1);
+			Global._trackLeft_ = Global.TRACK_RADIUS * Direction From Angles(90, 0);
+			Create Beam Effect(All Players(All Teams), Good Beam, Global.trackPoints[Global._i_ - 1] + Global._trackLeft_,
+				Global.trackPoints[Global._i_] + Global._trackLeft_, Color(Green), Visible To);
+			Modify Global Variable(trackEffectIds, Append To Array, Last Created Entity);
+			Create Beam Effect(All Players(All Teams), Good Beam, Global.trackPoints[Global._i_ - 1] - Global._trackLeft_,
+				Global.trackPoints[Global._i_] - Global._trackLeft_, Color(Green), Visible To);
+			Modify Global Variable(trackEffectIds, Append To Array, Last Created Entity);
+		End;
 	}
 }
 
@@ -101,7 +128,7 @@ rule("Host - Make Track Segment")
 	{
 		Ongoing - Each Player;
 		All;
-		Reinhardt;
+		All;
 	}
 
 	conditions
