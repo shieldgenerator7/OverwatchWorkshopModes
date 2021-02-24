@@ -430,3 +430,27 @@ rule("Player Damaged")
 		Call Subroutine(ReinTrailContainsTarget);
 	}
 }
+
+rule("Player Stop, Damage")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Magnitude Of(Velocity Of(Event Player)) == 0;
+		disabled Throttle Of(Event Player) == Forward;
+	}
+
+	actions
+	{
+		Damage(Event Player, Null, 14);
+		Call Subroutine(SetSpeedUsingHealth);
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
