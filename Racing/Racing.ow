@@ -77,7 +77,7 @@ rule("Map: Eichenwalde")
 	actions
 	{
 		Global.portalPoints1 = Array(Vector(26.878, 8.427, -87.156), Vector(99.770, 12.670, -70.680));
-		Global.portalPoints2 = Array(Vector(28.234, 8, -86.812), Vector(99.770, 12.670, -67.680));
+		Global.portalPoints2 = Array(Vector(28.234, 8, -86.812), Vector(100.260, 12.730, -68.740));
 		Global.trackPoints = Array(Vector(-2.771, 0.006, -9.900), Vector(-17.783, 0.078, -16.934), Vector(-22.672, -1.827, -14.997),
 			Vector(-28.986, -1.954, -12.829), Vector(-31.359, 1.814, -30.305), Vector(-32.700, 1.923, -33.667), Vector(-21.688, 1.967,
 			-35.846), Vector(-15.737, 1.991, -29.964), Vector(-3.721, 1.833, -27.165), Vector(5.064, 3.809, -27.066), Vector(8.396, 3.820,
@@ -201,6 +201,8 @@ rule("Player Spawn In")
 		Set Facing(Event Player, Global.trackPoints[1] - Global.trackPoints[0], To World);
 		Damage(Event Player, Null, 10000);
 		Set Move Speed(Event Player, 1);
+		Create HUD Text(Event Player, Custom String("Position: {0}", Position Of(Event Player)), Null, Null, Left, 0, Color(White), Color(
+			White), Color(White), String, Default Visibility);
 	}
 }
 
@@ -278,6 +280,8 @@ rule("==TOOL== Host - Make Door Portal 1")
 	actions
 	{
 		Modify Global Variable(portalPoints1, Append To Array, Position Of(Event Player));
+		Small Message(Event Player, Custom String("Teleport: {0} to {1}", Position Of(Event Player), Position Of(Event Player)
+			+ Facing Direction Of(Event Player) * 2));
 		Teleport(Event Player, Position Of(Event Player) + Facing Direction Of(Event Player) * 2);
 		Small Message(Event Player, Custom String("Now do Interact + Primary Fire to complete the portal"));
 	}
@@ -456,6 +460,7 @@ rule("Player Move Forward, Heal")
 	actions
 	{
 		Heal(Event Player, Event Player, 7);
+		disabled Add Health Pool To Player(Event Player, Shields, 14, False, False);
 		Call Subroutine(SetSpeedUsingHealth);
 		Wait(0.100, Ignore Condition);
 		Loop If Condition Is True;
