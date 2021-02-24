@@ -594,9 +594,7 @@ rule("Player enters portal")
 	conditions
 	{
 		Count Of(Global.portalPoints1) == Count Of(Global.portalPoints2);
-		Is True For Any(Global.portalPoints1, Distance Between(Current Array Element, Event Player)
-			<= Global.PORTAL_RADIUS && Is In Line of Sight(Current Array Element, Position Of(Event Player), Barriers Do Not Block LOS))
-			== True;
+		Is True For Any(Global.portalPoints1, Distance Between(Current Array Element, Event Player) <= Global.PORTAL_RADIUS) == True;
 	}
 
 	actions
