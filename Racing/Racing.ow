@@ -8,6 +8,8 @@ variables
 		4: trackPoints
 		5: trackEffectIds
 		6: textEffectIds
+		7: MAX_HEALTH
+		8: MAX_SPEED
 		20: _trackTargetList_
 		21: _trackLeft_
 		22: _trackTarget_
@@ -49,6 +51,8 @@ rule("Game Setup")
 		Global.TRACK_DPS = 250;
 		Global.TRACK_DURATION = 7;
 		Global.CHECKPOINT_INTERVAL = 5;
+		Global.MAX_HEALTH = 500;
+		Global.MAX_SPEED = 400;
 		Global.trackPoints = Array(Vector(-2.771, 0.006, -9.900), Vector(-17.783, 0.078, -16.934), Vector(-22.672, -1.827, -14.997),
 			Vector(-28.986, -1.954, -12.829), Vector(-31.359, 1.814, -30.305), Vector(-32.700, 1.923, -33.667), Vector(-21.688, 1.967,
 			-35.846), Vector(-15.737, 1.991, -29.964), Vector(-3.721, 1.833, -27.165), Vector(5.064, 3.809, -27.066), Vector(8.396, 3.820,
@@ -168,7 +172,7 @@ rule("Player Spawn In")
 		Create HUD Text(Event Player, Custom String("Next Checkpoint: {0}", Event Player.nextCheckPoint), Null, Null, Left, 0, Color(
 			White), Color(White), Color(White), String, Default Visibility);
 		Set Status(Event Player, Event Player, Unkillable, 9999);
-		Set Max Health(Event Player, 200);
+		Set Max Health(Event Player, 100);
 		Teleport(Event Player, Global.trackPoints[0]);
 		Set Facing(Event Player, Global.trackPoints[1] - Global.trackPoints[0], To World);
 		Damage(Event Player, Null, 10000);
@@ -393,7 +397,7 @@ rule("Set Speed Using Health")
 
 	actions
 	{
-		Set Move Speed(Event Player, Health(Event Player));
+		Set Move Speed(Event Player, Global.MAX_SPEED * Health(Event Player) / Global.MAX_HEALTH);
 	}
 }
 
