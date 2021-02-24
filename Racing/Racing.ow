@@ -160,10 +160,31 @@ rule("Player Spawn In")
 		Event Player.playerSpeed = 100;
 		Create HUD Text(Event Player, Custom String(">>index: {0}", Event Player.speedIndex), Null, Null, Left, 0, Color(White), Color(
 			White), Color(White), String, Default Visibility);
-		Teleport(Event Player, Global.trackPoints[0]);
-		Set Facing(Event Player, Global.trackPoints[1] - Global.trackPoints[0], To World);
 		Set Status(Event Player, Event Player, Unkillable, 9999);
 		Set Max Health(Event Player, 200);
+	}
+}
+
+rule("Player respawns, teleport to last checkpoint")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Count Of(Global.trackPoints) >= 100;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Global.trackPoints[Event Player.nextCheckPoint - 1]);
+		Set Facing(Event Player, Global.trackPoints[Event Player.nextCheckPoint] - Global.trackPoints[Event Player.nextCheckPoint - 1],
+			To World);
 		Damage(Event Player, Null, 10000);
 	}
 }
