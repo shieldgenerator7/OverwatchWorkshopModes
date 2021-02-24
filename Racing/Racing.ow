@@ -4,20 +4,21 @@ variables
 		0: TRACK_RADIUS
 		1: TRACK_DPS
 		2: TRACK_DURATION
-		3: trackPoints
-		4: trackEffectIds
-		5: _trackTargetList_
-		6: _trackLeft_
-		7: _trackTarget_
-		9: _result_
-		10: _i_
-		11: _j_
-		13: _x2_
-		14: _z2_
-		15: _x1_
-		16: _z1_
-		17: _x0_
-		18: _z0_
+		3: CHECKPOINT_INTERVAL
+		4: trackPoints
+		5: trackEffectIds
+		20: _trackTargetList_
+		21: _trackLeft_
+		22: _trackTarget_
+		23: _result_
+		24: _i_
+		25: _j_
+		26: _x2_
+		27: _z2_
+		28: _x1_
+		29: _z1_
+		30: _x0_
+		31: _z0_
 
 	player:
 		0: nextCheckPoint
@@ -45,6 +46,7 @@ rule("Game Setup")
 		Global.TRACK_RADIUS = 1;
 		Global.TRACK_DPS = 250;
 		Global.TRACK_DURATION = 7;
+		Global.CHECKPOINT_INTERVAL = 5;
 		Global.trackPoints = Array(Vector(-2.771, 0.006, -9.900), Vector(-17.783, 0.078, -16.934), Vector(-22.672, -1.827, -14.997),
 			Vector(-28.986, -1.954, -12.829), Vector(-31.359, 1.814, -30.305), Vector(-32.700, 1.923, -33.667), Vector(-21.688, 1.967,
 			-35.846), Vector(-15.737, 1.991, -29.964), Vector(-3.721, 1.833, -27.165), Vector(5.064, 3.809, -27.066), Vector(8.396, 3.820,
@@ -113,7 +115,8 @@ rule("Display Track Segments")
 		Global.trackEffectIds = Empty Array;
 		For Global Variable(_i_, 1, Count Of(Global.trackPoints), 1);
 			If(Is True For Any(All Players(All Teams),
-				Current Array Element.nextCheckPoint * 10 + 5 >= Global._i_ && Current Array Element.nextCheckPoint * 10 - 10 <= Global._i_));
+				Current Array Element.nextCheckPoint * Global.CHECKPOINT_INTERVAL + 5 >= Global._i_ && Current Array Element.nextCheckPoint * (
+				Global.CHECKPOINT_INTERVAL - 1) <= Global._i_));
 				Global._trackLeft_ = Global.TRACK_RADIUS * Direction From Angles(Angle Between Vectors(
 					Global.trackPoints[Global._i_ + 1] - Global.trackPoints[Global._i_ - 1], Forward) + 90, 0);
 				Create Beam Effect(All Players(All Teams), Good Beam, Global.trackPoints[Global._i_ - 1] + Global._trackLeft_,
@@ -146,9 +149,11 @@ rule("Player Spawn In")
 	{
 		Event Player.nextCheckPoint = 0;
 		Call Subroutine(NextPlayerCheckpoint);
-		Create Icon(Event Player, Global.trackPoints[Event Player.nextCheckPoint * 10], Flag, Position, Color(Green), True);
+		Create Icon(Event Player, Global.trackPoints[Event Player.nextCheckPoint * Global.CHECKPOINT_INTERVAL], Flag, Position, Color(
+			Green), True);
 		Event Player.flagEffectId = Last Created Entity;
-		Create Effect(Event Player, Ring, Color(Green), Global.trackPoints[Event Player.nextCheckPoint * 10], 2, Position and Radius);
+		Create Effect(Event Player, Ring, Color(Green), Global.trackPoints[Event Player.nextCheckPoint * Global.CHECKPOINT_INTERVAL], 2,
+			Position and Radius);
 		Create HUD Text(Event Player, Custom String("SPEED: {0}", Event Player.playerSpeed), Null, Null, Left, 0, Color(White), Color(
 			White), Color(White), String, Default Visibility);
 		Event Player.playerSpeed = 100;
@@ -236,7 +241,8 @@ rule("k")
 	actions
 	{
 		Global._result_ = False;
-		For Global Variable(_j_, Global._trackTarget_.nextCheckPoint * 10 - 10, Global._trackTarget_.nextCheckPoint * 10, 1);
+		For Global Variable(_j_, Global._trackTarget_.nextCheckPoint * (Global.CHECKPOINT_INTERVAL - 1),
+			Global._trackTarget_.nextCheckPoint * Global.CHECKPOINT_INTERVAL, 1);
 			Global._x2_ = X Component Of(Global.trackPoints[Global._j_]);
 			Global._z2_ = Z Component Of(Global.trackPoints[Global._j_]);
 			Global._x1_ = X Component Of(Global.trackPoints[Global._j_ - 1]);
@@ -285,7 +291,7 @@ rule("Next Player Checkpoint")
 	actions
 	{
 		Event Player.nextCheckPoint += 1;
-		If(Event Player.nextCheckPoint * 10 >= Count Of(Global.trackPoints));
+		If(Event Player.nextCheckPoint * Global.CHECKPOINT_INTERVAL >= Count Of(Global.trackPoints));
 			Event Player.nextCheckPoint = 0;
 		End;
 	}
@@ -302,7 +308,7 @@ rule("Player gets flag")
 
 	conditions
 	{
-		Distance Between(Position Of(Event Player), Global.trackPoints[Event Player.nextCheckPoint * 10]) <= 2;
+		Distance Between(Position Of(Event Player), Global.trackPoints[Event Player.nextCheckPoint * Global.CHECKPOINT_INTERVAL]) <= 2;
 	}
 
 	actions
