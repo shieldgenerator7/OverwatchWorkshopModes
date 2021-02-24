@@ -32,6 +32,7 @@ subroutines
 	0: ReinTrailContainsTarget
 	1: DisplayTrackSegments
 	2: NextPlayerCheckpoint
+	3: SetSpeedUsingHealth
 }
 
 rule("Game Setup")
@@ -161,6 +162,9 @@ rule("Player Spawn In")
 			White), Color(White), String, Default Visibility);
 		Teleport(Event Player, Global.trackPoints[0]);
 		Set Facing(Event Player, Global.trackPoints[1] - Global.trackPoints[0], To World);
+		Set Status(Event Player, Event Player, Unkillable, 9999);
+		Set Max Health(Event Player, 200);
+		Damage(Event Player, Null, 10000);
 	}
 }
 
@@ -194,7 +198,7 @@ rule("Host - Make Track Segment")
 	}
 }
 
-rule("Track speeds up players")
+disabled rule("Track speeds up players")
 {
 	event
 	{
@@ -232,7 +236,7 @@ rule("Track speeds up players")
 	}
 }
 
-rule("k")
+disabled rule("k")
 {
 	event
 	{
@@ -317,5 +321,72 @@ rule("Player gets flag")
 	{
 		Call Subroutine(NextPlayerCheckpoint);
 		Call Subroutine(DisplayTrackSegments);
+	}
+}
+
+rule("Player Move Forward, Heal")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Throttle Of(Event Player) == Forward;
+	}
+
+	actions
+	{
+		Heal(Event Player, Event Player, 7);
+		Call Subroutine(SetSpeedUsingHealth);
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Set Speed Using Health")
+{
+	event
+	{
+		Subroutine;
+		SetSpeedUsingHealth;
+	}
+
+	actions
+	{
+		Set Move Speed(Event Player, Health(Event Player));
+	}
+}
+
+rule("Player Healed")
+{
+	event
+	{
+		Player Received Healing;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Call Subroutine(ReinTrailContainsTarget);
+	}
+}
+
+rule("Player Damaged")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Call Subroutine(ReinTrailContainsTarget);
 	}
 }
