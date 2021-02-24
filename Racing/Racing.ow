@@ -53,6 +53,7 @@ rule("Game Setup")
 		Global.CHECKPOINT_INTERVAL = 5;
 		Global.MAX_HEALTH = 500;
 		Global.MAX_SPEED = 400;
+		Disable Built-In Game Mode Scoring;
 	}
 }
 
@@ -377,6 +378,8 @@ rule("Player gets flag")
 		disabled Small Message(Event Player, Custom String("DISTANCE: {0}", Distance Between(
 			Global.trackPoints[Event Player.nextCheckPoint * Global.CHECKPOINT_INTERVAL],
 			Global.trackPoints[Event Player.nextCheckPoint * Global.CHECKPOINT_INTERVAL - 1])));
+		Play Effect(Event Player, Buff Impact Sound, Color(White), Event Player, 2);
+		Modify Player Score(Event Player, 1);
 	}
 }
 
