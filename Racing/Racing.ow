@@ -465,6 +465,11 @@ rule("Next Player Checkpoint")
 		If(Event Player.nextCheckPoint * Global.CHECKPOINT_INTERVAL >= Count Of(Global.trackPoints));
 			Event Player.nextCheckPoint = 0;
 		End;
+		"At the start of every lap,"
+		If(Event Player.nextCheckPoint == 1);
+			"Give player ultimate"
+			Set Ultimate Charge(Event Player, 100);
+		End;
 	}
 }
 
