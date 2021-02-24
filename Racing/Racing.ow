@@ -159,6 +159,8 @@ rule("Player Spawn In")
 		Event Player.playerSpeed = 100;
 		Create HUD Text(Event Player, Custom String(">>index: {0}", Event Player.speedIndex), Null, Null, Left, 0, Color(White), Color(
 			White), Color(White), String, Default Visibility);
+		Teleport(Event Player, Global.trackPoints[0]);
+		Set Facing(Event Player, Global.trackPoints[1] - Global.trackPoints[0], To World);
 	}
 }
 
