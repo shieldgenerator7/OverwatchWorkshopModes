@@ -658,3 +658,11 @@ rule("Player wins")
 		Declare Player Victory(Event Player);
 	}
 }
+
+rule("== Your Health is Your Speed == Version 0.0.1 == by ShieldGnrtr7#2909 == Last Modified 2021-02-24 ==")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}

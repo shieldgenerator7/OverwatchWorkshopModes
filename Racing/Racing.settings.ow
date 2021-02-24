@@ -1,5 +1,10 @@
 settings
 {
+	main
+	{
+		Description: "Your health is your speed! Move forward to heal and speed up! *Game is currently in development and might not be balanced*"
+	}
+
 	lobby
 	{
 		Allow Players Who Are In Queue: Yes
@@ -37,10 +42,5 @@ settings
 			Ultimate Generation - Combat: 200%
 			Ultimate Generation - Passive: 200%
 		}
-	}
-
-	workshop
-	{
-		Checkpoint Interval: 7
 	}
 }
