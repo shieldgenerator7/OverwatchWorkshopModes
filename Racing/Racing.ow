@@ -164,7 +164,7 @@ rule("Player Spawn In")
 			Position and Radius);
 		Create HUD Text(Event Player, Custom String("SPEED: {0}", Event Player.playerSpeed), Null, Null, Left, 0, Color(White), Color(
 			White), Color(White), String, Default Visibility);
-		Event Player.playerSpeed = 100;
+		Event Player.playerSpeed = 1;
 		Create HUD Text(Event Player, Custom String("Next Checkpoint: {0}", Event Player.nextCheckPoint), Null, Null, Left, 0, Color(
 			White), Color(White), Color(White), String, Default Visibility);
 		Set Status(Event Player, Event Player, Unkillable, 9999);
@@ -172,6 +172,7 @@ rule("Player Spawn In")
 		Teleport(Event Player, Global.trackPoints[0]);
 		Set Facing(Event Player, Global.trackPoints[1] - Global.trackPoints[0], To World);
 		Damage(Event Player, Null, 10000);
+		Set Move Speed(Event Player, 1);
 	}
 }
 
