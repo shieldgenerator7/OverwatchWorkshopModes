@@ -40,6 +40,7 @@ subroutines
 	1: DisplayTrackSegments
 	2: NextPlayerCheckpoint
 	3: SetSpeedUsingHealth
+	4: DisplayPortals
 }
 
 rule("Game Setup")
@@ -59,6 +60,25 @@ rule("Game Setup")
 		Global.MAX_SPEED = 400;
 		Global.PORTAL_RADIUS = 2;
 		Disable Built-In Game Mode Scoring;
+	}
+}
+
+rule("Game Setup (Post-Track Setup)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		"If the track has finished setting up"
+		Count Of(Global.trackPoints) >= 100;
+	}
+
+	actions
+	{
+		Call Subroutine(DisplayPortals);
 	}
 }
 
@@ -164,6 +184,30 @@ rule("Display Track Segments")
 					None, Color(White), Default Visibility);
 				disabled Modify Global Variable(textEffectIds, Append To Array, Last Text ID);
 			End;
+		End;
+	}
+}
+
+rule("Display Portals")
+{
+	event
+	{
+		Subroutine;
+		DisplayPortals;
+	}
+
+	actions
+	{
+		For Global Variable(_i_, 0, Count Of(Global.portalPoints1), 1);
+			Create Effect(All Players(All Teams), Good Aura, Color(Blue), Global.portalPoints1[Global._i_] + Up * 1, Global.PORTAL_RADIUS,
+				Visible To);
+			Create Effect(All Players(All Teams), Good Aura, Color(Sky Blue), Global.portalPoints1[Global._i_] + Up * 1,
+				Global.PORTAL_RADIUS / 2, Visible To);
+			Create Effect(All Players(All Teams), Good Aura, Color(Blue), Global.portalPoints1[Global._i_] + Up * 1, Global.PORTAL_RADIUS / 4,
+				Visible To);
+			Create Effect(All Players(All Teams), Orb, Color(Sky Blue), Global.portalPoints1[Global._i_] + Up * 1, Global.PORTAL_RADIUS / 8,
+				Visible To);
+			Create Effect(All Players(All Teams), Ring, Color(Blue), Global.portalPoints1[Global._i_], Global.PORTAL_RADIUS, Visible To);
 		End;
 	}
 }
@@ -440,7 +484,7 @@ rule("Player gets flag")
 		disabled Small Message(Event Player, Custom String("DISTANCE: {0}", Distance Between(
 			Global.trackPoints[Event Player.nextCheckPoint * Global.CHECKPOINT_INTERVAL],
 			Global.trackPoints[Event Player.nextCheckPoint * Global.CHECKPOINT_INTERVAL - 1])));
-		Play Effect(Event Player, Buff Impact Sound, Color(White), Event Player, 2);
+		Play Effect(Event Player, Buff Impact Sound, Color(White), Event Player, 1);
 		Modify Player Score(Event Player, 1);
 	}
 }
@@ -560,6 +604,7 @@ rule("Player enters portal")
 		For Player Variable(Event Player, _i_, 0, Count Of(Global.portalPoints1), 1);
 			If(Distance Between(Global.portalPoints1[Event Player._i_], Position Of(Event Player)) <= Global.PORTAL_RADIUS);
 				Teleport(Event Player, Global.portalPoints2[Event Player._i_]);
+				Play Effect(Event Player, Ring Explosion Sound, Color(White), Event Player, 1);
 				Break;
 			End;
 		End;
