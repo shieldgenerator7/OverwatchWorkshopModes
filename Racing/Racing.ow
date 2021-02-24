@@ -444,6 +444,7 @@ rule("Player Stop, Damage")
 	{
 		Magnitude Of(Velocity Of(Event Player)) == 0;
 		disabled Throttle Of(Event Player) == Forward;
+		Health(Event Player) > 1;
 	}
 
 	actions
