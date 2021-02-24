@@ -10,6 +10,9 @@ variables
 		6: textEffectIds
 		7: MAX_HEALTH
 		8: MAX_SPEED
+		9: portalPoints1
+		10: portalPoints2
+		11: PORTAL_RADIUS
 		20: _trackTargetList_
 		21: _trackLeft_
 		22: _trackTarget_
@@ -28,6 +31,7 @@ variables
 		1: flagEffectId
 		2: playerSpeed
 		3: speedIndex
+		20: _i_
 }
 
 subroutines
@@ -53,6 +57,7 @@ rule("Game Setup")
 		Global.CHECKPOINT_INTERVAL = 5;
 		Global.MAX_HEALTH = 500;
 		Global.MAX_SPEED = 400;
+		Global.PORTAL_RADIUS = 2;
 		Disable Built-In Game Mode Scoring;
 	}
 }
@@ -71,6 +76,8 @@ rule("Map: Eichenwalde")
 
 	actions
 	{
+		Global.portalPoints1 = Array(Vector(26.878, 8.427, -87.156), Vector(99.770, 12.670, -70.680));
+		Global.portalPoints2 = Array(Vector(28.234, 8, -86.812), Vector(99.770, 12.670, -67.680));
 		Global.trackPoints = Array(Vector(-2.771, 0.006, -9.900), Vector(-17.783, 0.078, -16.934), Vector(-22.672, -1.827, -14.997),
 			Vector(-28.986, -1.954, -12.829), Vector(-31.359, 1.814, -30.305), Vector(-32.700, 1.923, -33.667), Vector(-21.688, 1.967,
 			-35.846), Vector(-15.737, 1.991, -29.964), Vector(-3.721, 1.833, -27.165), Vector(5.064, 3.809, -27.066), Vector(8.396, 3.820,
@@ -222,7 +229,7 @@ rule("Player respawns, teleport to last checkpoint")
 	}
 }
 
-rule("Host - Make Track Segment")
+rule("==TOOL== Host - Make Track Segment")
 {
 	event
 	{
@@ -249,6 +256,55 @@ rule("Host - Make Track Segment")
 				Global.trackPoints[Count Of(Global.trackPoints) - 1] - Global._trackLeft_, Color(Green), Visible To);
 			Modify Global Variable(trackEffectIds, Append To Array, Last Created Entity);
 		End;
+	}
+}
+
+rule("==TOOL== Host - Make Door Portal 1")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player == Host Player;
+		Is Button Held(Event Player, Button(Interact)) == True;
+		Is Button Held(Event Player, Button(Primary Fire)) == True;
+	}
+
+	actions
+	{
+		Modify Global Variable(portalPoints1, Append To Array, Position Of(Event Player));
+		Teleport(Event Player, Position Of(Event Player) + Facing Direction Of(Event Player) * 2);
+		Small Message(Event Player, Custom String("Now do Interact + Primary Fire to complete the portal"));
+	}
+}
+
+rule("==TOOL== Host - Make Door Portal 2")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player == Host Player;
+		Is Button Held(Event Player, Button(Interact)) == True;
+		Is Button Held(Event Player, Button(Secondary Fire)) == True;
+	}
+
+	actions
+	{
+		Modify Global Variable(portalPoints2, Append To Array, Position Of(Event Player));
+		disabled Teleport(Event Player, Position Of(Event Player) + Facing Direction Of(Event Player) * 2);
+		Small Message(Event Player, Custom String("Portal opened: {0} to {1}", Global.portalPoints1[Count Of(Global.portalPoints2) - 1],
+			Global.portalPoints2[Count Of(Global.portalPoints2) - 1]));
 	}
 }
 
@@ -472,5 +528,30 @@ rule("Player Stop, Damage")
 		Call Subroutine(SetSpeedUsingHealth);
 		Wait(0.100, Ignore Condition);
 		Loop If Condition Is True;
+	}
+}
+
+rule("Player enters portal")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is True For Any(Global.portalPoints1, Distance Between(Current Array Element, Event Player) <= Global.PORTAL_RADIUS) == True;
+	}
+
+	actions
+	{
+		For Player Variable(Event Player, _i_, 0, Count Of(Global.portalPoints1), 1);
+			If(Distance Between(Global.portalPoints1[Event Player._i_], Position Of(Event Player)) <= Global.PORTAL_RADIUS);
+				Teleport(Event Player, Global.portalPoints2[Event Player._i_]);
+				Break;
+			End;
+		End;
 	}
 }
