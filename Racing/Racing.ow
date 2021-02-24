@@ -53,6 +53,9 @@ rule("Game Setup")
 		Global.CHECKPOINT_INTERVAL = 5;
 		Global.MAX_HEALTH = 500;
 		Global.MAX_SPEED = 400;
+	}
+}
+
 rule("Map: Eichenwalde")
 {
 	event
