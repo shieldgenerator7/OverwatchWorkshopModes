@@ -13,6 +13,7 @@ variables
 		9: portalPoints1
 		10: portalPoints2
 		11: PORTAL_RADIUS
+		12: scoreToWin
 		20: _trackTargetList_
 		21: _trackLeft_
 		22: _trackTarget_
@@ -60,6 +61,8 @@ rule("Game Setup")
 		Global.MAX_SPEED = 400;
 		Global.PORTAL_RADIUS = 2;
 		Disable Built-In Game Mode Scoring;
+		Disable Built-In Game Mode Completion;
+		Disable Built-In Game Mode Announcer;
 	}
 }
 
@@ -79,6 +82,7 @@ rule("Game Setup (Post-Track Setup)")
 	actions
 	{
 		Call Subroutine(DisplayPortals);
+		Global.scoreToWin = (Round To Integer(Count Of(Global.trackPoints) / Global.CHECKPOINT_INTERVAL, Down) + 1) * 3;
 	}
 }
 
@@ -606,5 +610,27 @@ rule("Player enters portal")
 				Break;
 			End;
 		End;
+	}
+}
+
+rule("Player wins")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Score Of(Event Player) >= Global.scoreToWin;
+		"If the track has finished setting up"
+		Count Of(Global.trackPoints) >= 100;
+	}
+
+	actions
+	{
+		Declare Player Victory(Event Player);
 	}
 }
