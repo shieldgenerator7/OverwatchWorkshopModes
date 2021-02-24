@@ -41,6 +41,6 @@ settings
 
 	workshop
 	{
-		Checkpoint Interval: 10
+		Checkpoint Interval: 7
 	}
 }

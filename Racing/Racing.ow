@@ -67,6 +67,24 @@ rule("Game Setup")
 	}
 }
 
+rule("Game Setup (Hero Assembly)")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Is Assembling Heroes == True;
+	}
+
+	actions
+	{
+		Set Match Time(10);
+	}
+}
+
 rule("Game Setup (Post-Track Setup)")
 {
 	event
