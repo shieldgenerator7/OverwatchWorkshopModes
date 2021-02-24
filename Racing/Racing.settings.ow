@@ -28,4 +28,15 @@ settings
 			Spawn Health Packs: Enabled
 		}
 	}
+
+	heroes
+	{
+		General
+		{
+			Ability Cooldown Time: 0%
+			Spawn With Ultimate Ready: On
+			Ultimate Generation - Combat: 200%
+			Ultimate Generation - Passive: 0%
+		}
+	}
 }
