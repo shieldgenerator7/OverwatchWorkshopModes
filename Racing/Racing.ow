@@ -53,10 +53,11 @@ rule("Game Setup")
 
 	actions
 	{
-		Global.TRACK_RADIUS = 1;
+		Global.TRACK_RADIUS = Workshop Setting Real(Custom String("RACE SETTINGS"), Custom String("Track Width"), 1, 0.500, 10, 0);
 		Global.TRACK_DPS = 250;
 		Global.TRACK_DURATION = 7;
-		Global.CHECKPOINT_INTERVAL = 5;
+		Global.CHECKPOINT_INTERVAL = Workshop Setting Integer(Custom String("RACE SETTINGS"), Custom String("Checkpoint Interval"), 5, 1,
+			200, 0);
 		Global.MAX_HEALTH = 500;
 		Global.MAX_SPEED = 400;
 		Global.PORTAL_RADIUS = 2;
@@ -488,7 +489,7 @@ rule("Player gets flag")
 		disabled Small Message(Event Player, Custom String("DISTANCE: {0}", Distance Between(
 			Global.trackPoints[Event Player.nextCheckPoint * Global.CHECKPOINT_INTERVAL],
 			Global.trackPoints[Event Player.nextCheckPoint * Global.CHECKPOINT_INTERVAL - 1])));
-		Play Effect(Event Player, Buff Impact Sound, Color(White), Event Player, 1);
+		Play Effect(Event Player, Buff Impact Sound, Color(White), Event Player, 0.500);
 		Modify Player Score(Event Player, 1);
 	}
 }
@@ -606,7 +607,7 @@ rule("Player enters portal")
 		For Player Variable(Event Player, _i_, 0, Count Of(Global.portalPoints1), 1);
 			If(Distance Between(Global.portalPoints1[Event Player._i_], Position Of(Event Player)) <= Global.PORTAL_RADIUS);
 				Teleport(Event Player, Global.portalPoints2[Event Player._i_]);
-				Play Effect(Event Player, Ring Explosion Sound, Color(White), Event Player, 1);
+				Play Effect(Event Player, Ring Explosion Sound, Color(White), Event Player, 0.500);
 				Break;
 			End;
 		End;

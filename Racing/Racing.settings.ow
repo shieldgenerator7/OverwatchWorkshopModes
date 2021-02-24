@@ -33,10 +33,14 @@ settings
 	{
 		General
 		{
-			Ability Cooldown Time: 0%
-			Spawn With Ultimate Ready: On
+			Ability Cooldown Time: 50%
 			Ultimate Generation - Combat: 200%
-			Ultimate Generation - Passive: 0%
+			Ultimate Generation - Passive: 200%
 		}
+	}
+
+	workshop
+	{
+		Checkpoint Interval: 10
 	}
 }
