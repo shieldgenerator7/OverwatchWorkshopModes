@@ -7,6 +7,7 @@ variables
 		3: CHECKPOINT_INTERVAL
 		4: trackPoints
 		5: trackEffectIds
+		6: textEffectIds
 		20: _trackTargetList_
 		21: _trackLeft_
 		22: _trackTarget_
@@ -70,29 +71,29 @@ rule("Game Setup")
 			-97.945), Vector(84.285, 12.707, -94.436), Vector(88.395, 12.691, -77.389), Vector(90.673, 12.663, -74.163), Vector(98.452,
 			12.666, -71.625), Vector(100.266, 12.723, -69.760), Vector(99.890, 12.733, -66.049), Vector(98.382, 12.733, -58.651), Vector(
 			97.274, 12.723, -57.575), Vector(94.389, 12.723, -56.861), Vector(94.703, 12.723, -54.503), Vector(95.436, 11.723, -49.360),
-			Vector(96.596, 10.723, -45.515), Vector(95.321, 12.723, -111.270), Vector(95.844, 10.723, -44.483), Vector(103.445, 12.723,
-			-46.879), Vector(104.941, 12.723, -47.618), Vector(104.785, 12.723, -53.778), Vector(113.877, 12.723, -59.679), Vector(120.368,
-			10.723, -61.158), Vector(125.992, 10.723, -61.670), Vector(129.564, 11.810, -62.159), Vector(133.266, 11.723, -62.764), Vector(
-			135.673, 11.723, -62.218), Vector(136.961, 11.723, -60.672), Vector(141.966, 11.723, -47.974), Vector(142.373, 11.723,
-			-41.047), Vector(142.777, 11.723, -35.560), Vector(141.716, 11.810, -31.496), Vector(139.622, 10.723, -28.227), Vector(136.344,
-			10.723, -21.164), Vector(133.814, 10.723, -16.777), Vector(133.813, 12.723, -11.366), Vector(133.841, 12.723, -9.874), Vector(
-			132.306, 12.868, -8.681), Vector(129.958, 13.723, -8.313), Vector(126.812, 13.723, -7.583), Vector(123.461, 12.723, -6.724),
-			Vector(122.650, 12.723, -6.670), Vector(121.824, 12.723, -8.129), Vector(120.727, 10.723, -13.107), Vector(116.877, 10.723,
-			-13.856), Vector(114.852, 10.723, -15.427), Vector(113.553, 10.723, -18.365), Vector(113.635, 10.723, -21.663), Vector(113.773,
-			10.723, -27.854), Vector(114.922, 8.720, -32.211), Vector(115.639, 8.719, -37.752), Vector(112.278, 8.958, -40.348), Vector(
-			107.324, 10.723, -37.398), Vector(107.130, 10.723, -37.084), Vector(107.161, 10.723, -35.588), Vector(108.168, 10.723,
-			-30.500), Vector(108.583, 11.316, -28.701), Vector(109.159, 12.558, -26.288), Vector(109.571, 12.723, -23.909), Vector(108.087,
-			12.742, -23.391), Vector(101.764, 15.723, -21.468), Vector(98.689, 15.723, -20.585), Vector(94.141, 15.723, -19.550), Vector(
-			90.818, 15.723, -19.606), Vector(89.104, 15.723, -21.476), Vector(87.756, 12.723, -28.667), Vector(86.530, 12.723, -35.028),
-			Vector(83.538, 12.723, -49.007), Vector(81.539, 12.723, -51.833), Vector(78.650, 12.723, -56.345), Vector(77.757, 12.723,
-			-59.850), Vector(76.895, 12.723, -63.326), Vector(76.364, 12.660, -65.137), Vector(74.101, 12.801, -65.120), Vector(70.986,
-			14.692, -64.442), Vector(68.448, 16.196, -65.340), Vector(64.877, 18.249, -67.320), Vector(61.356, 20.021, -67.476), Vector(
-			56.645, 21.003, -66.141), Vector(51.286, 21.726, -65.048), Vector(44.763, 5.306, -65.555), Vector(41.779, 5.085, -62.567),
-			Vector(39.244, 5.152, -59.769), Vector(36.614, 5.250, -58.131), Vector(34.411, 5.250, -58.867), Vector(29.986, 4.839, -59.083),
-			Vector(23.780, 4.814, -57.344), Vector(21.228, 4.853, -53.300), Vector(21.813, 5, -48.554), Vector(22.990, 5, -44.097), Vector(
-			26.611, 5, -39.585), Vector(27.045, 4.015, -36.379), Vector(26.771, 4.015, -30.708), Vector(27.135, 3.901, -26.890), Vector(
-			27.663, 3.239, -23.080), Vector(28.278, 0.983, -14.875), Vector(26.767, 0.920, -11.989), Vector(24.211, 0.905, -10.010),
-			Vector(20.854, 0.896, -8.384), Vector(16.711, 0.890, -6.993), Vector(9.761, 1, -7.176), Vector(-0.986, 0.016, -9.394));
+			Vector(96.596, 10.723, -45.515), Vector(103.445, 12.723, -46.879), Vector(104.941, 12.723, -47.618), Vector(104.785, 12.723,
+			-53.778), Vector(113.877, 12.723, -59.679), Vector(120.368, 10.723, -61.158), Vector(125.992, 10.723, -61.670), Vector(129.564,
+			11.810, -62.159), Vector(133.266, 11.723, -62.764), Vector(135.673, 11.723, -62.218), Vector(136.961, 11.723, -60.672), Vector(
+			141.966, 11.723, -47.974), Vector(142.373, 11.723, -41.047), Vector(142.777, 11.723, -35.560), Vector(141.716, 11.810,
+			-31.496), Vector(139.622, 10.723, -28.227), Vector(136.344, 10.723, -21.164), Vector(133.814, 10.723, -16.777), Vector(133.813,
+			12.723, -11.366), Vector(133.841, 12.723, -9.874), Vector(132.306, 12.868, -8.681), Vector(129.958, 13.723, -8.313), Vector(
+			126.812, 13.723, -7.583), Vector(123.461, 12.723, -6.724), Vector(122.650, 12.723, -6.670), Vector(121.824, 12.723, -8.129),
+			Vector(120.727, 10.723, -13.107), Vector(116.877, 10.723, -13.856), Vector(114.852, 10.723, -15.427), Vector(113.553, 10.723,
+			-18.365), Vector(113.635, 10.723, -21.663), Vector(113.773, 10.723, -27.854), Vector(114.922, 8.720, -32.211), Vector(115.639,
+			8.719, -37.752), Vector(112.278, 8.958, -40.348), Vector(107.324, 10.723, -37.398), Vector(107.130, 10.723, -37.084), Vector(
+			107.161, 10.723, -35.588), Vector(108.168, 10.723, -30.500), Vector(108.583, 11.316, -28.701), Vector(109.159, 12.558,
+			-26.288), Vector(109.571, 12.723, -23.909), Vector(108.087, 12.742, -23.391), Vector(101.764, 15.723, -21.468), Vector(98.689,
+			15.723, -20.585), Vector(94.141, 15.723, -19.550), Vector(90.818, 15.723, -19.606), Vector(89.104, 15.723, -21.476), Vector(
+			87.756, 12.723, -28.667), Vector(86.530, 12.723, -35.028), Vector(83.538, 12.723, -49.007), Vector(81.539, 12.723, -51.833),
+			Vector(78.650, 12.723, -56.345), Vector(77.757, 12.723, -59.850), Vector(76.895, 12.723, -63.326), Vector(76.364, 12.660,
+			-65.137), Vector(74.101, 12.801, -65.120), Vector(70.986, 14.692, -64.442), Vector(68.448, 16.196, -65.340), Vector(64.877,
+			18.249, -67.320), Vector(61.356, 20.021, -67.476), Vector(56.645, 21.003, -66.141), Vector(51.286, 21.726, -65.048), Vector(
+			44.763, 5.306, -65.555), Vector(41.779, 5.085, -62.567), Vector(39.244, 5.152, -59.769), Vector(36.614, 5.250, -58.131),
+			Vector(34.411, 5.250, -58.867), Vector(29.986, 4.839, -59.083), Vector(23.780, 4.814, -57.344), Vector(21.228, 4.853, -53.300),
+			Vector(21.813, 5, -48.554), Vector(22.990, 5, -44.097), Vector(26.611, 5, -39.585), Vector(27.045, 4.015, -36.379), Vector(
+			26.771, 4.015, -30.708), Vector(27.135, 3.901, -26.890), Vector(27.663, 3.239, -23.080), Vector(28.278, 0.983, -14.875),
+			Vector(26.767, 0.920, -11.989), Vector(24.211, 0.905, -10.010), Vector(20.854, 0.896, -8.384), Vector(16.711, 0.890, -6.993),
+			Vector(9.761, 1, -7.176), Vector(-0.986, 0.016, -9.394));
 		disabled Call Subroutine(DisplayTrackSegments);
 	}
 }
@@ -113,6 +114,9 @@ rule("Display Track Segments")
 		For Global Variable(_i_, 0, Count Of(Global.trackPoints), 1);
 			Destroy Effect(Global.trackEffectIds[Global._i_]);
 		End;
+		disabled For Global Variable(_i_, 0, Count Of(Global.textEffectIds), 1);
+		disabled Destroy In-World Text(Global._i_);
+		disabled End;
 		Global.trackEffectIds = Empty Array;
 		For Global Variable(_i_, 1, Count Of(Global.trackPoints), 1);
 			If(Is True For Any(All Players(All Teams),
@@ -126,6 +130,9 @@ rule("Display Track Segments")
 				Create Beam Effect(All Players(All Teams), Good Beam, Global.trackPoints[Global._i_ - 1] - Global._trackLeft_,
 					Global.trackPoints[Global._i_] - Global._trackLeft_, Color(Green), Visible To);
 				Modify Global Variable(trackEffectIds, Append To Array, Last Created Entity);
+				disabled Create In-World Text(All Players(All Teams), Custom String("{0}", Global._i_), Global.trackPoints[Global._i_], 2, Do Not Clip,
+					None, Color(White), Default Visibility);
+				disabled Modify Global Variable(textEffectIds, Append To Array, Last Text ID);
 			End;
 		End;
 	}
@@ -346,6 +353,9 @@ rule("Player gets flag")
 	{
 		Call Subroutine(NextPlayerCheckpoint);
 		Call Subroutine(DisplayTrackSegments);
+		disabled Small Message(Event Player, Custom String("DISTANCE: {0}", Distance Between(
+			Global.trackPoints[Event Player.nextCheckPoint * Global.CHECKPOINT_INTERVAL],
+			Global.trackPoints[Event Player.nextCheckPoint * Global.CHECKPOINT_INTERVAL - 1])));
 	}
 }
 
