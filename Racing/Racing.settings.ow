@@ -1,51 +1,31 @@
 settings
 {
+	lobby
+	{
+		Allow Players Who Are In Queue: Yes
+		Map Rotation: After A Game
+		Match Voice Chat: Enabled
+		Max Spectators: 12
+		Return To Lobby: Never
+	}
+
 	modes
 	{
-		Assault
+		Deathmatch
 		{
-			Limit Roles: 2 Of Each Role Per Team
-
-			enabled maps
-			{
-			}
-		}
-
-		Control
-		{
-			Limit Roles: 2 Of Each Role Per Team
-
-			enabled maps
-			{
-			}
-		}
-
-		Escort
-		{
-			Limit Roles: 2 Of Each Role Per Team
-
-			enabled maps
-			{
-			}
-		}
-
-		Hybrid
-		{
-			Limit Roles: 2 Of Each Role Per Team
+			Score To Win: 100
 
 			enabled maps
 			{
 				Eichenwalde
 			}
 		}
-	}
 
-	heroes
-	{
 		General
 		{
-			Ability Cooldown Time: 0%
-			Spawn With Ultimate Ready: On
+			Health Pack Respawn Time Scalar: 50%
+			Hero Limit: Off
+			Spawn Health Packs: Enabled
 		}
 	}
 }
