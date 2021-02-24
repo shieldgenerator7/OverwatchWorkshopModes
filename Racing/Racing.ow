@@ -240,10 +240,10 @@ rule("Player Spawn In")
 		Event Player.flagEffectId = Last Created Entity;
 		Create Effect(Event Player, Ring, Color(Green), Global.trackPoints[Event Player.nextCheckPoint * Global.CHECKPOINT_INTERVAL], 2,
 			Position and Radius);
-		Create HUD Text(Event Player, Custom String("SPEED: {0}", Event Player.playerSpeed), Null, Null, Left, 0, Color(White), Color(
+		disabled Create HUD Text(Event Player, Custom String("SPEED: {0}", Event Player.playerSpeed), Null, Null, Left, 0, Color(White), Color(
 			White), Color(White), String, Default Visibility);
 		Event Player.playerSpeed = 1;
-		Create HUD Text(Event Player, Custom String("Next Checkpoint: {0}", Event Player.nextCheckPoint), Null, Null, Left, 0, Color(
+		disabled Create HUD Text(Event Player, Custom String("Next Checkpoint: {0}", Event Player.nextCheckPoint), Null, Null, Left, 0, Color(
 			White), Color(White), Color(White), String, Default Visibility);
 		Set Status(Event Player, Event Player, Unkillable, 9999);
 		Set Max Health(Event Player, 100);
@@ -251,7 +251,7 @@ rule("Player Spawn In")
 		Set Facing(Event Player, Global.trackPoints[1] - Global.trackPoints[0], To World);
 		Damage(Event Player, Null, 10000);
 		Set Move Speed(Event Player, 1);
-		Create HUD Text(Event Player, Custom String("Position: {0}", Position Of(Event Player)), Null, Null, Left, 0, Color(White), Color(
+		disabled Create HUD Text(Event Player, Custom String("Position: {0}", Position Of(Event Player)), Null, Null, Left, 0, Color(White), Color(
 			White), Color(White), String, Default Visibility);
 	}
 }
