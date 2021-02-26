@@ -10,6 +10,14 @@ variables
 		0: timer
 		1: timerLast
 		2: timerBest
+		3: isTimerRunning
+}
+
+subroutines
+{
+	0: startTimer
+	1: stopTimer
+	2: cancelTimer
 }
 
 rule("Game Setup")
@@ -49,13 +57,22 @@ rule("Player Setup")
 	actions
 	{
 		Teleport(Event Player, Global.modeTriggerPosList[0]);
-		Event Player.timer = 0;
+		Event Player.timer = -1;
 		Event Player.timerLast = -1;
 		Event Player.timerBest = -1;
+		Event Player.isTimerRunning = False;
+		Create HUD Text(Filtered Array(Event Player, Current Array Element.timer >= 0), Custom String("Time: {0}", Event Player.timer),
+			Null, Null, Left, 0, Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
+		Create HUD Text(Filtered Array(Event Player, Current Array Element.timerLast >= 0), Custom String("Last: {0}",
+			Event Player.timerLast), Null, Null, Left, 1, Color(White), Color(White), Color(White), Visible To and String,
+			Default Visibility);
+		Create HUD Text(Filtered Array(Event Player, Current Array Element.timerBest >= 0), Custom String("Best: {0}",
+			Event Player.timerBest), Null, Null, Left, 2, Color(White), Color(White), Color(White), Visible To and String,
+			Default Visibility);
 	}
 }
 
-rule("[TOOL] HUD")
+disabled rule("[TOOL] HUD")
 {
 	event
 	{
@@ -72,9 +89,9 @@ rule("[TOOL] HUD")
 
 	actions
 	{
-		Create HUD Text(Event Player, Custom String("POS: {0}", Position Of(Event Player)), Null, Null, Left, 0, Color(White), Color(
+		Create HUD Text(Event Player, Custom String("POS: {0}", Position Of(Event Player)), Null, Null, Left, 10, Color(White), Color(
 			White), Color(White), Visible To and String, Default Visibility);
-		Create HUD Text(Event Player, Custom String("DIR: {0}", Facing Direction Of(Event Player)), Null, Null, Left, 1, Color(White),
+		Create HUD Text(Event Player, Custom String("DIR: {0}", Facing Direction Of(Event Player)), Null, Null, Left, 11, Color(White),
 			Color(White), Color(White), Visible To and String, Default Visibility);
 		For Global Variable(_i_, 0, Count Of(Global.modeTriggerPosList), 1);
 			Create Effect(All Players(All Teams), Ring, Color(Yellow), Global.modeTriggerPosList[Global._i_], Global.MODE_TRIGGER_RADIUS,
@@ -133,6 +150,10 @@ rule("[Orisa] Player triggers game mode")
 			If(Distance Between(Position Of(Event Player), Global.modeTriggerPosList[Global._i_]) <= Global.MODE_TRIGGER_RADIUS);
 				Teleport(Event Player, Global.modeTriggerPosList[Global._i_]);
 				Set Status(Event Player, Null, Rooted, 9999);
+				Event Player.timer = -1;
+				Event Player.timerLast = -1;
+				Event Player.timerBest = -1;
+				Event Player.isTimerRunning = False;
 				Destroy All Dummy Bots;
 				Global.trainingMode = Global._i_;
 			End;
@@ -212,5 +233,100 @@ rule("[0] Ana bot dies")
 	{
 		Destroy Dummy Bot(All Teams, 0);
 		Create Dummy Bot(Hero(Ana), Opposite Team Of(Team Of(Host Player)), 0, Vector(79.710, 12.710, -99.980), Vector(0.250, 0, 0.970));
+		Call Subroutine(stopTimer);
+	}
+}
+
+rule("Timer")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.isTimerRunning == True;
+	}
+
+	actions
+	{
+		Wait(0.100, Ignore Condition);
+		Event Player.timer += 0.100;
+		Loop If Condition Is True;
+	}
+}
+
+rule("Start Timer")
+{
+	event
+	{
+		Subroutine;
+		startTimer;
+	}
+
+	actions
+	{
+		Host Player.timer = 0;
+		Host Player.isTimerRunning = True;
+	}
+}
+
+rule("Stop Timer")
+{
+	event
+	{
+		Subroutine;
+		stopTimer;
+	}
+
+	actions
+	{
+		Host Player.isTimerRunning = False;
+		Host Player.timerLast = Host Player.timer;
+		If(Host Player.timer < Host Player.timerBest || Host Player.timerBest < 0);
+			Host Player.timerBest = Host Player.timer;
+		End;
+		Host Player.timer = -1;
+	}
+}
+
+rule("[0] Orisa Halt starts timer")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Orisa;
+	}
+
+	conditions
+	{
+		Global.trainingMode == 0;
+		Hero Of(Event Player) == Hero(Orisa);
+		Is Firing Secondary(Event Player) == True;
+		Event Player.isTimerRunning == False;
+	}
+
+	actions
+	{
+		Call Subroutine(startTimer);
+	}
+}
+
+rule("Cancel Timer")
+{
+	event
+	{
+		Subroutine;
+		cancelTimer;
+	}
+
+	actions
+	{
+		Host Player.isTimerRunning = False;
+		Host Player.timer = -1;
 	}
 }
