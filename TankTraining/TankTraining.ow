@@ -15,6 +15,7 @@ variables
 		4: streak
 		5: streakLast
 		6: streakBest
+		7: blockedHook
 }
 
 subroutines
@@ -435,6 +436,7 @@ rule("[1] Orisa - Hog Hook Countering")
 
 	actions
 	{
+		Host Player.blockedHook = False;
 		Create Dummy Bot(Hero(Roadhog), Opposite Team Of(Team Of(Host Player)), -1, Vector(80.370, 12.680, -96.780), Vector(0.200, -0.510,
 			0.830));
 		Set Primary Fire Enabled(Host Player, False);
@@ -493,6 +495,12 @@ rule("[1] Limit duration of Fortify")
 		Wait(0.500, Ignore Condition);
 		Kill(Event Player, Null);
 		Resurrect(Event Player);
+		If(Event Player.blockedHook == True);
+			Event Player.streak += 1;
+		Else;
+			Call Subroutine(resetStreak);
+		End;
+		Event Player.blockedHook = False;
 	}
 }
 
@@ -509,6 +517,7 @@ rule("[1] Orisa hooked - teleport back to start")
 	{
 		Global.trainingMode == 1;
 		Hero Of(Event Player) == Hero(Orisa);
+		Event Damage < 100;
 	}
 
 	actions
@@ -517,5 +526,29 @@ rule("[1] Orisa hooked - teleport back to start")
 		Wait(1, Ignore Condition);
 		Teleport(Event Player, Global.START_POS);
 		Heal(Event Player, Null, 100);
+	}
+}
+
+rule("[1] Orisa blocks hook")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Roadhog;
+	}
+
+	conditions
+	{
+		Global.trainingMode == 1;
+		Hero Of(Event Player) == Hero(Roadhog);
+		Is Dummy Bot(Event Player) == True;
+		Is Using Ability 1(Event Player) == True;
+		Is Using Ability 1(Host Player) == True;
+	}
+
+	actions
+	{
+		Host Player.blockedHook = True;
 	}
 }
