@@ -396,8 +396,55 @@ rule("[1] Roadhog uses Hook")
 	actions
 	{
 		Set Facing(Event Player, Direction Towards(Position Of(Event Player), Position Of(Host Player)), To World);
-		Wait(Random Real(1, 5), Ignore Condition);
+		Wait(Random Real(2, 7), Ignore Condition);
 		Press Button(Event Player, Button(Ability 1));
 		Loop If Condition Is True;
+	}
+}
+
+rule("[1] Limit duration of Fortify")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Orisa;
+	}
+
+	conditions
+	{
+		Global.trainingMode == 1;
+		Hero Of(Event Player) == Hero(Orisa);
+		Is Using Ability 1(Event Player) == True;
+	}
+
+	actions
+	{
+		Wait(0.500, Ignore Condition);
+		Kill(Event Player, Null);
+		Resurrect(Event Player);
+	}
+}
+
+rule("[1] Orisa hooked - teleport back to start")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		Orisa;
+	}
+
+	conditions
+	{
+		Global.trainingMode == 1;
+		Hero Of(Event Player) == Hero(Orisa);
+	}
+
+	actions
+	{
+		Wait(1, Ignore Condition);
+		Teleport(Event Player, Global.START_POS);
+		Heal(Event Player, Null, 100);
 	}
 }
