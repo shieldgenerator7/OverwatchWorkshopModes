@@ -206,10 +206,32 @@ rule("[0] Orisa spawns shield")
 	actions
 	{
 		Set Facing(Event Player, Vector(0.200, -0.510, 0.830), To World);
-		Press Button(Event Player, Button(Ability 1));
 		Press Button(Event Player, Button(Ability 2));
 		Wait(5, Abort When False);
 		Loop If Condition Is True;
+	}
+}
+
+rule("[0] Orisa uses Fortify")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Orisa;
+	}
+
+	conditions
+	{
+		Global.trainingMode == 0;
+		Hero Of(Event Player) == Hero(Orisa);
+		Is Dummy Bot(Event Player) == True;
+		Is Using Ability 1(Event Player) == False;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Button(Ability 1));
 	}
 }
 
