@@ -55,18 +55,20 @@ rule("[TOOL] HUD")
 	}
 }
 
-rule("Player triggers game mode")
+rule("[Orisa] Player triggers game mode")
 {
 	event
 	{
 		Ongoing - Each Player;
 		All;
-		All;
+		Orisa;
 	}
 
 	conditions
 	{
 		Is Button Held(Event Player, Button(Interact)) == True;
+		Hero Of(Event Player) == Hero(Orisa);
+		Global.trainingMode < 0;
 	}
 
 	actions
@@ -74,6 +76,7 @@ rule("Player triggers game mode")
 		For Global Variable(_i_, 0, Count Of(Global.modeTriggerPosList), 1);
 			If(Distance Between(Position Of(Event Player), Global.modeTriggerPosList[Global._i_]) <= Global.MODE_TRIGGER_RADIUS);
 				Teleport(Event Player, Global.modeTriggerPosList[Global._i_]);
+				Set Status(Event Player, Null, Rooted, 9999);
 				Destroy All Dummy Bots;
 				Global.trainingMode = Global._i_;
 			End;
@@ -98,6 +101,11 @@ rule("[0] Orisa - Over-shield pulling")
 		Create Dummy Bot(Hero(Ana), Opposite Team Of(Team Of(Host Player)), -1, Vector(79.710, 12.710, -99.980), Vector(0.250, 0, 0.970));
 		Create Dummy Bot(Hero(Orisa), Opposite Team Of(Team Of(Host Player)), -1, Vector(80.370, 12.680, -96.780), Vector(0.200, -0.510,
 			0.830));
+		Set Primary Fire Enabled(Host Player, True);
+		Set Secondary Fire Enabled(Host Player, True);
+		Set Ability 1 Enabled(Host Player, False);
+		Set Ability 2 Enabled(Host Player, False);
+		Set Ultimate Ability Enabled(Host Player, False);
 	}
 }
 
