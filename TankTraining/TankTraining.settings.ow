@@ -1,5 +1,10 @@
 settings
 {
+	main
+	{
+		Description: "Tank Trainer: Select your tank and then select your training mode. Training focuses on mechanics and reaction times. Made by ShieldGnrtr7#2909"
+	}
+
 	modes
 	{
 		Skirmish

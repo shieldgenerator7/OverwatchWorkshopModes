@@ -583,3 +583,11 @@ rule("[1] Orisa blocks hook")
 		Host Player.blockedHook = True;
 	}
 }
+
+rule("== Tank Trainer == Version 0.0.1 == by ShieldGnrtr7 == Last modified 2021-02-26 ==")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
