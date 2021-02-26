@@ -5,6 +5,11 @@ variables
 		1: modeTriggerPosList
 		2: MODE_TRIGGER_RADIUS
 		20: _i_
+
+	player:
+		0: timer
+		1: timerLast
+		2: timerBest
 }
 
 rule("Game Setup")
@@ -23,6 +28,30 @@ rule("Game Setup")
 			Create Effect(All Players(All Teams), Ring, Color(Yellow), Global.modeTriggerPosList[Global._i_], Global.MODE_TRIGGER_RADIUS,
 				Visible To Position and Radius);
 		End;
+	}
+}
+
+rule("Player Setup")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Host Player == Event Player;
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Teleport(Event Player, Global.modeTriggerPosList[0]);
+		Event Player.timer = 0;
+		Event Player.timerLast = -1;
+		Event Player.timerBest = -1;
 	}
 }
 
@@ -51,7 +80,6 @@ rule("[TOOL] HUD")
 			Create Effect(All Players(All Teams), Ring, Color(Yellow), Global.modeTriggerPosList[Global._i_], Global.MODE_TRIGGER_RADIUS,
 				Visible To Position and Radius);
 		End;
-		Teleport(Event Player, Global.modeTriggerPosList[0]);
 	}
 }
 
