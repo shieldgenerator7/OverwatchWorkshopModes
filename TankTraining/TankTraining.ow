@@ -1,4 +1,32 @@
-rule("HUD")
+variables
+{
+	global:
+		0: trainingMode
+		1: modeTriggerPosList
+		2: MODE_TRIGGER_RADIUS
+		20: _i_
+}
+
+rule("Game Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.trainingMode = -1;
+		Global.MODE_TRIGGER_RADIUS = 2;
+		Global.modeTriggerPosList = Array(Vector(87.580, 12.650, -70.250));
+		For Global Variable(_i_, 0, Count Of(Global.modeTriggerPosList), 1);
+			Create Effect(All Players(All Teams), Ring, Color(Yellow), Global.modeTriggerPosList[Global._i_], Global.MODE_TRIGGER_RADIUS,
+				Visible To Position and Radius);
+		End;
+	}
+}
+
+rule("[TOOL] HUD")
 {
 	event
 	{
@@ -19,10 +47,41 @@ rule("HUD")
 			White), Color(White), Visible To and String, Default Visibility);
 		Create HUD Text(Event Player, Custom String("DIR: {0}", Facing Direction Of(Event Player)), Null, Null, Left, 1, Color(White),
 			Color(White), Color(White), Visible To and String, Default Visibility);
+		For Global Variable(_i_, 0, Count Of(Global.modeTriggerPosList), 1);
+			Create Effect(All Players(All Teams), Ring, Color(Yellow), Global.modeTriggerPosList[Global._i_], Global.MODE_TRIGGER_RADIUS,
+				Visible To Position and Radius);
+		End;
+		Teleport(Event Player, Global.modeTriggerPosList[0]);
 	}
 }
 
-rule("Spawn Dummy Bots")
+rule("Player triggers game mode")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Interact)) == True;
+	}
+
+	actions
+	{
+		For Global Variable(_i_, 0, Count Of(Global.modeTriggerPosList), 1);
+			If(Distance Between(Position Of(Event Player), Global.modeTriggerPosList[Global._i_]) <= Global.MODE_TRIGGER_RADIUS);
+				Teleport(Event Player, Global.modeTriggerPosList[Global._i_]);
+				Destroy All Dummy Bots;
+				Global.trainingMode = Global._i_;
+			End;
+		End;
+	}
+}
+
+rule("[0] Orisa - Over-shield pulling")
 {
 	event
 	{
@@ -31,7 +90,7 @@ rule("Spawn Dummy Bots")
 
 	conditions
 	{
-		Has Spawned(Host Player) == True;
+		Global.trainingMode == 0;
 	}
 
 	actions
@@ -42,7 +101,7 @@ rule("Spawn Dummy Bots")
 	}
 }
 
-rule("[DUMMY] Orisa spawns shield")
+rule("[0] Orisa spawns shield")
 {
 	event
 	{
@@ -53,6 +112,7 @@ rule("[DUMMY] Orisa spawns shield")
 
 	conditions
 	{
+		Global.trainingMode == 0;
 		Hero Of(Event Player) == Hero(Orisa);
 		Is Dummy Bot(Event Player) == True;
 		Has Spawned(Event Player) == True;
