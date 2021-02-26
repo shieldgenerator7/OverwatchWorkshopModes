@@ -4,6 +4,7 @@ variables
 		0: trainingMode
 		1: modeTriggerPosList
 		2: MODE_TRIGGER_RADIUS
+		3: START_POS
 		20: _i_
 
 	player:
@@ -31,6 +32,7 @@ rule("Game Setup")
 	{
 		Global.trainingMode = -1;
 		Global.MODE_TRIGGER_RADIUS = 2;
+		Global.START_POS = Vector(85.890, 12.680, -77.020);
 		Global.modeTriggerPosList = Array(Vector(87.580, 12.650, -70.250));
 		For Global Variable(_i_, 0, Count Of(Global.modeTriggerPosList), 1);
 			Create Effect(All Players(All Teams), Ring, Color(Yellow), Global.modeTriggerPosList[Global._i_], Global.MODE_TRIGGER_RADIUS,
@@ -56,7 +58,7 @@ rule("Player Setup")
 
 	actions
 	{
-		Teleport(Event Player, Global.modeTriggerPosList[0]);
+		Teleport(Event Player, Global.START_POS);
 		Event Player.timer = -1;
 		Event Player.timerLast = -1;
 		Event Player.timerBest = -1;
@@ -148,7 +150,8 @@ rule("[Orisa] Player triggers game mode")
 	{
 		For Global Variable(_i_, 0, Count Of(Global.modeTriggerPosList), 1);
 			If(Distance Between(Position Of(Event Player), Global.modeTriggerPosList[Global._i_]) <= Global.MODE_TRIGGER_RADIUS);
-				Teleport(Event Player, Global.modeTriggerPosList[Global._i_]);
+				Teleport(Event Player, Global.START_POS);
+				Set Facing(Event Player, Vector(-0.260, -0.090, -0.960), To World);
 				Set Status(Event Player, Null, Rooted, 9999);
 				Event Player.timer = -1;
 				Event Player.timerLast = -1;
