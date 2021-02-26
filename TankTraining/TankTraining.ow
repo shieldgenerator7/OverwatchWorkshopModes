@@ -6,6 +6,7 @@ variables
 		2: MODE_TRIGGER_RADIUS
 		3: START_POS
 		4: modeNameList
+		5: modeTextList
 		20: _i_
 
 	player:
@@ -44,6 +45,10 @@ rule("Game Setup")
 		Global.modeTriggerPosList = Array(Vector(87.580, 12.650, -70.250), Vector(82.310, 12.670, -69.290));
 		Global.modeNameList = Array(Custom String("{0} Over-Shield Pulling (Halt)", Ability Icon String(Hero(Orisa), Button(
 			Secondary Fire))), Custom String("{0} Hog Hook Blocking (Fortify)", Ability Icon String(Hero(Orisa), Button(Ability 1))));
+		Global.modeTextList = Array(Custom String("KILL ANA!   {0} -> {1} -> {2}", Ability Icon String(Hero(Orisa), Button(
+			Secondary Fire)), Ability Icon String(Hero(Orisa), Button(Primary Fire)), Hero Icon String(Hero(Ana))), Custom String(
+			"BLOCK THE HOOK!   {0}{1} -> {2}", Hero Icon String(Hero(Roadhog)), Ability Icon String(Hero(Roadhog), Button(Ability 1)),
+			Ability Icon String(Hero(Orisa), Button(Ability 1))));
 		For Global Variable(_i_, 0, Count Of(Global.modeTriggerPosList), 1);
 			Create Effect(All Players(All Teams), Ring, Color(Yellow), Global.modeTriggerPosList[Global._i_], Global.MODE_TRIGGER_RADIUS,
 				Visible To);
@@ -95,10 +100,12 @@ rule("Player Setup")
 		Create HUD Text(Filtered Array(Event Player, Current Array Element.streakBest >= 0), Custom String("Best: {0}",
 			Event Player.streakBest), Null, Null, Left, 2, Color(White), Color(White), Color(White), Visible To and String,
 			Default Visibility);
-		Create HUD Text(Event Player, Null, Null, Custom String("Press INTERACT to enter a mode"), Right, 0, Color(White), Color(White),
+		Create HUD Text(Event Player, Null, Null, Custom String("Press INTERACT to enter a mode"), Right, 1, Color(White), Color(White),
 			Color(White), Visible To, Default Visibility);
-		Create HUD Text(Event Player, Null, Null, Custom String("Press CROUCH to exit the mode"), Right, 0, Color(White), Color(White),
+		Create HUD Text(Event Player, Null, Null, Custom String("Press CROUCH to exit the mode"), Right, 2, Color(White), Color(White),
 			Color(White), Visible To, Default Visibility);
+		Create HUD Text(Event Player, Null, Null, Global.modeTextList[Global.trainingMode], Right, 0, Color(White), Color(White), Color(
+			White), Visible To and String, Default Visibility);
 	}
 }
 
@@ -305,6 +312,7 @@ rule("[Orisa] Player triggers game mode")
 				Event Player.streakBest = -1;
 				Destroy All Dummy Bots;
 				Global.trainingMode = Global._i_;
+				disabled Big Message(Event Player, Global.modeTextList[Global.trainingMode]);
 			End;
 		End;
 	}
@@ -332,8 +340,7 @@ rule("[0] Orisa - Over-shield pulling")
 		Set Ability 1 Enabled(Host Player, False);
 		Set Ability 2 Enabled(Host Player, False);
 		Set Ultimate Ability Enabled(Host Player, False);
-		Big Message(Host Player, Custom String("KILL ANA! {0} -> {1} -> {2}", Ability Icon String(Hero(Orisa), Button(Secondary Fire)),
-			Ability Icon String(Hero(Orisa), Button(Primary Fire)), Hero Icon String(Hero(Ana))));
+		Big Message(Host Player, Global.modeTextList[0]);
 	}
 }
 
@@ -456,8 +463,7 @@ rule("[1] Orisa - Hog Hook Countering")
 		Set Ability 2 Enabled(Host Player, False);
 		Set Ultimate Ability Enabled(Host Player, False);
 		Call Subroutine(startStreak);
-		Big Message(Host Player, Custom String("BLOCK THE HOOK! {0}{1} -> {2}", Hero Icon String(Hero(Roadhog)), Ability Icon String(Hero(
-			Roadhog), Button(Ability 1)), Ability Icon String(Hero(Orisa), Button(Ability 1))));
+		Big Message(Host Player, Global.modeTextList[1]);
 	}
 }
 
