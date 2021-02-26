@@ -55,6 +55,34 @@ rule("[TOOL] HUD")
 	}
 }
 
+rule("Player exits game mode")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Crouch)) == True;
+		Global.trainingMode >= 0;
+	}
+
+	actions
+	{
+		Clear Status(Event Player, Rooted);
+		Destroy All Dummy Bots;
+		Global.trainingMode = -1;
+		Set Primary Fire Enabled(Event Player, True);
+		Set Secondary Fire Enabled(Event Player, True);
+		Set Ability 1 Enabled(Event Player, True);
+		Set Ability 2 Enabled(Event Player, True);
+		Set Ultimate Ability Enabled(Event Player, True);
+	}
+}
+
 rule("[Orisa] Player triggers game mode")
 {
 	event
