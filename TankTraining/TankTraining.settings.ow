@@ -1,0 +1,30 @@
+settings
+{
+	modes
+	{
+		Hybrid
+		{
+			enabled maps
+			{
+				Eichenwalde
+			}
+		}
+	}
+
+	heroes
+	{
+		General
+		{
+			Ability Cooldown Time: 0%
+			Spawn With Ultimate Ready: On
+			Ultimate Generation: 500%
+			Ultimate Generation - Combat: 500%
+			Ultimate Generation - Passive: 500%
+
+			enabled heroes
+			{
+				Orisa
+			}
+		}
+	}
+}
