@@ -2,7 +2,7 @@ settings
 {
 	modes
 	{
-		Hybrid
+		Skirmish
 		{
 			enabled maps
 			{
