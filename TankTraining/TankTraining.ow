@@ -184,6 +184,9 @@ rule("Stop Timer")
 		Host Player.timerLast = Host Player.timer;
 		If(Host Player.timer < Host Player.timerBest || Host Player.timerBest < 0);
 			Host Player.timerBest = Host Player.timer;
+			Big Message(Host Player, Custom String("NEW BEST! {0}", Host Player.timerBest));
+		Else If(Host Player.timer <= Host Player.timerBest + 2);
+			Big Message(Host Player, Custom String("SO CLOSE! (Within {0})", Host Player.timer - Host Player.timerBest));
 		End;
 		Host Player.timer = -1;
 	}
@@ -231,6 +234,9 @@ rule("Reset Streak")
 		Host Player.streakLast = Host Player.streak;
 		If(Host Player.streak > Host Player.streakBest || Host Player.streakBest < 0);
 			Host Player.streakBest = Host Player.streak;
+			Big Message(Host Player, Custom String("NEW RECORD! {0}", Host Player.streakBest));
+		Else If(Host Player.streakBest - Host Player.streak <= 2);
+			Big Message(Host Player, Custom String("SO CLOSE! Try again!"));
 		End;
 		Host Player.streak = 0;
 	}
@@ -518,6 +524,7 @@ rule("[1] Limit duration of Fortify")
 			Event Player.streak += 1;
 		Else;
 			Call Subroutine(resetStreak);
+			Small Message(Event Player, Custom String("Don't spam Fortify {0}", Ability Icon String(Hero(Orisa), Button(Ability 1))));
 		End;
 		Event Player.blockedHook = False;
 	}
@@ -542,6 +549,8 @@ rule("[1] Orisa hooked - teleport back to start")
 	actions
 	{
 		Call Subroutine(resetStreak);
+		Small Message(Event Player, Custom String("Use Fortify {0} to block Hook {1}", Ability Icon String(Hero(Orisa), Button(Ability 1)),
+			Ability Icon String(Hero(Roadhog), Button(Ability 1))));
 		Wait(1, Ignore Condition);
 		Teleport(Event Player, Global.START_POS);
 		Heal(Event Player, Null, 100);
