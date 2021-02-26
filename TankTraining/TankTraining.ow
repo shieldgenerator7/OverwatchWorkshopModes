@@ -33,7 +33,7 @@ rule("Game Setup")
 		Global.trainingMode = -1;
 		Global.MODE_TRIGGER_RADIUS = 2;
 		Global.START_POS = Vector(85.890, 12.680, -77.020);
-		Global.modeTriggerPosList = Array(Vector(87.580, 12.650, -70.250));
+		Global.modeTriggerPosList = Array(Vector(87.580, 12.650, -70.250), Vector(82.310, 12.670, -69.290));
 		For Global Variable(_i_, 0, Count Of(Global.modeTriggerPosList), 1);
 			Create Effect(All Players(All Teams), Ring, Color(Yellow), Global.modeTriggerPosList[Global._i_], Global.MODE_TRIGGER_RADIUS,
 				Visible To);
@@ -349,5 +349,55 @@ rule("[0] Orisa Halt starts timer")
 	actions
 	{
 		Call Subroutine(startTimer);
+	}
+}
+
+rule("[1] Orisa - Hog Hook Countering")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global.trainingMode == 1;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Hero(Roadhog), Opposite Team Of(Team Of(Host Player)), -1, Vector(80.370, 12.680, -96.780), Vector(0.200, -0.510,
+			0.830));
+		Set Primary Fire Enabled(Host Player, False);
+		Set Secondary Fire Enabled(Host Player, False);
+		Set Ability 1 Enabled(Host Player, True);
+		Set Ability 2 Enabled(Host Player, False);
+		Set Ultimate Ability Enabled(Host Player, False);
+	}
+}
+
+rule("[1] Roadhog uses Hook")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Roadhog;
+	}
+
+	conditions
+	{
+		Global.trainingMode == 1;
+		Hero Of(Event Player) == Hero(Roadhog);
+		Is Dummy Bot(Event Player) == True;
+		Has Spawned(Event Player) == True;
+	}
+
+	actions
+	{
+		Set Facing(Event Player, Direction Towards(Position Of(Event Player), Position Of(Host Player)), To World);
+		Wait(Random Real(1, 5), Ignore Condition);
+		Press Button(Event Player, Button(Ability 1));
+		Loop If Condition Is True;
 	}
 }
