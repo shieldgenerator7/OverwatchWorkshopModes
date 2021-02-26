@@ -126,7 +126,7 @@ rule("[0] Orisa - Over-shield pulling")
 
 	actions
 	{
-		Create Dummy Bot(Hero(Ana), Opposite Team Of(Team Of(Host Player)), -1, Vector(79.710, 12.710, -99.980), Vector(0.250, 0, 0.970));
+		Create Dummy Bot(Hero(Ana), Opposite Team Of(Team Of(Host Player)), 0, Vector(79.710, 12.710, -99.980), Vector(0.250, 0, 0.970));
 		Create Dummy Bot(Hero(Orisa), Opposite Team Of(Team Of(Host Player)), -1, Vector(80.370, 12.680, -96.780), Vector(0.200, -0.510,
 			0.830));
 		Set Primary Fire Enabled(Host Player, True);
@@ -161,5 +161,28 @@ rule("[0] Orisa spawns shield")
 		Press Button(Event Player, Button(Ability 2));
 		Wait(5, Abort When False);
 		Loop If Condition Is True;
+	}
+}
+
+rule("[0] Ana bot dies")
+{
+	event
+	{
+		Player Died;
+		All;
+		Ana;
+	}
+
+	conditions
+	{
+		Global.trainingMode == 0;
+		Hero Of(Event Player) == Hero(Ana);
+		Is Dummy Bot(Event Player) == True;
+	}
+
+	actions
+	{
+		Destroy Dummy Bot(All Teams, 0);
+		Create Dummy Bot(Hero(Ana), Opposite Team Of(Team Of(Host Player)), 0, Vector(79.710, 12.710, -99.980), Vector(0.250, 0, 0.970));
 	}
 }
