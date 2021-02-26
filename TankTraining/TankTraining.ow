@@ -98,6 +98,77 @@ disabled rule("[TOOL] HUD")
 	}
 }
 
+rule("Timer")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.isTimerRunning == True;
+	}
+
+	actions
+	{
+		Wait(0.100, Ignore Condition);
+		Event Player.timer += 0.100;
+		Loop If Condition Is True;
+	}
+}
+
+rule("Start Timer")
+{
+	event
+	{
+		Subroutine;
+		startTimer;
+	}
+
+	actions
+	{
+		Host Player.timer = 0;
+		Host Player.isTimerRunning = True;
+	}
+}
+
+rule("Stop Timer")
+{
+	event
+	{
+		Subroutine;
+		stopTimer;
+	}
+
+	actions
+	{
+		Host Player.isTimerRunning = False;
+		Host Player.timerLast = Host Player.timer;
+		If(Host Player.timer < Host Player.timerBest || Host Player.timerBest < 0);
+			Host Player.timerBest = Host Player.timer;
+		End;
+		Host Player.timer = -1;
+	}
+}
+
+rule("Cancel Timer")
+{
+	event
+	{
+		Subroutine;
+		cancelTimer;
+	}
+
+	actions
+	{
+		Host Player.isTimerRunning = False;
+		Host Player.timer = -1;
+	}
+}
+
 rule("Player exits game mode")
 {
 	event
@@ -258,62 +329,6 @@ rule("[0] Ana bot dies")
 	}
 }
 
-rule("Timer")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		All;
-	}
-
-	conditions
-	{
-		Event Player.isTimerRunning == True;
-	}
-
-	actions
-	{
-		Wait(0.100, Ignore Condition);
-		Event Player.timer += 0.100;
-		Loop If Condition Is True;
-	}
-}
-
-rule("Start Timer")
-{
-	event
-	{
-		Subroutine;
-		startTimer;
-	}
-
-	actions
-	{
-		Host Player.timer = 0;
-		Host Player.isTimerRunning = True;
-	}
-}
-
-rule("Stop Timer")
-{
-	event
-	{
-		Subroutine;
-		stopTimer;
-	}
-
-	actions
-	{
-		Host Player.isTimerRunning = False;
-		Host Player.timerLast = Host Player.timer;
-		If(Host Player.timer < Host Player.timerBest || Host Player.timerBest < 0);
-			Host Player.timerBest = Host Player.timer;
-		End;
-		Host Player.timer = -1;
-	}
-}
-
 rule("[0] Orisa Halt starts timer")
 {
 	event
@@ -334,20 +349,5 @@ rule("[0] Orisa Halt starts timer")
 	actions
 	{
 		Call Subroutine(startTimer);
-	}
-}
-
-rule("Cancel Timer")
-{
-	event
-	{
-		Subroutine;
-		cancelTimer;
-	}
-
-	actions
-	{
-		Host Player.isTimerRunning = False;
-		Host Player.timer = -1;
 	}
 }
