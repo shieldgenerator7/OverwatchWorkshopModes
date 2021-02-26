@@ -12,6 +12,9 @@ variables
 		1: timerLast
 		2: timerBest
 		3: isTimerRunning
+		4: streak
+		5: streakLast
+		6: streakBest
 }
 
 subroutines
@@ -19,6 +22,9 @@ subroutines
 	0: startTimer
 	1: stopTimer
 	2: cancelTimer
+	3: startStreak
+	4: resetStreak
+	5: cancelStreak
 }
 
 rule("Game Setup")
@@ -70,6 +76,18 @@ rule("Player Setup")
 			Default Visibility);
 		Create HUD Text(Filtered Array(Event Player, Current Array Element.timerBest >= 0), Custom String("Best: {0}",
 			Event Player.timerBest), Null, Null, Left, 2, Color(White), Color(White), Color(White), Visible To and String,
+			Default Visibility);
+		Event Player.streak = -1;
+		Event Player.streakLast = -1;
+		Event Player.streakBest = -1;
+		Create HUD Text(Filtered Array(Event Player, Current Array Element.streak >= 0), Custom String("Counters: {0}",
+			Event Player.streak), Null, Null, Left, 0, Color(White), Color(White), Color(White), Visible To and String,
+			Default Visibility);
+		Create HUD Text(Filtered Array(Event Player, Current Array Element.streakLast >= 0), Custom String("Last: {0}",
+			Event Player.streakLast), Null, Null, Left, 1, Color(White), Color(White), Color(White), Visible To and String,
+			Default Visibility);
+		Create HUD Text(Filtered Array(Event Player, Current Array Element.streakBest >= 0), Custom String("Best: {0}",
+			Event Player.streakBest), Null, Null, Left, 2, Color(White), Color(White), Color(White), Visible To and String,
 			Default Visibility);
 	}
 }
@@ -169,6 +187,52 @@ rule("Cancel Timer")
 	}
 }
 
+rule("Start Streak")
+{
+	event
+	{
+		Subroutine;
+		startStreak;
+	}
+
+	actions
+	{
+		Host Player.streak = 0;
+	}
+}
+
+rule("Reset Streak")
+{
+	event
+	{
+		Subroutine;
+		resetStreak;
+	}
+
+	actions
+	{
+		Host Player.streakLast = Host Player.streak;
+		If(Host Player.streak > Host Player.streakBest || Host Player.streakBest < 0);
+			Host Player.streakBest = Host Player.streak;
+		End;
+		Host Player.streak = 0;
+	}
+}
+
+rule("Cancel Streak")
+{
+	event
+	{
+		Subroutine;
+		cancelStreak;
+	}
+
+	actions
+	{
+		Host Player.streak = -1;
+	}
+}
+
 rule("Player exits game mode")
 {
 	event
@@ -194,6 +258,8 @@ rule("Player exits game mode")
 		Set Ability 1 Enabled(Event Player, True);
 		Set Ability 2 Enabled(Event Player, True);
 		Set Ultimate Ability Enabled(Event Player, True);
+		Call Subroutine(cancelTimer);
+		Call Subroutine(cancelStreak);
 	}
 }
 
@@ -224,6 +290,9 @@ rule("[Orisa] Player triggers game mode")
 				Event Player.timerLast = -1;
 				Event Player.timerBest = -1;
 				Event Player.isTimerRunning = False;
+				Event Player.streak = -1;
+				Event Player.streakLast = -1;
+				Event Player.streakBest = -1;
 				Destroy All Dummy Bots;
 				Global.trainingMode = Global._i_;
 			End;
@@ -373,6 +442,7 @@ rule("[1] Orisa - Hog Hook Countering")
 		Set Ability 1 Enabled(Host Player, True);
 		Set Ability 2 Enabled(Host Player, False);
 		Set Ultimate Ability Enabled(Host Player, False);
+		Call Subroutine(startStreak);
 	}
 }
 
@@ -443,6 +513,7 @@ rule("[1] Orisa hooked - teleport back to start")
 
 	actions
 	{
+		Call Subroutine(resetStreak);
 		Wait(1, Ignore Condition);
 		Teleport(Event Player, Global.START_POS);
 		Heal(Event Player, Null, 100);
