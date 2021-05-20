@@ -6,6 +6,7 @@ variables
 	player:
 		0: effectIdList
 		1: _temp
+		2: textIdList
 		3: moveSpeed
 		4: scale
 		5: damageDealt
@@ -49,7 +50,9 @@ rule("Player Spawn")
 
 	actions
 	{
+		Call Subroutine(clearPlayerEffects);
 		Event Player.effectIdList = Empty Array;
+		Event Player.textIdList = Empty Array;
 	}
 }
 
@@ -128,6 +131,8 @@ rule("Clear Player Effects")
 	{
 		Event Player.moveSpeed = 100;
 		Event Player.scale = 1;
+		Event Player.damageDealt = 100;
+		Event Player.damageReceived = 100;
 		Call Subroutine(applyPlayerEffectChanges);
 	}
 }
@@ -146,5 +151,15 @@ rule("Apply Player Effect Changes")
 		Start Scaling Player(Event Player, Event Player.scale, False);
 		Set Damage Dealt(Event Player, Event Player.damageDealt);
 		Set Damage Received(Event Player, Event Player.damageReceived);
+		For Player Variable(Event Player, _temp, 0, Count Of(Event Player.textIdList), 1);
+			Destroy HUD Text(Event Player.textIdList[Event Player._temp]);
+		End;
+		Destroy HUD Text(Event Player.textIdList[0]);
+		Event Player.textIdList = Empty Array;
+		For Player Variable(Event Player, _temp, Count Of(Event Player.effectIdList), 0, -1);
+			Create HUD Text(Event Player, Global.effectNameList[Event Player.effectIdList[Event Player._temp]], Null, Null, Left, 0, Color(
+				White), Color(White), Color(White), None, Default Visibility);
+			Modify Player Variable(Event Player, textIdList, Append To Array, Last Text ID);
+		End;
 	}
 }
