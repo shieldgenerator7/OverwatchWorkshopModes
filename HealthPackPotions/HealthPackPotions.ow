@@ -93,6 +93,13 @@ rule("Update Player Effects")
 	actions
 	{
 		Call Subroutine(clearPlayerEffects);
+		"Remove opposites"
+		For Player Variable(Event Player, _temp, Count Of(Event Player.effectIdList), 0, -1);
+			If(Event Player._temp % 2 == 0 && Array Contains(Event Player.effectIdList, Event Player._temp + 1) == True);
+				Modify Player Variable(Event Player, effectIdList, Remove From Array By Value, Event Player._temp);
+				Modify Player Variable(Event Player, effectIdList, Remove From Array By Value, Event Player._temp + 1);
+			End;
+		End;
 		For Player Variable(Event Player, _temp, 0, Count Of(Event Player.effectIdList), 1);
 			If(Event Player.effectIdList[Event Player._temp] == 0);
 				Event Player.moveSpeed *= 1.500;
