@@ -1,0 +1,56 @@
+variables
+{
+	global:
+		0: effectNameList
+
+	player:
+		0: effectIdList
+}
+
+rule("Game Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.effectNameList = Array(Custom String("SPEED BOOST"), Custom String("GIANT"), Custom String("TINY"));
+	}
+}
+
+rule("Player Spawn")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.effectIdList = Empty Array;
+	}
+}
+
+rule("Player gains effect")
+{
+	event
+	{
+		Player Received Healing;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Was Health Pack == True;
+	}
+}
