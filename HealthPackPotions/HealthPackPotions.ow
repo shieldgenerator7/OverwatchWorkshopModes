@@ -12,6 +12,7 @@ variables
 		5: damageDealt
 		6: damageReceived
 		7: maxHealth
+		8: magnetism
 }
 
 subroutines
@@ -32,9 +33,9 @@ rule("Game Setup")
 	{
 		Global.effectNameList = Array(Custom String("FAST"), Custom String("SLOW"), Custom String("BIG"), Custom String("SMALL"),
 			Custom String("POWERFUL"), Custom String("POWERLESS"), Custom String("TOUGH"), Custom String("WEAK"), Custom String(
-			"LIFE STEAL"), Custom String("LIFE GIVE"), Custom String("HEALTHY"), Custom String("UNHEALTHY"));
-		Create Dummy Bot(Hero(Orisa), Opposite Team Of(Team Of(Host Player)), -1, Vector(80.370, 12.680, -96.780), Vector(0.200, -0.510,
-			0.830));
+			"LIFE STEAL"), Custom String("LIFE GIVE"), Custom String("HEALTHY"), Custom String("UNHEALTHY"), Custom String("ATTRACTIVE"),
+			Custom String("REPULSIVE"));
+		Create Dummy Bot(Hero(Orisa), All Teams, -1, Vector(80.370, 12.680, -96.780), Vector(0.200, -0.510, 0.830));
 	}
 }
 
@@ -131,6 +132,12 @@ rule("Update Player Effects")
 			If(Event Player.effectIdList[Event Player._temp] == 11);
 				Event Player.maxHealth /= 1.500;
 			End;
+			If(Event Player.effectIdList[Event Player._temp] == 12);
+				Event Player.magnetism += 5;
+			End;
+			If(Event Player.effectIdList[Event Player._temp] == 13);
+				Event Player.magnetism -= 5;
+			End;
 		End;
 		Call Subroutine(applyPlayerEffectChanges);
 	}
@@ -151,6 +158,7 @@ rule("Clear Player Effects")
 		Event Player.damageDealt = 100;
 		Event Player.damageReceived = 100;
 		Event Player.maxHealth = 100;
+		Event Player.magnetism = 0;
 		Call Subroutine(applyPlayerEffectChanges);
 	}
 }
@@ -220,5 +228,45 @@ rule("Effect 9: Life Give")
 	actions
 	{
 		Heal(Attacker, Event Player, Event Damage);
+	}
+}
+
+rule("Effect 12 & 13: Attractive & Repulsive")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player.magnetism != 0;
+	}
+
+	actions
+	{
+		Apply Impulse(Victim, Position Of(Attacker) - Position Of(Victim), Attacker.magnetism, To World, Cancel Contrary Motion);
+	}
+}
+
+rule("==TEST== CREATE BOT ==")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Interact)) == True;
+	}
+
+	actions
+	{
+		Create Dummy Bot(Hero(Orisa), All Teams, -1, Position Of(Event Player), Facing Direction Of(Event Player));
 	}
 }
