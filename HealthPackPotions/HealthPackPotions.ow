@@ -11,6 +11,7 @@ variables
 		4: scale
 		5: damageDealt
 		6: damageReceived
+		7: maxHealth
 }
 
 subroutines
@@ -30,7 +31,10 @@ rule("Game Setup")
 	actions
 	{
 		Global.effectNameList = Array(Custom String("FAST"), Custom String("SLOW"), Custom String("BIG"), Custom String("SMALL"),
-			Custom String("POWERFUL"), Custom String("POWERLESS"), Custom String("TOUGH"), Custom String("WEAK"));
+			Custom String("POWERFUL"), Custom String("POWERLESS"), Custom String("TOUGH"), Custom String("WEAK"), Custom String(
+			"LIFE STEAL"), Custom String("LIFE GIVE"), Custom String("HEALTHY"), Custom String("UNHEALTHY"));
+		Create Dummy Bot(Hero(Orisa), Opposite Team Of(Team Of(Host Player)), -1, Vector(80.370, 12.680, -96.780), Vector(0.200, -0.510,
+			0.830));
 	}
 }
 
@@ -114,6 +118,12 @@ rule("Update Player Effects")
 			If(Event Player.effectIdList[Event Player._temp] == 7);
 				Event Player.damageReceived /= 1.500;
 			End;
+			If(Event Player.effectIdList[Event Player._temp] == 10);
+				Event Player.maxHealth *= 1.500;
+			End;
+			If(Event Player.effectIdList[Event Player._temp] == 11);
+				Event Player.maxHealth /= 1.500;
+			End;
 		End;
 		Call Subroutine(applyPlayerEffectChanges);
 	}
@@ -133,6 +143,7 @@ rule("Clear Player Effects")
 		Event Player.scale = 1;
 		Event Player.damageDealt = 100;
 		Event Player.damageReceived = 100;
+		Event Player.maxHealth = 100;
 		Call Subroutine(applyPlayerEffectChanges);
 	}
 }
@@ -151,6 +162,7 @@ rule("Apply Player Effect Changes")
 		Start Scaling Player(Event Player, Event Player.scale, False);
 		Set Damage Dealt(Event Player, Event Player.damageDealt);
 		Set Damage Received(Event Player, Event Player.damageReceived);
+		Set Max Health(Event Player, Event Player.maxHealth);
 		For Player Variable(Event Player, _temp, 0, Count Of(Event Player.textIdList), 1);
 			Destroy HUD Text(Event Player.textIdList[Event Player._temp]);
 		End;
@@ -161,5 +173,45 @@ rule("Apply Player Effect Changes")
 				White), Color(White), Color(White), None, Default Visibility);
 			Modify Player Variable(Event Player, textIdList, Append To Array, Last Text ID);
 		End;
+	}
+}
+
+rule("Effect 8: Life Steal")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Array Contains(Event Player.effectIdList, 8) == True;
+	}
+
+	actions
+	{
+		Heal(Event Player, Event Player, Event Damage);
+	}
+}
+
+rule("Effect 9: Life Give")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Array Contains(Event Player.effectIdList, 9) == True;
+	}
+
+	actions
+	{
+		Heal(Attacker, Event Player, Event Damage);
 	}
 }
