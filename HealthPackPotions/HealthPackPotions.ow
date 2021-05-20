@@ -8,6 +8,8 @@ variables
 		1: _temp
 		3: moveSpeed
 		4: scale
+		5: damageDealt
+		6: damageReceived
 }
 
 subroutines
@@ -26,7 +28,8 @@ rule("Game Setup")
 
 	actions
 	{
-		Global.effectNameList = Array(Custom String("SPEED BOOST"), Custom String("SLOW"), Custom String("GIANT"), Custom String("TINY"));
+		Global.effectNameList = Array(Custom String("FAST"), Custom String("SLOW"), Custom String("BIG"), Custom String("SMALL"),
+			Custom String("POWERFUL"), Custom String("POWERLESS"), Custom String("TOUGH"), Custom String("WEAK"));
 	}
 }
 
@@ -85,16 +88,28 @@ rule("Update Player Effects")
 		Call Subroutine(clearPlayerEffects);
 		For Player Variable(Event Player, _temp, 0, Count Of(Event Player.effectIdList), 1);
 			If(Event Player.effectIdList[Event Player._temp] == 0);
-				Event Player.moveSpeed += 50;
+				Event Player.moveSpeed *= 1.500;
 			End;
 			If(Event Player.effectIdList[Event Player._temp] == 1);
-				Event Player.moveSpeed -= 50;
+				Event Player.moveSpeed /= 1.500;
 			End;
 			If(Event Player.effectIdList[Event Player._temp] == 2);
-				Event Player.scale += 0.500;
+				Event Player.scale *= 1.500;
 			End;
 			If(Event Player.effectIdList[Event Player._temp] == 3);
-				Event Player.scale -= 0.500;
+				Event Player.scale /= 1.500;
+			End;
+			If(Event Player.effectIdList[Event Player._temp] == 4);
+				Event Player.damageDealt *= 1.500;
+			End;
+			If(Event Player.effectIdList[Event Player._temp] == 5);
+				Event Player.damageDealt /= 1.500;
+			End;
+			If(Event Player.effectIdList[Event Player._temp] == 6);
+				Event Player.damageReceived *= 1.500;
+			End;
+			If(Event Player.effectIdList[Event Player._temp] == 7);
+				Event Player.damageReceived /= 1.500;
 			End;
 		End;
 		Call Subroutine(applyPlayerEffectChanges);
@@ -129,5 +144,7 @@ rule("Apply Player Effect Changes")
 	{
 		Set Move Speed(Event Player, Event Player.moveSpeed);
 		Start Scaling Player(Event Player, Event Player.scale, False);
+		Set Damage Dealt(Event Player, Event Player.damageDealt);
+		Set Damage Received(Event Player, Event Player.damageReceived);
 	}
 }
