@@ -83,6 +83,22 @@ rule("Player gains effect")
 	}
 }
 
+rule("Player dies")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	actions
+	{
+		Event Player.effectIdList = Empty Array;
+		Call Subroutine(updatePlayerEffects);
+	}
+}
+
 rule("Update Player Effects")
 {
 	event
