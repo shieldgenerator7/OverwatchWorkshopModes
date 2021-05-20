@@ -5,6 +5,7 @@ variables
 
 	player:
 		0: effectIdList
+		1: _temp
 }
 
 rule("Game Setup")
@@ -52,5 +53,11 @@ rule("Player gains effect")
 	conditions
 	{
 		Event Was Health Pack == True;
+	}
+
+	actions
+	{
+		Event Player._temp = Random Integer(0, Count Of(Global.effectNameList) - 1);
+		Modify Player Variable(Event Player, effectIdList, Append To Array, Event Player._temp);
 	}
 }
