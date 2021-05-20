@@ -6,6 +6,15 @@ variables
 	player:
 		0: effectIdList
 		1: _temp
+		3: moveSpeed
+		4: scale
+}
+
+subroutines
+{
+	0: updatePlayerEffects
+	1: clearPlayerEffects
+	2: applyPlayerEffectChanges
 }
 
 rule("Game Setup")
@@ -17,7 +26,7 @@ rule("Game Setup")
 
 	actions
 	{
-		Global.effectNameList = Array(Custom String("SPEED BOOST"), Custom String("GIANT"), Custom String("TINY"));
+		Global.effectNameList = Array(Custom String("SPEED BOOST"), Custom String("SLOW"), Custom String("GIANT"), Custom String("TINY"));
 	}
 }
 
@@ -59,5 +68,66 @@ rule("Player gains effect")
 	{
 		Event Player._temp = Random Integer(0, Count Of(Global.effectNameList) - 1);
 		Modify Player Variable(Event Player, effectIdList, Append To Array, Event Player._temp);
+		Call Subroutine(updatePlayerEffects);
+	}
+}
+
+rule("Update Player Effects")
+{
+	event
+	{
+		Subroutine;
+		updatePlayerEffects;
+	}
+
+	actions
+	{
+		Call Subroutine(clearPlayerEffects);
+		For Player Variable(Event Player, _temp, 0, Count Of(Event Player.effectIdList), 1);
+			If(Event Player.effectIdList[Event Player._temp] == 0);
+				Event Player.moveSpeed += 50;
+			End;
+			If(Event Player.effectIdList[Event Player._temp] == 1);
+				Event Player.moveSpeed -= 50;
+			End;
+			If(Event Player.effectIdList[Event Player._temp] == 2);
+				Event Player.scale += 0.500;
+			End;
+			If(Event Player.effectIdList[Event Player._temp] == 3);
+				Event Player.scale -= 0.500;
+			End;
+		End;
+		Call Subroutine(applyPlayerEffectChanges);
+	}
+}
+
+rule("Clear Player Effects")
+{
+	event
+	{
+		Subroutine;
+		clearPlayerEffects;
+	}
+
+	actions
+	{
+		Event Player.moveSpeed = 100;
+		Event Player.scale = 1;
+		Call Subroutine(applyPlayerEffectChanges);
+	}
+}
+
+rule("Apply Player Effect Changes")
+{
+	event
+	{
+		Subroutine;
+		applyPlayerEffectChanges;
+	}
+
+	actions
+	{
+		Set Move Speed(Event Player, Event Player.moveSpeed);
+		Start Scaling Player(Event Player, Event Player.scale, False);
 	}
 }
