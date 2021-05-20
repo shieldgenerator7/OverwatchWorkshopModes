@@ -30,4 +30,14 @@ settings
 			Spawn Health Packs: Enabled
 		}
 	}
+
+	heroes
+	{
+		General
+		{
+			Healing Dealt: 10%
+			Healing Received: 200%
+		}
+	}
+}
 }
