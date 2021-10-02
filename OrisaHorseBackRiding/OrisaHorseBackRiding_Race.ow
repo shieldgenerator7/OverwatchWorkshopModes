@@ -1,0 +1,309 @@
+
+
+
+
+rule("player spawn (horse) (orisa)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Orisa;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Hero Of(Event Player) == Hero(Orisa);
+	}
+
+	actions
+	{
+		Skip If(Compare(Global Variable(H), !=, 0), 1);
+		Set Global Variable(H, Event Player);
+		Skip If(Array Contains(Global Variable(H), Event Player), 1);
+		Modify Global Variable(H, Append To Array, Event Player);
+		Modify Global Variable(R, Remove From Array By Value, Event Player);
+		Set Player Variable(Event Player, A, False);
+		Set Player Variable(Player Variable(Event Player, R), H, Null);
+		Set Player Variable(Player Variable(Event Player, H), R, Null);
+		Set Player Variable(Event Player, H, Null);
+		Set Player Variable(Event Player, R, Null);
+		Set Player Variable(Event Player, M, 0);
+		Set Player Variable(Event Player, N, False);
+		Set Player Variable(Event Player, S, 50);
+		Set Move Speed(Event Player, 50);
+		Set Aim Speed(Event Player, 100);
+		Clear Status(Event Player, Unkillable);
+		Clear Status(Event Player, Phased Out);
+	}
+}
+
+rule("horse injured")
+{
+	event
+	{
+		Player took damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, A) == False;
+		Player Variable(Event Player, N) == True;
+		Normalized Health(Event Player) < 0.500;
+	}
+
+	actions
+	{
+		Set Player Variable(Player Variable(Event Player, R), N, False);
+		Set Player Variable(Player Variable(Event Player, R), M, 2);
+	}
+}
+
+
+
+
+
+rule("horse dies")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, A) == False;
+	}
+
+	actions
+	{
+		Set Player Variable(Player Variable(Event Player, R), H, Null);
+		Set Player Variable(Event Player, R, Null);
+		Modify Global Variable(H, Remove From Array By Value, Event Player);
+	}
+}
+
+
+
+rule("horse's rider dies")
+{
+	event
+	{
+		Player Died;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, A) == False;
+		Is Alive(Player Variable(Event Player, R)) == False;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, R, Null);
+	}
+}
+
+rule("horse gallop (speed up)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, A) == False;
+		Is Button Held(Event Player, Ability 1) == True;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, S, Add, 10);
+		Set Player Variable(Event Player, S, Min(Player Variable(Event Player, S), 200));
+		Set Move Speed(Event Player, Player Variable(Event Player, S));
+		Set Aim Speed(Event Player, Min(Subtract(215, Player Variable(Event Player, S)), 100));
+		Wait(0.500, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("horse gallop (initial speed burst)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, A) == False;
+		Is Button Held(Event Player, Ability 1) == True;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, S, Add, 30);
+		Set Player Variable(Event Player, S, Min(Player Variable(Event Player, S), 200));
+		Set Move Speed(Event Player, Player Variable(Event Player, S));
+		Set Aim Speed(Event Player, Min(Subtract(215, Player Variable(Event Player, S)), 100));
+	}
+}
+
+rule("horse gallop (slow down)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, A) == False;
+		Is Button Held(Event Player, Ability 1) == False;
+		Player Variable(Event Player, S) > 50;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, S, Subtract, 10);
+		Set Player Variable(Event Player, S, Max(Player Variable(Event Player, S), 50));
+		Set Move Speed(Event Player, Player Variable(Event Player, S));
+		Set Aim Speed(Event Player, Min(Subtract(215, Player Variable(Event Player, S)), 100));
+		Wait(0.300, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("horse gallop (initial slow down)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, A) == False;
+		Is Button Held(Event Player, Ability 1) == False;
+		Player Variable(Event Player, S) > 50;
+	}
+
+	actions
+	{
+		Modify Player Variable(Event Player, S, Subtract, 15);
+		Set Player Variable(Event Player, S, Max(Player Variable(Event Player, S), 50));
+		Set Move Speed(Event Player, Player Variable(Event Player, S));
+		Set Aim Speed(Event Player, Min(Subtract(215, Player Variable(Event Player, S)), 100));
+	}
+}
+
+rule("horse punches deal damage the faster she went (suggested by XDnetwork)")
+{
+	event
+	{
+		Player dealt damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Attacker, A) == False;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, D, Subtract(Multiply(Player Variable(Event Player, S), 0.500), 80));
+		Damage(Victim, Attacker, Player Variable(Event Player, D));
+		Set Status(Attacker, Victim, Rooted, 0.500);
+		Small Message(Attacker, String("{0}: {1}", String("Damage", Null, Null, Null), Player Variable(Event Player, D), Null));
+	}
+}
+
+rule("horse reset speed")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, A) == False;
+		Speed Of(Event Player) < 1;
+	}
+
+	actions
+	{
+		Set Player Variable(Event Player, S, 50);
+		Set Move Speed(Event Player, Player Variable(Event Player, S));
+		Set Aim Speed(Event Player, 100);
+	}
+}
+
+
+
+rule("antibug attempt #1 (horse)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, A) == False;
+		Player Variable(Event Player, N) == True;
+		Player Variable(Event Player, R) == Null;
+	}
+
+	actions
+	{
+		Kill(Event Player, Null);
+	}
+}
+
+rule("antibug attempt #2 (horse)")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Player Variable(Event Player, A) == False;
+		Player Variable(Event Player, R) != Null;
+		Player Variable(Player Variable(Event Player, R), H) != Event Player;
+	}
+
+	actions
+	{
+		Kill(Event Player, Null);
+		Clear Status(Event Player, Unkillable);
+		Clear Status(Event Player, Phased Out);
+	}
+}
+
