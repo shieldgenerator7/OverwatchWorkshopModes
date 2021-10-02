@@ -1,3 +1,21 @@
+variables
+{
+	global:
+		7: horseList
+		14: OFFSET_ATTACH
+		17: riderList
+
+	player:
+		0: alive
+		2: _verticalFacingAngle
+		3: punchDamage
+		7: horse
+		12: mountCooldown
+		13: mounted
+		17: rider
+		18: speed
+}
+
 rule("game setup - made by shieldgnrtr7")
 {
 	event
@@ -7,7 +25,7 @@ rule("game setup - made by shieldgnrtr7")
 
 	actions
 	{
-		Global.O = Vector(0, 1, 0);
+		Global.OFFSET_ATTACH = Vector(0, 1, 0);
 	}
 }
 
@@ -64,18 +82,18 @@ rule("player spawn (rider) (mccree)")
 
 	actions
 	{
-		Skip If(Global.R != 0, 1);
-		Global.R = Event Player;
-		Skip If(Array Contains(Global.R, Event Player), 1);
-		Modify Global Variable(R, Append To Array, Event Player);
-		Modify Global Variable(H, Remove From Array By Value, Event Player);
-		Event Player.A = True;
-		Event Player.H.R = Null;
-		Event Player.R.H = Null;
-		Event Player.H = Null;
-		Event Player.R = Null;
-		Event Player.M = 0;
-		Event Player.N = False;
+		Skip If(Global.riderList != 0, 1);
+		Global.riderList = Event Player;
+		Skip If(Array Contains(Global.riderList, Event Player), 1);
+		Modify Global Variable(riderList, Append To Array, Event Player);
+		Modify Global Variable(horseList, Remove From Array By Value, Event Player);
+		Event Player.alive = True;
+		Event Player.horse.rider = Null;
+		Event Player.rider.horse = Null;
+		Event Player.horse = Null;
+		Event Player.rider = Null;
+		Event Player.mountCooldown = 0;
+		Event Player.mounted = False;
 		Set Move Speed(Event Player, 100);
 		Set Aim Speed(Event Player, 100);
 		Clear Status(Event Player, Unkillable);
@@ -100,19 +118,19 @@ rule("player spawn (horse) (orisa)")
 
 	actions
 	{
-		Skip If(Global.H != 0, 1);
-		Global.H = Event Player;
-		Skip If(Array Contains(Global.H, Event Player), 1);
-		Modify Global Variable(H, Append To Array, Event Player);
-		Modify Global Variable(R, Remove From Array By Value, Event Player);
-		Event Player.A = False;
-		Event Player.R.H = Null;
-		Event Player.H.R = Null;
-		Event Player.H = Null;
-		Event Player.R = Null;
-		Event Player.M = 0;
-		Event Player.N = False;
-		Event Player.S = 50;
+		Skip If(Global.horseList != 0, 1);
+		Global.horseList = Event Player;
+		Skip If(Array Contains(Global.horseList, Event Player), 1);
+		Modify Global Variable(horseList, Append To Array, Event Player);
+		Modify Global Variable(riderList, Remove From Array By Value, Event Player);
+		Event Player.alive = False;
+		Event Player.rider.horse = Null;
+		Event Player.horse.rider = Null;
+		Event Player.horse = Null;
+		Event Player.rider = Null;
+		Event Player.mountCooldown = 0;
+		Event Player.mounted = False;
+		Event Player.speed = 50;
 		Set Move Speed(Event Player, 50);
 		Set Aim Speed(Event Player, 100);
 		Clear Status(Event Player, Unkillable);
@@ -131,17 +149,17 @@ rule("rider chooses horse")
 
 	conditions
 	{
-		Event Player.A == True;
-		Event Player.H == Null;
-		Is True For Any(Global.H, Current Array Element.R == Null && Distance Between(Position Of(Event Player), Position Of(
+		Event Player.alive == True;
+		Event Player.horse == Null;
+		Is True For Any(Global.horseList, Current Array Element.rider == Null && Distance Between(Position Of(Event Player), Position Of(
 			Current Array Element)) <= 2) == True;
 	}
 
 	actions
 	{
-		Event Player.H = Filtered Array(Global.H, Current Array Element.R == Null && Distance Between(Position Of(Event Player),
-			Position Of(Current Array Element)) <= 2)[0];
-		Event Player.H.R = Event Player;
+		Event Player.horse = Filtered Array(Global.horseList, Current Array Element.rider == Null && Distance Between(Position Of(
+			Event Player), Position Of(Current Array Element)) <= 2)[0];
+		Event Player.horse.rider = Event Player;
 	}
 }
 
@@ -156,22 +174,22 @@ rule("rider mounts horse")
 
 	conditions
 	{
-		Event Player.A == True;
-		Event Player.H != Null;
-		Event Player.N == False;
-		Distance Between(Position Of(Event Player), Position Of(Event Player.H)) <= 2;
-		Event Player.M == 0;
+		Event Player.alive == True;
+		Event Player.horse != Null;
+		Event Player.mounted == False;
+		Distance Between(Position Of(Event Player), Position Of(Event Player.horse)) <= 2;
+		Event Player.mountCooldown == 0;
 	}
 
 	actions
 	{
-		Event Player.N = True;
-		Event Player.H.N = True;
-		Set Status(Event Player, Event Player.H, Phased Out, 9999);
-		Set Status(Event Player.H, Event Player, Unkillable, 9999);
+		Event Player.mounted = True;
+		Event Player.horse.mounted = True;
+		Set Status(Event Player, Event Player.horse, Phased Out, 9999);
+		Set Status(Event Player.horse, Event Player, Unkillable, 9999);
 		Clear Status(Event Player, Knocked Down);
-		Heal(Event Player, Event Player.H, 100);
-		Heal(Event Player.H, Event Player, 100);
+		Heal(Event Player, Event Player.horse, 100);
+		Heal(Event Player.horse, Event Player, 100);
 	}
 }
 
@@ -186,11 +204,11 @@ rule("rider rides horse (copied from \"stacks\" by Squ1dward)")
 
 	conditions
 	{
-		Event Player.A == True;
-		Event Player.N == True;
+		Event Player.alive == True;
+		Event Player.mounted == True;
 		Is Alive(Event Player) == True;
-		Event Player.H != Null;
-		Is Alive(Event Player.H) == True;
+		Event Player.horse != Null;
+		Is Alive(Event Player.horse) == True;
 	}
 
 	actions
@@ -199,12 +217,15 @@ rule("rider rides horse (copied from \"stacks\" by Squ1dward)")
 		Apply Impulse(Event Player, Direction Towards(Position Of(Event Player), Position Of(Event Player) + Vector(Speed Of In Direction(
 			Event Player, Left), Vertical Speed Of(Event Player), Speed Of In Direction(Event Player, Forward))), Speed Of(Event Player)
 			* -0.800, To World, Incorporate Contrary Motion);
-		Apply Impulse(Event Player, Direction Towards(Event Player, Position Of(Event Player.H) + Global.O), Distance Between(Position Of(
-			Event Player), Position Of(Event Player.H) + Global.O) * 10, To World, Cancel Contrary Motion);
-		Skip If(Distance Between(Position Of(Event Player), Position Of(Event Player.H)) < 2 || Is Alive(Event Player.H) != True, 3);
-		Event Player.C = Vertical Facing Angle Of(Event Player);
-		Teleport(Event Player, Position Of(Event Player.H) + Global.O);
-		Set Facing(Event Player, Direction From Angles(Horizontal Facing Angle Of(Event Player), Event Player.C), To World);
+		Apply Impulse(Event Player, Direction Towards(Event Player, Position Of(Event Player.horse) + Global.OFFSET_ATTACH),
+			Distance Between(Position Of(Event Player), Position Of(Event Player.horse) + Global.OFFSET_ATTACH) * 10, To World,
+			Cancel Contrary Motion);
+		Skip If(Distance Between(Position Of(Event Player), Position Of(Event Player.horse)) < 2 || Is Alive(Event Player.horse) != True,
+			3);
+		Event Player._verticalFacingAngle = Vertical Facing Angle Of(Event Player);
+		Teleport(Event Player, Position Of(Event Player.horse) + Global.OFFSET_ATTACH);
+		Set Facing(Event Player, Direction From Angles(Horizontal Facing Angle Of(Event Player), Event Player._verticalFacingAngle),
+			To World);
 		Wait(0.016, Ignore Condition);
 		Loop If Condition Is True;
 	}
@@ -221,15 +242,15 @@ rule("rider injured")
 
 	conditions
 	{
-		Event Player.A == True;
-		Event Player.N == True;
+		Event Player.alive == True;
+		Event Player.mounted == True;
 		Normalized Health(Event Player) < 0.250;
 	}
 
 	actions
 	{
-		Event Player.N = False;
-		Event Player.M = 2;
+		Event Player.mounted = False;
+		Event Player.mountCooldown = 2;
 	}
 }
 
@@ -244,15 +265,15 @@ rule("horse injured")
 
 	conditions
 	{
-		Event Player.A == False;
-		Event Player.N == True;
+		Event Player.alive == False;
+		Event Player.mounted == True;
 		Normalized Health(Event Player) < 0.500;
 	}
 
 	actions
 	{
-		Event Player.R.N = False;
-		Event Player.R.M = 2;
+		Event Player.rider.mounted = False;
+		Event Player.rider.mountCooldown = 2;
 	}
 }
 
@@ -267,19 +288,19 @@ rule("rider thrown off horse")
 
 	conditions
 	{
-		Event Player.A == True;
-		Event Player.M > 0;
+		Event Player.alive == True;
+		Event Player.mountCooldown > 0;
 	}
 
 	actions
 	{
-		Event Player.H.N = False;
-		Event Player.M = 2;
-		Chase Player Variable Over Time(Event Player, M, 0, 2, Destination and Duration);
+		Event Player.horse.mounted = False;
+		Event Player.mountCooldown = 2;
+		Chase Player Variable Over Time(Event Player, mountCooldown, 0, 2, Destination and Duration);
 		Clear Status(Event Player, Phased Out);
-		Clear Status(Event Player.H, Unkillable);
+		Clear Status(Event Player.horse, Unkillable);
 		Set Status(Event Player, Null, Knocked Down, 5);
-		Apply Impulse(Event Player, Facing Direction Of(Event Player.H) * -1 + Vector(0, 1, 0), 10, To World, Cancel Contrary Motion);
+		Apply Impulse(Event Player, Facing Direction Of(Event Player.horse) * -1 + Vector(0, 1, 0), 10, To World, Cancel Contrary Motion);
 	}
 }
 
@@ -294,14 +315,14 @@ rule("rider dies")
 
 	conditions
 	{
-		Event Player.A == True;
+		Event Player.alive == True;
 	}
 
 	actions
 	{
-		Event Player.H.R = Null;
-		Event Player.H = Null;
-		Modify Global Variable(R, Remove From Array By Value, Event Player);
+		Event Player.horse.rider = Null;
+		Event Player.horse = Null;
+		Modify Global Variable(riderList, Remove From Array By Value, Event Player);
 	}
 }
 
@@ -316,14 +337,14 @@ rule("horse dies")
 
 	conditions
 	{
-		Event Player.A == False;
+		Event Player.alive == False;
 	}
 
 	actions
 	{
-		Event Player.R.H = Null;
-		Event Player.R = Null;
-		Modify Global Variable(H, Remove From Array By Value, Event Player);
+		Event Player.rider.horse = Null;
+		Event Player.rider = Null;
+		Modify Global Variable(horseList, Remove From Array By Value, Event Player);
 	}
 }
 
@@ -338,13 +359,13 @@ rule("rider's horse dies")
 
 	conditions
 	{
-		Event Player.A == True;
-		Is Alive(Event Player.H) == False;
+		Event Player.alive == True;
+		Is Alive(Event Player.horse) == False;
 	}
 
 	actions
 	{
-		Event Player.H = Null;
+		Event Player.horse = Null;
 	}
 }
 
@@ -359,13 +380,13 @@ rule("horse's rider dies")
 
 	conditions
 	{
-		Event Player.A == False;
-		Is Alive(Event Player.R) == False;
+		Event Player.alive == False;
+		Is Alive(Event Player.rider) == False;
 	}
 
 	actions
 	{
-		Event Player.R = Null;
+		Event Player.rider = Null;
 	}
 }
 
@@ -380,16 +401,16 @@ rule("horse gallop (speed up)")
 
 	conditions
 	{
-		Event Player.A == False;
+		Event Player.alive == False;
 		Is Button Held(Event Player, Button(Ability 1)) == True;
 	}
 
 	actions
 	{
-		Event Player.S += 10;
-		Event Player.S = Min(Event Player.S, 200);
-		Set Move Speed(Event Player, Event Player.S);
-		Set Aim Speed(Event Player, Min(215 - Event Player.S, 100));
+		Event Player.speed += 10;
+		Event Player.speed = Min(Event Player.speed, 200);
+		Set Move Speed(Event Player, Event Player.speed);
+		Set Aim Speed(Event Player, Min(215 - Event Player.speed, 100));
 		Wait(0.500, Ignore Condition);
 		Loop If Condition Is True;
 	}
@@ -406,16 +427,16 @@ rule("horse gallop (initial speed burst)")
 
 	conditions
 	{
-		Event Player.A == False;
+		Event Player.alive == False;
 		Is Button Held(Event Player, Button(Ability 1)) == True;
 	}
 
 	actions
 	{
-		Event Player.S += 30;
-		Event Player.S = Min(Event Player.S, 200);
-		Set Move Speed(Event Player, Event Player.S);
-		Set Aim Speed(Event Player, Min(215 - Event Player.S, 100));
+		Event Player.speed += 30;
+		Event Player.speed = Min(Event Player.speed, 200);
+		Set Move Speed(Event Player, Event Player.speed);
+		Set Aim Speed(Event Player, Min(215 - Event Player.speed, 100));
 	}
 }
 
@@ -430,17 +451,17 @@ rule("horse gallop (slow down)")
 
 	conditions
 	{
-		Event Player.A == False;
+		Event Player.alive == False;
 		Is Button Held(Event Player, Button(Ability 1)) == False;
-		Event Player.S > 50;
+		Event Player.speed > 50;
 	}
 
 	actions
 	{
-		Event Player.S -= 10;
-		Event Player.S = Max(Event Player.S, 50);
-		Set Move Speed(Event Player, Event Player.S);
-		Set Aim Speed(Event Player, Min(215 - Event Player.S, 100));
+		Event Player.speed -= 10;
+		Event Player.speed = Max(Event Player.speed, 50);
+		Set Move Speed(Event Player, Event Player.speed);
+		Set Aim Speed(Event Player, Min(215 - Event Player.speed, 100));
 		Wait(0.300, Ignore Condition);
 		Loop If Condition Is True;
 	}
@@ -457,17 +478,17 @@ rule("horse gallop (initial slow down)")
 
 	conditions
 	{
-		Event Player.A == False;
+		Event Player.alive == False;
 		Is Button Held(Event Player, Button(Ability 1)) == False;
-		Event Player.S > 50;
+		Event Player.speed > 50;
 	}
 
 	actions
 	{
-		Event Player.S -= 15;
-		Event Player.S = Max(Event Player.S, 50);
-		Set Move Speed(Event Player, Event Player.S);
-		Set Aim Speed(Event Player, Min(215 - Event Player.S, 100));
+		Event Player.speed -= 15;
+		Event Player.speed = Max(Event Player.speed, 50);
+		Set Move Speed(Event Player, Event Player.speed);
+		Set Aim Speed(Event Player, Min(215 - Event Player.speed, 100));
 	}
 }
 
@@ -482,15 +503,15 @@ rule("horse punches deal damage the faster she went (suggested by XDnetwork)")
 
 	conditions
 	{
-		Attacker.A == False;
+		Attacker.alive == False;
 	}
 
 	actions
 	{
-		Event Player.D = Event Player.S * 0.500 - 80;
-		Damage(Victim, Attacker, Event Player.D);
+		Event Player.punchDamage = Event Player.speed * 0.500 - 80;
+		Damage(Victim, Attacker, Event Player.punchDamage);
 		Set Status(Attacker, Victim, Rooted, 0.500);
-		Small Message(Attacker, String("{0}: {1}", String("Damage"), Event Player.D));
+		Small Message(Attacker, String("{0}: {1}", String("Damage"), Event Player.punchDamage));
 	}
 }
 
@@ -505,14 +526,14 @@ rule("horse reset speed")
 
 	conditions
 	{
-		Event Player.A == False;
+		Event Player.alive == False;
 		Speed Of(Event Player) < 1;
 	}
 
 	actions
 	{
-		Event Player.S = 50;
-		Set Move Speed(Event Player, Event Player.S);
+		Event Player.speed = 50;
+		Set Move Speed(Event Player, Event Player.speed);
 		Set Aim Speed(Event Player, 100);
 	}
 }
@@ -528,9 +549,9 @@ rule("antibug attempt #1 (rider)")
 
 	conditions
 	{
-		Event Player.A == True;
-		Event Player.N == True;
-		Event Player.H == Null;
+		Event Player.alive == True;
+		Event Player.mounted == True;
+		Event Player.horse == Null;
 	}
 
 	actions
@@ -550,9 +571,9 @@ rule("antibug attempt #1 (horse)")
 
 	conditions
 	{
-		Event Player.A == False;
-		Event Player.N == True;
-		Event Player.R == Null;
+		Event Player.alive == False;
+		Event Player.mounted == True;
+		Event Player.rider == Null;
 	}
 
 	actions
@@ -572,9 +593,9 @@ rule("antibug attempt #2 (rider)")
 
 	conditions
 	{
-		Event Player.A == True;
-		Event Player.H != Null;
-		Event Player.H.R != Event Player;
+		Event Player.alive == True;
+		Event Player.horse != Null;
+		Event Player.horse.rider != Event Player;
 	}
 
 	actions
@@ -596,9 +617,9 @@ rule("antibug attempt #2 (horse)")
 
 	conditions
 	{
-		Event Player.A == False;
-		Event Player.R != Null;
-		Event Player.R.H != Event Player;
+		Event Player.alive == False;
+		Event Player.rider != Null;
+		Event Player.rider.horse != Event Player;
 	}
 
 	actions
