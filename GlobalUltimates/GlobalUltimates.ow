@@ -115,9 +115,9 @@ rule("ULT: Ashe")
 
 	actions
 	{
-		Big Message(All Players(All Teams), Custom String("HANDSOME FOR 8 SECONDS"));
+		Big Message(All Players(All Teams), Custom String("{0} HANDSOME FOR 8 SECONDS", Hero Icon String(Hero(Ashe))));
 		Global.asheUltTimeLeft = Global.ASHE_ULT_DURATION;
-		Chase Global Variable Over Time(asheUltTimeLeft, 0, Global.asheUltTimeLeft, None);
+		Chase Global Variable Over Time(asheUltTimeLeft, 0, Global.ASHE_ULT_DURATION, None);
 	}
 }
 
@@ -137,9 +137,9 @@ rule("ULT: Ashe effect")
 	{
 		disabled Big Message(All Players(All Teams), Custom String("HANDSOME FOR {0} SECONDS", Global.asheUltTimeLeft));
 		Communicate(Filtered Array(All Players(All Teams), Is Communicating Any Emote(Current Array Element) == False), Emote Up);
-		Wait(1, Ignore Condition);
+		Wait(0.500, Ignore Condition);
 		Loop If Condition Is True;
-		Big Message(All Players(All Teams), Custom String("OK BACK TO CASUAL", Global.asheUltTimeLeft));
+		Big Message(All Players(All Teams), Custom String("{0} OK BACK TO CASUAL", Hero Icon String(Hero(Ashe))));
 	}
 }
 
