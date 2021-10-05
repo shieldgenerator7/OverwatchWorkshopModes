@@ -183,6 +183,34 @@ rule("ULT: Ashe effect")
 	}
 }
 
+rule("ULT: Junkrat")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Ultimate)) == True;
+		Ultimate Charge Percent(Event Player) == 100;
+		Hero Of(Event Player) == Hero(Junkrat);
+	}
+
+	actions
+	{
+		Big Message(All Players(All Teams), Custom String("{0} HOLD STILL! {1}", Hero Icon String(Hero(Junkrat)), Ability Icon String(Hero(
+			Junkrat), Button(Ability 2))));
+		Set Status(Filtered Array(All Players(All Teams), Is On Ground(Current Array Element) == True && Hero Of(Current Array Element)
+			!= Hero(Junkrat)), Event Player, Rooted, Global.GLOBAL_ULT_DURATION);
+		disabled Set Ultimate Ability Enabled(Event Player, False);
+		disabled Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
+		disabled Set Ultimate Ability Enabled(Event Player, True);
+	}
+}
+
 rule("ULT: Lucio")
 {
 	event
@@ -229,7 +257,8 @@ rule("ULT: Reinhardt")
 
 	actions
 	{
-		Big Message(All Players(All Teams), Custom String("{0} EARTHQUAKE!!!", Hero Icon String(Hero(Reinhardt))));
+		Big Message(All Players(All Teams), Custom String("{0} EARTHQUAKE!!! {1}", Hero Icon String(Hero(Reinhardt)), Ability Icon String(
+			Hero(Reinhardt), Button(Ultimate))));
 		Set Status(Filtered Array(All Players(All Teams), Is On Ground(Current Array Element) == True && Hero Of(Current Array Element)
 			!= Hero(Reinhardt)), Event Player, Knocked Down, Global.GLOBAL_ULT_DURATION);
 		Set Ultimate Ability Enabled(Event Player, False);
