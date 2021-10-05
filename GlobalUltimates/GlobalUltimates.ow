@@ -136,7 +136,8 @@ rule("ULT: Ashe effect")
 	actions
 	{
 		disabled Big Message(All Players(All Teams), Custom String("HANDSOME FOR {0} SECONDS", Global.asheUltTimeLeft));
-		Communicate(Filtered Array(All Players(All Teams), Is Communicating Any Emote(Current Array Element) == False), Emote Up);
+		Communicate(Filtered Array(All Players(All Teams), Is Communicating Any Emote(Current Array Element) == False && Hero Of(
+			Current Array Element) != Hero(Ashe)), Emote Up);
 		Wait(0.500, Ignore Condition);
 		Loop If Condition Is True;
 		Big Message(All Players(All Teams), Custom String("{0} OK BACK TO CASUAL", Hero Icon String(Hero(Ashe))));
@@ -162,7 +163,7 @@ rule("ULT: Reinhardt")
 	actions
 	{
 		Big Message(All Players(All Teams), Custom String("{0} EARTHQUAKE!!!", Hero Icon String(Hero(Reinhardt))));
-		Set Status(Filtered Array(All Players(All Teams), Is On Ground(Current Array Element) == True), Event Player, Knocked Down,
-			Global.GLOBAL_ULT_DURATION);
+		Set Status(Filtered Array(All Players(All Teams), Is On Ground(Current Array Element) == True && Hero Of(Current Array Element)
+			!= Hero(Reinhardt)), Event Player, Knocked Down, Global.GLOBAL_ULT_DURATION);
 	}
 }
