@@ -67,6 +67,27 @@ rule("Skip assembly")
 	}
 }
 
+rule("==TEST== Teleport to objective ==")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player == Host Player;
+		Is Button Held(Event Player, Button(Interact)) == True;
+	}
+
+	actions
+	{
+		Teleport(All Players(All Teams), Objective Position(0));
+	}
+}
+
 rule("Player Setup - Disable ultimate")
 {
 	event
