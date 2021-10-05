@@ -6,11 +6,13 @@ variables
 		2: asheUltTimeLeft
 		3: tracerUltTimeLeft
 		5: TRACER_ULT_BLINK_DISTANCE
+		7: REAPER_ULT_DAMAGE_PER_SECOND
 
 	player:
 		0: _targetPlayer
 		1: _targetPlayerList
 		2: _i_
+		3: reaperUltTimeLeft
 }
 
 rule("Game Setup")
@@ -25,6 +27,7 @@ rule("Game Setup")
 		Global.GLOBAL_ULT_DURATION = 10;
 		Global.ASHE_ULT_DURATION = 8;
 		Global.TRACER_ULT_BLINK_DISTANCE = 5;
+		Global.REAPER_ULT_DAMAGE_PER_SECOND = 100;
 	}
 }
 
@@ -151,7 +154,8 @@ rule("ULT: Ashe")
 
 	actions
 	{
-		Big Message(All Players(All Teams), Custom String("{0} HANDSOME FOR 8 SECONDS", Hero Icon String(Hero(Ashe))));
+		Big Message(All Players(All Teams), Custom String("{0} HANDSOME FOR 8 SECONDS {1}", Hero Icon String(Hero(Ashe)),
+			Ability Icon String(Hero(Ashe), Button(Ultimate))));
 		Global.asheUltTimeLeft = Global.ASHE_ULT_DURATION;
 		Chase Global Variable Over Time(asheUltTimeLeft, 0, Global.ASHE_ULT_DURATION, None);
 		Set Ultimate Ability Enabled(Event Player, False);
@@ -236,6 +240,63 @@ rule("ULT: Lucio")
 		Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
 		disabled Set Ultimate Ability Enabled(Event Player, True);
 		Set Move Speed(All Players(All Teams), 100);
+	}
+}
+
+rule("ULT: Reaper")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reaper;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Ultimate)) == True;
+		Ultimate Charge Percent(Event Player) == 100;
+		Hero Of(Event Player) == Hero(Reaper);
+	}
+
+	actions
+	{
+		Big Message(All Players(All Teams), Custom String("{0} DIE! DIE! DIE! {1}", Hero Icon String(Hero(Reaper)), Ability Icon String(
+			Hero(Reaper), Button(Ultimate))));
+		Event Player.reaperUltTimeLeft = Global.GLOBAL_ULT_DURATION;
+		Chase Player Variable Over Time(Event Player, reaperUltTimeLeft, 0, Global.GLOBAL_ULT_DURATION, None);
+		Event Player._targetPlayerList = Filtered Array(All Players(All Teams), Current Array Element != Event Player);
+		Set Ultimate Ability Enabled(Event Player, False);
+		Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
+		Set Ultimate Ability Enabled(Event Player, True);
+	}
+}
+
+rule("ULT: Reaper effect")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reaper;
+	}
+
+	conditions
+	{
+		Event Player.reaperUltTimeLeft > 0;
+		Hero Of(Event Player) == Hero(Reaper);
+	}
+
+	actions
+	{
+		For Player Variable(Event Player, _i_, 0, Count Of(Event Player._targetPlayerList), 1);
+			Event Player._targetPlayer = Event Player._targetPlayerList[Event Player._i_];
+			Damage(Event Player._targetPlayer, Event Player, Global.REAPER_ULT_DAMAGE_PER_SECOND / 10);
+			disabled Small Message(Event Player, Custom String("DAMGE {0} {1}", Event Player._targetPlayer, Global.REAPER_ULT_DAMAGE_PER_SECOND / 10));
+		End;
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+		disabled Big Message(All Players(All Teams), Custom String("{0} OK BACK TO CASUAL", Hero Icon String(Hero(Ashe))));
 	}
 }
 
