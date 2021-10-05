@@ -9,6 +9,7 @@ variables
 		6: roadhogUltTimeLeft
 		7: REAPER_ULT_DAMAGE_PER_SECOND
 		8: mercyUltTimeLeft
+		9: widowmakerUltTimeLeft
 
 	player:
 		0: _targetPlayer
@@ -529,6 +530,58 @@ rule("ULT: Tracer effect")
 			Event Player._targetPlayer = Event Player._targetPlayerList[Event Player._i_];
 			Teleport(Event Player._targetPlayer, Nearest Walkable Position(Position Of(Event Player._targetPlayer)
 				+ Global.TRACER_ULT_BLINK_DISTANCE * Facing Direction Of(Event Player)));
+		End;
+	}
+}
+
+rule("ULT: Widowmaker")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Widowmaker;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Ultimate)) == True;
+		Ultimate Charge Percent(Event Player) == 100;
+		Hero Of(Event Player) == Hero(Widowmaker);
+	}
+
+	actions
+	{
+		Big Message(All Players(All Teams), Custom String("{0} I FEEL ALIVE {1}", Hero Icon String(Hero(Widowmaker)), Ability Icon String(
+			Hero(Widowmaker), Button(Secondary Fire))));
+		Global.widowmakerUltTimeLeft = Global.GLOBAL_ULT_DURATION;
+		Chase Global Variable Over Time(widowmakerUltTimeLeft, 0, Global.GLOBAL_ULT_DURATION, None);
+		disabled Set Ultimate Ability Enabled(Event Player, False);
+		Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
+		disabled Set Ultimate Ability Enabled(Event Player, True);
+	}
+}
+
+rule("ULT: Widowmaker effect")
+{
+	event
+	{
+		Player Took Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Global.widowmakerUltTimeLeft > 0;
+		Event Was Critical Hit == False;
+	}
+
+	actions
+	{
+		Heal(Victim, Null, Event Damage);
+		If(Is Alive(Victim) == False);
+			Resurrect(Victim);
 		End;
 	}
 }
