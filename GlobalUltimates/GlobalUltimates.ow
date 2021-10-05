@@ -118,6 +118,9 @@ rule("ULT: Ashe")
 		Big Message(All Players(All Teams), Custom String("{0} HANDSOME FOR 8 SECONDS", Hero Icon String(Hero(Ashe))));
 		Global.asheUltTimeLeft = Global.ASHE_ULT_DURATION;
 		Chase Global Variable Over Time(asheUltTimeLeft, 0, Global.ASHE_ULT_DURATION, None);
+		Set Ultimate Ability Enabled(Event Player, False);
+		Wait(Global.ASHE_ULT_DURATION, Ignore Condition);
+		Set Ultimate Ability Enabled(Event Player, True);
 	}
 }
 
@@ -165,5 +168,8 @@ rule("ULT: Reinhardt")
 		Big Message(All Players(All Teams), Custom String("{0} EARTHQUAKE!!!", Hero Icon String(Hero(Reinhardt))));
 		Set Status(Filtered Array(All Players(All Teams), Is On Ground(Current Array Element) == True && Hero Of(Current Array Element)
 			!= Hero(Reinhardt)), Event Player, Knocked Down, Global.GLOBAL_ULT_DURATION);
+		Set Ultimate Ability Enabled(Event Player, False);
+		Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
+		Set Ultimate Ability Enabled(Event Player, True);
 	}
 }
