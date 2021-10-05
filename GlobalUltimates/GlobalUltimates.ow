@@ -97,6 +97,34 @@ rule("Player presses ultimate button")
 	}
 }
 
+rule("ULT: Ana")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Ana;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Ultimate)) == True;
+		Ultimate Charge Percent(Event Player) == 100;
+		Hero Of(Event Player) == Hero(Ana);
+	}
+
+	actions
+	{
+		Big Message(All Players(All Teams), Custom String("{0} NAP TIME... {1}", Hero Icon String(Hero(Ana)), Ability Icon String(Hero(
+			Ana), Button(Ability 1))));
+		Set Status(Filtered Array(All Players(All Teams), Hero Of(Current Array Element) != Hero(Ana)), Event Player, Asleep,
+			Global.GLOBAL_ULT_DURATION);
+		disabled Set Ultimate Ability Enabled(Event Player, False);
+		disabled Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
+		disabled Set Ultimate Ability Enabled(Event Player, True);
+	}
+}
+
 rule("ULT: Ashe")
 {
 	event
