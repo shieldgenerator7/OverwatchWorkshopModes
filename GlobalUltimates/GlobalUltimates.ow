@@ -1,8 +1,22 @@
+variables
+{
+	global:
+		0: GLOBAL_ULT_DURATION
+		1: ASHE_ULT_DURATION
+		2: asheUltTimeLeft
+}
+
 rule("Game Setup")
 {
 	event
 	{
 		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.GLOBAL_ULT_DURATION = 10;
+		Global.ASHE_ULT_DURATION = 8;
 	}
 }
 
@@ -80,6 +94,51 @@ rule("Player presses ultimate button")
 	actions
 	{
 		Set Ultimate Charge(Event Player, 0);
-		Big Message(All Players(All Teams), Custom String("GLOBAL ULTIMATE"));
+	}
+}
+
+rule("ULT: Ashe")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Ashe;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Ultimate)) == True;
+		Ultimate Charge Percent(Event Player) == 100;
+		Hero Of(Event Player) == Hero(Ashe);
+	}
+
+	actions
+	{
+		Big Message(All Players(All Teams), Custom String("HANDSOME FOR 8 SECONDS"));
+		Global.asheUltTimeLeft = Global.ASHE_ULT_DURATION;
+		Chase Global Variable Over Time(asheUltTimeLeft, 0, Global.asheUltTimeLeft, None);
+	}
+}
+
+rule("ULT: Ashe effect")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	conditions
+	{
+		Global.asheUltTimeLeft > 0;
+	}
+
+	actions
+	{
+		disabled Big Message(All Players(All Teams), Custom String("HANDSOME FOR {0} SECONDS", Global.asheUltTimeLeft));
+		Communicate(Filtered Array(All Players(All Teams), Is Communicating Any Emote(Current Array Element) == False), Emote Up);
+		Wait(1, Ignore Condition);
+		Loop If Condition Is True;
+		Big Message(All Players(All Teams), Custom String("OK BACK TO CASUAL", Global.asheUltTimeLeft));
 	}
 }
