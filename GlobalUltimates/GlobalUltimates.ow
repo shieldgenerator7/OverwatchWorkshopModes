@@ -497,7 +497,7 @@ rule("ULT: Tracer")
 
 	actions
 	{
-		Big Message(All Players(All Teams), Custom String("{0} OPEN THE EYE OF AGAMOTTO {1}", Hero Icon String(Hero(Tracer)),
+		Big Message(All Players(All Teams), Custom String("{0} TIME TO OPEN THE EYE OF AGAMOTTO {1}", Hero Icon String(Hero(Tracer)),
 			Ability Icon String(Hero(Tracer), Button(Ability 1))));
 		Event Player._targetPlayerList = Filtered Array(All Players(All Teams), Current Array Element != Event Player);
 		Global.tracerUltTimeLeft = Global.GLOBAL_ULT_DURATION;
@@ -583,5 +583,34 @@ rule("ULT: Widowmaker effect")
 		If(Is Alive(Victim) == False);
 			Resurrect(Victim);
 		End;
+	}
+}
+
+rule("ULT: Winston")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Winston;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Ultimate)) == True;
+		Ultimate Charge Percent(Event Player) == 100;
+		Hero Of(Event Player) == Hero(Winston);
+	}
+
+	actions
+	{
+		Big Message(All Players(All Teams), Custom String("{0} OOOH TANKY! {1}", Hero Icon String(Hero(Winston)), Ability Icon String(Hero(
+			Winston), Button(Ultimate))));
+		Set Max Health(All Players(All Teams), 200);
+		Heal(All Players(All Teams), Event Player, 1000);
+		disabled Set Ultimate Ability Enabled(Event Player, False);
+		Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
+		disabled Set Ultimate Ability Enabled(Event Player, True);
+		Set Max Health(Event Player, 100);
 	}
 }
