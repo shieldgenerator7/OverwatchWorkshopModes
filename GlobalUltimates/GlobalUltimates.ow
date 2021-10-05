@@ -297,7 +297,9 @@ rule("ULT: Mercy effect")
 {
 	event
 	{
-		Ongoing - Global;
+		Player Died;
+		All;
+		All;
 	}
 
 	conditions
@@ -307,11 +309,10 @@ rule("ULT: Mercy effect")
 
 	actions
 	{
-		disabled Big Message(All Players(All Teams), Custom String("HANDSOME FOR {0} SECONDS", Global.asheUltTimeLeft));
-		Resurrect(All Dead Players(All Teams));
-		Wait(0.500, Ignore Condition);
-		Loop If Condition Is True;
-		disabled Big Message(All Players(All Teams), Custom String("{0} OK BACK TO CASUAL", Hero Icon String(Hero(Ashe))));
+		Wait(2, Ignore Condition);
+		Resurrect(Event Player);
+		Big Message(All Players(All Teams), Custom String("{0} {1} RESURRECTED {0}", Ability Icon String(Hero(Mercy), Button(Ability 2)),
+			Hero Of(Event Player)));
 	}
 }
 
