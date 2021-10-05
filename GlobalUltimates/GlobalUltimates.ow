@@ -6,6 +6,7 @@ variables
 		2: asheUltTimeLeft
 		3: tracerUltTimeLeft
 		5: TRACER_ULT_BLINK_DISTANCE
+		6: roadhogUltTimeLeft
 		7: REAPER_ULT_DAMAGE_PER_SECOND
 		8: mercyUltTimeLeft
 
@@ -398,6 +399,54 @@ rule("ULT: Reinhardt")
 		Set Ultimate Ability Enabled(Event Player, False);
 		Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
 		Set Ultimate Ability Enabled(Event Player, True);
+	}
+}
+
+rule("ULT: Roadhog")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Roadhog;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Ultimate)) == True;
+		Ultimate Charge Percent(Event Player) == 100;
+		Hero Of(Event Player) == Hero(Roadhog);
+	}
+
+	actions
+	{
+		Big Message(All Players(All Teams), Custom String("{0} GET OUT {1}", Hero Icon String(Hero(Roadhog)), Ability Icon String(Hero(
+			Roadhog), Button(Ultimate))));
+		Global.roadhogUltTimeLeft = Global.GLOBAL_ULT_DURATION;
+		Chase Global Variable Over Time(roadhogUltTimeLeft, 0, Global.GLOBAL_ULT_DURATION, None);
+		disabled Set Ultimate Ability Enabled(Event Player, False);
+		disabled Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
+		disabled Set Ultimate Ability Enabled(Event Player, True);
+	}
+}
+
+rule("ULT: Roadhog effect")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Global.roadhogUltTimeLeft > 0;
+	}
+
+	actions
+	{
+		Apply Impulse(Victim, Facing Direction Of(Attacker), Event Damage, To World, Incorporate Contrary Motion);
 	}
 }
 
