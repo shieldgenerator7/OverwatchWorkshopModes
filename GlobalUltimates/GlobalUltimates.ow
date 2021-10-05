@@ -142,3 +142,27 @@ rule("ULT: Ashe effect")
 		Big Message(All Players(All Teams), Custom String("OK BACK TO CASUAL", Global.asheUltTimeLeft));
 	}
 }
+
+rule("ULT: Reinhardt")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Reinhardt;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Ultimate)) == True;
+		Ultimate Charge Percent(Event Player) == 100;
+		Hero Of(Event Player) == Hero(Reinhardt);
+	}
+
+	actions
+	{
+		Big Message(All Players(All Teams), Custom String("{0} EARTHQUAKE!!!", Hero Icon String(Hero(Reinhardt))));
+		Set Status(Filtered Array(All Players(All Teams), Is On Ground(Current Array Element) == True), Event Player, Knocked Down,
+			Global.GLOBAL_ULT_DURATION);
+	}
+}
