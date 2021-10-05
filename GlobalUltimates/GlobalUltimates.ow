@@ -210,6 +210,34 @@ rule("ULT: Ashe effect")
 	}
 }
 
+rule("ULT: Bastion")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Bastion;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Ultimate)) == True;
+		Ultimate Charge Percent(Event Player) == 100;
+		Hero Of(Event Player) == Hero(Bastion);
+	}
+
+	actions
+	{
+		Big Message(All Players(All Teams), Custom String("{0} COME OUT COME OUT WHERE EVER YOU ARE {1}", Hero Icon String(Hero(Bastion)),
+			Icon String(Arrow: Up)));
+		Start Forcing Throttle(All Players(All Teams), 1, 1, 0, 1, 0, 1);
+		disabled Set Ultimate Ability Enabled(Event Player, False);
+		Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
+		disabled Set Ultimate Ability Enabled(Event Player, True);
+		Stop Forcing Throttle(All Players(All Teams));
+	}
+}
+
 rule("ULT: Junkrat")
 {
 	event
