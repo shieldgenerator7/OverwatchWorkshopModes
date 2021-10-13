@@ -31,13 +31,13 @@ rule("Game Setup")
 
 	actions
 	{
-		Global.BRIG_LVL_MAX_HP = Array(-1, 10, 25, 50);
-		Global.BRIG_LVL_HEALING = Array(-1, 1, 2, 3);
-		Global.BRIG_LVL_DAMAGE = Array(-1, 2, 5, 10);
+		Global.BRIG_LVL_MAX_HP = Array(-1, 5, 10, 18);
+		Global.BRIG_LVL_HEALING = Array(-1, 7, 14, 21);
+		Global.BRIG_LVL_DAMAGE = Array(-1, 3, 6, 10);
 		Global.BRIG_LVL_MAX_EXP = Array(-1, 1, 5, 8);
 		Global.MINION_SPAWN = Array(Array(1, Vector(3.382, 3.733, -26.961)), Array(0, Vector(15.681, 4.023, -20.617)), Array(0, Vector(
 			12.225, 4.023, -19.150)), Array(0, Vector(16.181, 4.023, -15.474)));
-		Global.MINION_INFO = Array(Array(Hero(Junkrat), 0.300, 1, 1), Array(Hero(Pharah), 0.500, 5, 1));
+		Global.MINION_INFO = Array(Array(Hero(Junkrat), 0.300, 1, 1), Array(Hero(Pharah), 0.500, 5, 4));
 		Global.lastSpawnedMinionID = -1;
 	}
 }
