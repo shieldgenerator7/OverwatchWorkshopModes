@@ -4,8 +4,8 @@ settings
 	{
 		Map Rotation: Paused
 		Max Spectators: 12
-		Max Team 1 Players: 1
-		Max Team 2 Players: 11
+		Max Team 1 Players: 11
+		Max Team 2 Players: 1
 		Return To Lobby: Never
 		Team Balancing: After A Game
 	}
@@ -13,6 +13,12 @@ settings
 	modes
 	{
 		Skirmish
+		{
+			enabled maps
+			{
+				Eichenwalde Halloween
+			}
+		}
 
 		General
 		{
