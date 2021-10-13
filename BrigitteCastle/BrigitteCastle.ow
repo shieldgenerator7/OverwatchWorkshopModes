@@ -5,6 +5,7 @@ variables
 		1: BRIG_LVL_HEALING
 		2: BRIG_LVL_DAMAGE
 		3: BRIG_LVL_MAX_EXP
+		4: brigPlayer
 		8: _i_
 		10: MINION_SPAWN
 		11: MINION_INFO
@@ -126,6 +127,7 @@ rule("Spawn Brig Player")
 
 	actions
 	{
+		Global.brigPlayer = Event Player;
 		Event Player.brigLevel = 1;
 		Call Subroutine(BrigSetLevel);
 		Create HUD Text(Event Player, Custom String("EXP: {0} / {1}", Event Player.brigEXP,
@@ -255,7 +257,7 @@ rule("Minion Spawns: Junkrat")
 
 	actions
 	{
-		Set Facing(Event Player, Vector(0, -1, 0), To World);
+		Set Facing(Event Player, Down, To World);
 		Press Button(Event Player, Button(Ability 2));
 	}
 }
@@ -281,5 +283,31 @@ rule("Minion Behaviour: Junkrat")
 		Press Button(Event Player, Button(Primary Fire));
 		Wait(1, Ignore Condition);
 		Loop If Condition Is True;
+	}
+}
+
+rule("Minion Behaviour: Junkrat sees Brig")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Junkrat);
+		Is Alive(Event Player) == True;
+		Event Player.minionTypeID == 0;
+		Is In Line of Sight(Position Of(Event Player), Position Of(Global.brigPlayer), Enemy Barriers Block LOS) == True;
+	}
+
+	actions
+	{
+		Start Facing(Event Player, Position Of(Global.brigPlayer) - Position Of(Event Player), 120, To World, Direction and Turn Rate);
+		Wait Until(!Is In Line of Sight(Position Of(Event Player), Position Of(Global.brigPlayer), Enemy Barriers Block LOS), 99999);
+		Stop Facing(Event Player);
+		Set Facing(Event Player, Down, To World);
 	}
 }
