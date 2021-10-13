@@ -5,6 +5,8 @@ variables
 		1: BRIG_LVL_HEALING
 		2: BRIG_LVL_DAMAGE
 		3: BRIG_LVL_MAX_EXP
+		8: _i_
+		10: MINION_SPAWN
 
 	player:
 		0: brigEXP
@@ -29,6 +31,8 @@ rule("Game Setup")
 		Global.BRIG_LVL_HEALING = Array(-1, 1, 2, 3);
 		Global.BRIG_LVL_DAMAGE = Array(-1, 2, 5, 10);
 		Global.BRIG_LVL_MAX_EXP = Array(-1, 1, 5, 8);
+		Global.MINION_SPAWN = Array(Array(Hero(Junkrat), Vector(0.010, 2.820, -26.940)), Array(Hero(Pharah), Vector(9.150, 3.810,
+			-28.370)));
 	}
 }
 
@@ -140,5 +144,20 @@ rule("== TEST == GIVE EXP ==")
 	actions
 	{
 		Event Player.brigEXP += 1;
+	}
+}
+
+rule("Game Setup: Spawn Minions")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		For Global Variable(_i_, 0, Count Of(Global.MINION_SPAWN), 1);
+			Create Dummy Bot(Global.MINION_SPAWN[Global._i_][0], Team 1, -1, Global.MINION_SPAWN[Global._i_][1], Vector(0, 0, 0));
+		End;
 	}
 }
