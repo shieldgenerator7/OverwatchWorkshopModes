@@ -37,7 +37,7 @@ rule("Game Setup")
 		Global.BRIG_LVL_MAX_EXP = Array(-1, 1, 5, 8);
 		Global.MINION_SPAWN = Array(Array(1, Vector(3.382, 3.733, -26.961)), Array(0, Vector(15.681, 4.023, -20.617)), Array(0, Vector(
 			12.225, 4.023, -19.150)), Array(0, Vector(16.181, 4.023, -15.474)));
-		Global.MINION_INFO = Array(Array(Hero(Junkrat), 0.300, 5, 1), Array(Hero(Pharah), 0.500, 5, 1));
+		Global.MINION_INFO = Array(Array(Hero(Junkrat), 0.300, 1, 1), Array(Hero(Pharah), 0.500, 5, 1));
 		Global.lastSpawnedMinionID = -1;
 	}
 }
@@ -212,5 +212,25 @@ rule("Minion Spawns")
 		Start Scaling Player(Event Player, Global.MINION_INFO[Global.lastSpawnedMinionID][1], False);
 		Set Max Health(Event Player, Global.MINION_INFO[Global.lastSpawnedMinionID][2]);
 		Event Player.minionGiveEXP = Global.MINION_INFO[Global.lastSpawnedMinionID][3];
+	}
+}
+
+rule("Brig kill minion")
+{
+	event
+	{
+		Player Earned Elimination;
+		All;
+		Brigitte;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Brigitte);
+	}
+
+	actions
+	{
+		Event Player.brigEXP += Victim.minionGiveEXP;
 	}
 }
