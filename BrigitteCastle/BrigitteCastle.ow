@@ -37,8 +37,8 @@ rule("Game Setup")
 		Global.BRIG_LVL_HEALING = Array(-1, 7, 14, 21);
 		Global.BRIG_LVL_DAMAGE = Array(-1, 3, 6, 10);
 		Global.BRIG_LVL_MAX_EXP = Array(-1, 1, 5, 8);
-		Global.MINION_SPAWN = Array(Array(1, Vector(3.382, 3.733, -26.961)), Array(0, Vector(15.681, 4.023, -20.617)), Array(0, Vector(
-			12.225, 4.023, -19.150)), Array(0, Vector(16.181, 4.023, -15.474)));
+		Global.MINION_SPAWN = Array(Array(0, Vector(-17.802, 0, -10.827)), Array(0, Vector(-11.276, -0.077, -14.615)), Array(0, Vector(
+			-5.708, 0, -10.306)));
 		Global.MINION_INFO = Array(Array(Hero(Junkrat), 0.300, 1, 1), Array(Hero(Pharah), 0.500, 5, 4));
 		Global.lastSpawnedMinionTypeID = -1;
 	}
@@ -89,7 +89,7 @@ rule("== TEST == GIVE EXP ==")
 	}
 }
 
-rule("== TEST == PLACE MINION ==")
+rule("=== TEST == PLACE MINION ==")
 {
 	event
 	{
@@ -106,7 +106,8 @@ rule("== TEST == PLACE MINION ==")
 
 	actions
 	{
-		Modify Global Variable(MINION_SPAWN, Append To Array, Array(0, Position Of(Event Player)));
+		Modify Global Variable(MINION_SPAWN, Append To Array, 0);
+		Global.MINION_SPAWN[Count Of(Global.MINION_SPAWN) - 1] = Array(0, Position Of(Event Player));
 	}
 }
 
