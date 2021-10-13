@@ -6,6 +6,9 @@ variables
 		2: BRIG_LVL_DAMAGE
 		3: BRIG_LVL_MAX_EXP
 		4: brigPlayer
+		5: BRIG_ABILITY_SPAWN
+		6: BRIG_ABILITY_RADIUS
+		7: currentAbilityGranter
 		8: _i_
 		10: MINION_SPAWN
 		11: MINION_INFO
@@ -37,10 +40,12 @@ rule("Game Setup")
 		Global.BRIG_LVL_HEALING = Array(-1, 7, 14, 21);
 		Global.BRIG_LVL_DAMAGE = Array(-1, 3, 6, 10);
 		Global.BRIG_LVL_MAX_EXP = Array(-1, 1, 5, 8);
+		Global.BRIG_ABILITY_SPAWN = Array(Array(0, Vector(2.266, 6.092, 0.319)));
 		Global.MINION_SPAWN = Array(Array(0, Vector(-17.802, 0, -10.827)), Array(0, Vector(-11.276, -0.077, -14.615)), Array(0, Vector(
-			-5.708, 0, -10.306)));
+			-5.708, 0, -10.306)), Array(0, Vector(-6.656, 0.939, -19.477)), Array(0, Vector(-15.448, 1.707, -23.945)));
 		Global.MINION_INFO = Array(Array(Hero(Junkrat), 0.300, 1, 1), Array(Hero(Pharah), 0.500, 5, 4));
 		Global.lastSpawnedMinionTypeID = -1;
+		Global.BRIG_ABILITY_RADIUS = 2;
 	}
 }
 
@@ -111,6 +116,28 @@ rule("=== TEST == PLACE MINION ==")
 	}
 }
 
+rule("=== TEST == PLACE ABILITY ==")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player == Host Player;
+		Is Button Held(Event Player, Button(Jump)) == True;
+	}
+
+	actions
+	{
+		Modify Global Variable(BRIG_ABILITY_SPAWN, Append To Array, 0);
+		Global.BRIG_ABILITY_SPAWN[Count Of(Global.BRIG_ABILITY_SPAWN) - 1] = Array(0, Position Of(Event Player));
+	}
+}
+
 rule("Spawn Brig Player")
 {
 	event
@@ -136,6 +163,10 @@ rule("Spawn Brig Player")
 			Default Visibility);
 		Create HUD Text(Event Player, Custom String("LEVEL: {0}", Event Player.brigLevel), Null, Null, Left, 0, Color(White), Color(White),
 			Color(White), String, Default Visibility);
+		Set Secondary Fire Enabled(Event Player, False);
+		Set Ability 1 Enabled(Event Player, False);
+		Set Ability 2 Enabled(Event Player, False);
+		Set Ultimate Ability Enabled(Event Player, False);
 	}
 }
 
@@ -306,9 +337,34 @@ rule("Minion Behaviour: Junkrat sees Brig")
 
 	actions
 	{
-		Start Facing(Event Player, Position Of(Global.brigPlayer) - Position Of(Event Player), 120, To World, Direction and Turn Rate);
+		Start Facing(Event Player, Position Of(Global.brigPlayer) - Position Of(Event Player), 360, To World, Direction and Turn Rate);
 		Wait Until(!Is In Line of Sight(Position Of(Event Player), Position Of(Global.brigPlayer), Enemy Barriers Block LOS), 99999);
 		Stop Facing(Event Player);
 		Set Facing(Event Player, Down, To World);
+	}
+}
+
+rule("Brig gets ability")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Count Of(Filtered Array(Global.BRIG_ABILITY_SPAWN, Distance Between(Position Of(Event Player), Current Array Element[1])
+			<= Global.BRIG_ABILITY_RADIUS)) > 0;
+	}
+
+	actions
+	{
+		Global.currentAbilityGranter = Filtered Array(Global.BRIG_ABILITY_SPAWN, Distance Between(Position Of(Event Player),
+			Current Array Element[1]) <= Global.BRIG_ABILITY_RADIUS)[0];
+		If(Global.currentAbilityGranter[0] == 0);
+			Set Secondary Fire Enabled(Event Player, True);
+		End;
 	}
 }
