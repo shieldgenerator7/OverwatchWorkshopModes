@@ -1,8 +1,34 @@
+variables
+{
+	global:
+		0: BRIG_LVL_MAX_HP
+		1: BRIG_LVL_HEALING
+		2: BRIG_LVL_DAMAGE
+		3: BRIG_LVL_MAX_EXP
+
+	player:
+		0: brigEXP
+		1: brigLevel
+}
+
+subroutines
+{
+	0: BrigSetLevel
+}
+
 rule("Game Setup")
 {
 	event
 	{
 		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.BRIG_LVL_MAX_HP = Array(-1, 10, 25, 50);
+		Global.BRIG_LVL_HEALING = Array(-1, 1, 2, 3);
+		Global.BRIG_LVL_DAMAGE = Array(-1, 2, 5, 10);
+		Global.BRIG_LVL_MAX_EXP = Array(-1, 1, 5, 8);
 	}
 }
 
@@ -27,5 +53,92 @@ rule("== TEST == SHOW POSITION ==")
 			White), Color(White), String, Default Visibility);
 		Create HUD Text(Event Player, Custom String("FACING: {0}", Facing Direction Of(Event Player)), Null, Null, Left, 0, Color(White),
 			Color(White), Color(White), String, Default Visibility);
+	}
+}
+
+rule("Spawn Brig Player")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Brigitte;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Brigitte);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.brigLevel = 1;
+		Call Subroutine(BrigSetLevel);
+		Create HUD Text(Event Player, Custom String("EXP: {0} / {1}", Event Player.brigEXP,
+			Global.BRIG_LVL_MAX_EXP[Event Player.brigLevel]), Null, Null, Left, 0, Color(White), Color(White), Color(White), String,
+			Default Visibility);
+		Create HUD Text(Event Player, Custom String("LEVEL: {0}", Event Player.brigLevel), Null, Null, Left, 0, Color(White), Color(White),
+			Color(White), String, Default Visibility);
+	}
+}
+
+rule("BrigSetLevel()")
+{
+	event
+	{
+		Subroutine;
+		BrigSetLevel;
+	}
+
+	actions
+	{
+		Event Player.brigEXP = 0;
+		Set Max Health(Event Player, Global.BRIG_LVL_MAX_HP[Event Player.brigLevel]);
+		Set Healing Dealt(Event Player, Global.BRIG_LVL_HEALING[Event Player.brigLevel]);
+		Set Damage Dealt(Event Player, Global.BRIG_LVL_DAMAGE[Event Player.brigLevel]);
+	}
+}
+
+rule("Brig Player Level Up")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Brigitte;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Brigitte);
+		Event Player.brigEXP >= Global.BRIG_LVL_MAX_EXP[Event Player.brigLevel];
+	}
+
+	actions
+	{
+		Event Player.brigLevel += 1;
+		Call Subroutine(BrigSetLevel);
+	}
+}
+
+rule("== TEST == GIVE EXP ==")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player == Host Player;
+		Is Button Held(Event Player, Button(Interact)) == True;
+	}
+
+	actions
+	{
+		Event Player.brigEXP += 1;
 	}
 }
