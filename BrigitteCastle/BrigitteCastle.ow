@@ -209,8 +209,8 @@ rule("Minion Spawns")
 
 	actions
 	{
-		Start Scaling Player(Event Player, Global.MINION_INFO[1], False);
-		Set Max Health(Event Player, Global.MINION_INFO[2]);
-		Event Player.minionGiveEXP = Global.MINION_INFO[3];
+		Start Scaling Player(Event Player, Global.MINION_INFO[Global.lastSpawnedMinionID][1], False);
+		Set Max Health(Event Player, Global.MINION_INFO[Global.lastSpawnedMinionID][2]);
+		Event Player.minionGiveEXP = Global.MINION_INFO[Global.lastSpawnedMinionID][3];
 	}
 }
