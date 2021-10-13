@@ -31,8 +31,8 @@ rule("Game Setup")
 		Global.BRIG_LVL_HEALING = Array(-1, 1, 2, 3);
 		Global.BRIG_LVL_DAMAGE = Array(-1, 2, 5, 10);
 		Global.BRIG_LVL_MAX_EXP = Array(-1, 1, 5, 8);
-		Global.MINION_SPAWN = Array(Array(Hero(Junkrat), Vector(0.010, 2.820, -26.940)), Array(Hero(Pharah), Vector(9.150, 3.810,
-			-28.370)));
+		Global.MINION_SPAWN = Array(Array(Hero(Junkrat), Vector(0.010, 2.820, -26.940)), Array(Hero(Junkrat), Vector(9.150, 3.810,
+			-28.370)), Hero(Junkrat), Vector(5.492, 3.869, -24.259), Hero(Junkrat), Vector(10.929, 4.095, -37.706));
 	}
 }
 
@@ -57,6 +57,48 @@ rule("== TEST == SHOW POSITION ==")
 			White), Color(White), String, Default Visibility);
 		Create HUD Text(Event Player, Custom String("FACING: {0}", Facing Direction Of(Event Player)), Null, Null, Left, 0, Color(White),
 			Color(White), Color(White), String, Default Visibility);
+	}
+}
+
+rule("== TEST == GIVE EXP ==")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player == Host Player;
+		Is Button Held(Event Player, Button(Interact)) == True;
+	}
+
+	actions
+	{
+		Event Player.brigEXP += 1;
+	}
+}
+
+rule("== TEST == PLACE MINION ==")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player == Host Player;
+		Is Button Held(Event Player, Button(Crouch)) == True;
+	}
+
+	actions
+	{
+		Modify Global Variable(MINION_SPAWN, Append To Array, Array(Hero(Junkrat), Position Of(Event Player)));
 	}
 }
 
@@ -123,27 +165,6 @@ rule("Brig Player Level Up")
 	{
 		Event Player.brigLevel += 1;
 		Call Subroutine(BrigSetLevel);
-	}
-}
-
-rule("== TEST == GIVE EXP ==")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		All;
-	}
-
-	conditions
-	{
-		Event Player == Host Player;
-		Is Button Held(Event Player, Button(Interact)) == True;
-	}
-
-	actions
-	{
-		Event Player.brigEXP += 1;
 	}
 }
 
