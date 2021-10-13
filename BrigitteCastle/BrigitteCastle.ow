@@ -10,6 +10,7 @@ variables
 		6: BRIG_ABILITY_RADIUS
 		7: currentAbilityGranter
 		8: _i_
+		9: abilityGranterEffectIds
 		10: MINION_SPAWN
 		11: MINION_INFO
 		12: lastSpawnedMinionTypeID
@@ -363,8 +364,31 @@ rule("Brig gets ability")
 	{
 		Global.currentAbilityGranter = Filtered Array(Global.BRIG_ABILITY_SPAWN, Distance Between(Position Of(Event Player),
 			Current Array Element[1]) <= Global.BRIG_ABILITY_RADIUS)[0];
+		Destroy Effect(Global.abilityGranterEffectIds[Global.currentAbilityGranter][0]);
+		Destroy In-World Text(Global.abilityGranterEffectIds[Global.currentAbilityGranter][1]);
 		If(Global.currentAbilityGranter[0] == 0);
 			Set Secondary Fire Enabled(Event Player, True);
+		End;
+	}
+}
+
+rule("Game setup: Ability Grant Effect")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.abilityGranterEffectIds = Empty Array;
+		For Global Variable(_i_, 0, Count Of(Global.BRIG_ABILITY_SPAWN), 1);
+			Modify Global Variable(abilityGranterEffectIds, Append To Array, 0);
+			Create Effect(All Players(All Teams), Ring, Color(Yellow), Global.BRIG_ABILITY_SPAWN[Global._i_][1], Global.BRIG_ABILITY_RADIUS,
+				Visible To);
+			Create In-World Text(All Players(All Teams), Custom String("{0}", Ability Icon String(Hero(Brigitte), Button(Secondary Fire))),
+				Global.BRIG_ABILITY_SPAWN[Global._i_][1] + Up, 10, Clip Against Surfaces, Visible To, Color(Yellow), Default Visibility);
+			Global.abilityGranterEffectIds[Count Of(Global.abilityGranterEffectIds) - 1] = Array(Last Created Entity, Last Text ID);
 		End;
 	}
 }
