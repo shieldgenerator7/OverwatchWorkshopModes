@@ -26,6 +26,17 @@ settings
 			Respawn As Random Hero: On
 		}
 	}
+
+	heroes
+	{
+		General
+		{
+			enabled heroes
+			{
+				Brigitte
+			}
+		}
+	}
 }
 
 rule("Game Setup")
@@ -40,12 +51,22 @@ rule("== TEST == SHOW POSITION ==")
 {
 	event
 	{
-		Ongoing - Global;
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is Alive(Event Player) == True;
+		Event Player == Host Player;
 	}
 
 	actions
 	{
-		Create HUD Text(Host Player, Custom String("POSITION: {0}", Position Of(Host Player)), Custom String("FACING: {0}",
-			Facing Direction Of(Host Player)), Null, Left, 0, Color(White), Color(White), Color(White), String, Default Visibility);
+		Create HUD Text(Event Player, Custom String("POSITION: {0}", Position Of(Event Player)), Null, Null, Left, 0, Color(White), Color(
+			White), Color(White), String, Default Visibility);
+		Create HUD Text(Event Player, Custom String("FACING: {0}", Facing Direction Of(Event Player)), Null, Null, Left, 0, Color(White),
+			Color(White), Color(White), String, Default Visibility);
 	}
 }
