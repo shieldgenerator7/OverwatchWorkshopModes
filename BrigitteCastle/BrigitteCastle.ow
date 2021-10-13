@@ -8,13 +8,14 @@ variables
 		8: _i_
 		10: MINION_SPAWN
 		11: MINION_INFO
-		12: lastSpawnedMinionID
+		12: lastSpawnedMinionTypeID
 		13: currentMinionOrder
 
 	player:
 		0: brigEXP
 		1: brigLevel
 		10: minionGiveEXP
+		11: minionTypeID
 }
 
 subroutines
@@ -38,7 +39,7 @@ rule("Game Setup")
 		Global.MINION_SPAWN = Array(Array(1, Vector(3.382, 3.733, -26.961)), Array(0, Vector(15.681, 4.023, -20.617)), Array(0, Vector(
 			12.225, 4.023, -19.150)), Array(0, Vector(16.181, 4.023, -15.474)));
 		Global.MINION_INFO = Array(Array(Hero(Junkrat), 0.300, 1, 1), Array(Hero(Pharah), 0.500, 5, 4));
-		Global.lastSpawnedMinionID = -1;
+		Global.lastSpawnedMinionTypeID = -1;
 	}
 }
 
@@ -185,8 +186,8 @@ rule("Game Setup: Spawn Minions")
 	{
 		For Global Variable(_i_, 0, Count Of(Global.MINION_SPAWN), 1);
 			Global.currentMinionOrder = Global.MINION_SPAWN[Global._i_];
-			Global.lastSpawnedMinionID = Global.currentMinionOrder[0];
-			Create Dummy Bot(Global.MINION_INFO[Global.lastSpawnedMinionID][0], Team 1, -1, Global.currentMinionOrder[1], Vector(0, 0, 0));
+			Global.lastSpawnedMinionTypeID = Global.currentMinionOrder[0];
+			Create Dummy Bot(Global.MINION_INFO[Global.lastSpawnedMinionTypeID][0], Team 1, -1, Global.currentMinionOrder[1], Vector(0, 0, 0));
 			Wait(0.100, Ignore Condition);
 		End;
 	}
@@ -209,9 +210,10 @@ rule("Minion Spawns")
 
 	actions
 	{
-		Start Scaling Player(Event Player, Global.MINION_INFO[Global.lastSpawnedMinionID][1], False);
-		Set Max Health(Event Player, Global.MINION_INFO[Global.lastSpawnedMinionID][2]);
-		Event Player.minionGiveEXP = Global.MINION_INFO[Global.lastSpawnedMinionID][3];
+		Event Player.minionTypeID = Global.lastSpawnedMinionTypeID;
+		Start Scaling Player(Event Player, Global.MINION_INFO[Event Player.minionTypeID][1], False);
+		Set Max Health(Event Player, Global.MINION_INFO[Event Player.minionTypeID][2]);
+		Event Player.minionGiveEXP = Global.MINION_INFO[Event Player.minionTypeID][3];
 	}
 }
 
@@ -232,5 +234,52 @@ rule("Brig kill minion")
 	actions
 	{
 		Event Player.brigEXP += Victim.minionGiveEXP;
+	}
+}
+
+rule("Minion Spawns: Junkrat")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Junkrat);
+		Is Alive(Event Player) == True;
+		Global.lastSpawnedMinionTypeID == 0;
+	}
+
+	actions
+	{
+		Set Facing(Event Player, Vector(0, -1, 0), To World);
+		Press Button(Event Player, Button(Ability 2));
+	}
+}
+
+rule("Minion Behaviour: Junkrat")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Junkrat);
+		Is Alive(Event Player) == True;
+		Event Player.minionTypeID == 0;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Button(Primary Fire));
+		Wait(1, Ignore Condition);
+		Loop If Condition Is True;
 	}
 }
