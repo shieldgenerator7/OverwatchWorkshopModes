@@ -1,0 +1,45 @@
+settings
+{
+	lobby
+	{
+		Map Rotation: Paused
+		Max Spectators: 12
+		Max Team 1 Players: 1
+		Max Team 2 Players: 11
+		Return To Lobby: Never
+		Team Balancing: After A Game
+	}
+
+	modes
+	{
+		Skirmish
+
+		General
+		{
+			Limit Roles: 2 Of Each Role Per Team
+			Respawn As Random Hero: On
+		}
+	}
+}
+
+rule("Game Setup")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+}
+
+rule("== TEST == SHOW POSITION ==")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Create HUD Text(Host Player, Custom String("POSITION: {0}", Position Of(Host Player)), Custom String("FACING: {0}",
+			Facing Direction Of(Host Player)), Null, Left, 0, Color(White), Color(White), Color(White), String, Default Visibility);
+	}
+}
