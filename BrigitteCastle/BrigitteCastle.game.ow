@@ -2,6 +2,7 @@ settings
 {
 	lobby
 	{
+		Allow Players Who Are In Queue: Yes
 		Map Rotation: Paused
 		Max Spectators: 12
 		Max Team 1 Players: 11
@@ -24,6 +25,7 @@ settings
 		{
 			Limit Roles: 2 Of Each Role Per Team
 			Respawn As Random Hero: On
+			Respawn Time Scalar: 0%
 		}
 	}
 
@@ -39,11 +41,56 @@ settings
 	}
 }
 
+variables
+{
+	global:
+		0: BRIG_LVL_MAX_HP
+		1: BRIG_LVL_HEALING
+		2: BRIG_LVL_DAMAGE
+		3: BRIG_LVL_MAX_EXP
+		4: brigPlayer
+		5: BRIG_ABILITY_SPAWN
+		6: BRIG_ABILITY_RADIUS
+		7: currentAbilityGranter
+		8: _i_
+		9: abilityGranterEffectIds
+		10: MINION_SPAWN
+		11: MINION_INFO
+		12: lastSpawnedMinionTypeID
+		13: currentMinionOrder
+
+	player:
+		0: brigEXP
+		1: brigLevel
+		10: minionGiveEXP
+		11: minionTypeID
+}
+
+subroutines
+{
+	0: BrigSetLevel
+}
+
 rule("Game Setup")
 {
 	event
 	{
 		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.BRIG_LVL_MAX_HP = Array(-1, 5, 10, 18);
+		Global.BRIG_LVL_HEALING = Array(-1, 7, 14, 21);
+		Global.BRIG_LVL_DAMAGE = Array(-1, 3, 6, 10);
+		Global.BRIG_LVL_MAX_EXP = Array(-1, 1, 5, 8);
+		Global.BRIG_ABILITY_SPAWN = Array(Array(0, Vector(2.266, 6.092, 0.319), Button(Secondary Fire)), Array(1, Vector(23.751, 6.092,
+			-15.892), Button(Ability 1)));
+		Global.MINION_SPAWN = Array(Array(0, Vector(-17.802, 0, -10.827)), Array(0, Vector(-11.276, -0.077, -14.615)), Array(0, Vector(
+			-5.708, 0, -10.306)), Array(0, Vector(-6.656, 0.939, -19.477)), Array(0, Vector(-15.448, 1.707, -23.945)));
+		Global.MINION_INFO = Array(Array(Hero(Junkrat), 0.300, 1, 1), Array(Hero(Pharah), 0.500, 5, 4));
+		Global.lastSpawnedMinionTypeID = -1;
+		Global.BRIG_ABILITY_RADIUS = 2;
 	}
 }
 
@@ -68,5 +115,327 @@ rule("== TEST == SHOW POSITION ==")
 			White), Color(White), String, Default Visibility);
 		Create HUD Text(Event Player, Custom String("FACING: {0}", Facing Direction Of(Event Player)), Null, Null, Left, 0, Color(White),
 			Color(White), Color(White), String, Default Visibility);
+	}
+}
+
+rule("== TEST == GIVE EXP ==")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player == Host Player;
+		Is Button Held(Event Player, Button(Interact)) == True;
+	}
+
+	actions
+	{
+		Event Player.brigEXP += 1;
+	}
+}
+
+rule("=== TEST == PLACE MINION ==")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player == Host Player;
+		Is Button Held(Event Player, Button(Crouch)) == True;
+	}
+
+	actions
+	{
+		Modify Global Variable(MINION_SPAWN, Append To Array, 0);
+		Global.MINION_SPAWN[Count Of(Global.MINION_SPAWN) - 1] = Array(0, Position Of(Event Player));
+	}
+}
+
+rule("=== TEST == PLACE ABILITY ==")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Event Player == Host Player;
+		Is Button Held(Event Player, Button(Jump)) == True;
+	}
+
+	actions
+	{
+		Modify Global Variable(BRIG_ABILITY_SPAWN, Append To Array, 0);
+		Global.BRIG_ABILITY_SPAWN[Count Of(Global.BRIG_ABILITY_SPAWN) - 1] = Array(0, Position Of(Event Player), Button(Primary Fire));
+	}
+}
+
+rule("Spawn Brig Player")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Brigitte;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Brigitte);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Global.brigPlayer = Event Player;
+		Event Player.brigLevel = 1;
+		Call Subroutine(BrigSetLevel);
+		Create HUD Text(Event Player, Custom String("EXP: {0} / {1}", Event Player.brigEXP,
+			Global.BRIG_LVL_MAX_EXP[Event Player.brigLevel]), Null, Null, Left, 0, Color(White), Color(White), Color(White), String,
+			Default Visibility);
+		Create HUD Text(Event Player, Custom String("LEVEL: {0}", Event Player.brigLevel), Null, Null, Left, 0, Color(White), Color(White),
+			Color(White), String, Default Visibility);
+		Set Secondary Fire Enabled(Event Player, False);
+		Set Ability 1 Enabled(Event Player, False);
+		Set Ability 2 Enabled(Event Player, False);
+		Set Ultimate Ability Enabled(Event Player, False);
+	}
+}
+
+rule("BrigSetLevel()")
+{
+	event
+	{
+		Subroutine;
+		BrigSetLevel;
+	}
+
+	actions
+	{
+		Event Player.brigEXP = 0;
+		Set Max Health(Event Player, Global.BRIG_LVL_MAX_HP[Event Player.brigLevel]);
+		Set Healing Dealt(Event Player, Global.BRIG_LVL_HEALING[Event Player.brigLevel]);
+		Set Damage Dealt(Event Player, Global.BRIG_LVL_DAMAGE[Event Player.brigLevel]);
+	}
+}
+
+rule("Brig Player Level Up")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Brigitte;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Brigitte);
+		Event Player.brigEXP >= Global.BRIG_LVL_MAX_EXP[Event Player.brigLevel];
+	}
+
+	actions
+	{
+		Event Player.brigLevel += 1;
+		Call Subroutine(BrigSetLevel);
+	}
+}
+
+rule("Game Setup: Spawn Minions")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		For Global Variable(_i_, 0, Count Of(Global.MINION_SPAWN), 1);
+			Global.currentMinionOrder = Global.MINION_SPAWN[Global._i_];
+			Global.lastSpawnedMinionTypeID = Global.currentMinionOrder[0];
+			Create Dummy Bot(Global.MINION_INFO[Global.lastSpawnedMinionTypeID][0], Team 1, -1, Global.currentMinionOrder[1], Vector(0, 0, 0));
+			Wait(0.100, Ignore Condition);
+		End;
+	}
+}
+
+rule("Minion Spawns")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != Hero(Brigitte);
+		Is Alive(Event Player) == True;
+	}
+
+	actions
+	{
+		Event Player.minionTypeID = Global.lastSpawnedMinionTypeID;
+		Start Scaling Player(Event Player, Global.MINION_INFO[Event Player.minionTypeID][1], False);
+		Set Max Health(Event Player, Global.MINION_INFO[Event Player.minionTypeID][2]);
+		Event Player.minionGiveEXP = Global.MINION_INFO[Event Player.minionTypeID][3];
+	}
+}
+
+rule("Brig kill minion")
+{
+	event
+	{
+		Player Earned Elimination;
+		All;
+		Brigitte;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Brigitte);
+	}
+
+	actions
+	{
+		Event Player.brigEXP += Victim.minionGiveEXP;
+	}
+}
+
+rule("Minion Spawns: Junkrat")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Junkrat);
+		Is Alive(Event Player) == True;
+		Global.lastSpawnedMinionTypeID == 0;
+	}
+
+	actions
+	{
+		Set Facing(Event Player, Down, To World);
+		Press Button(Event Player, Button(Ability 2));
+	}
+}
+
+rule("Minion Behaviour: Junkrat")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Junkrat);
+		Is Alive(Event Player) == True;
+		Event Player.minionTypeID == 0;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Button(Primary Fire));
+		Wait(1, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
+rule("Minion Behaviour: Junkrat sees Brig")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Junkrat;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) == Hero(Junkrat);
+		Is Alive(Event Player) == True;
+		Event Player.minionTypeID == 0;
+		Is In Line of Sight(Position Of(Event Player), Position Of(Global.brigPlayer), Enemy Barriers Block LOS) == True;
+	}
+
+	actions
+	{
+		Start Facing(Event Player, Position Of(Global.brigPlayer) - Position Of(Event Player), 360, To World, Direction and Turn Rate);
+		Wait Until(!Is In Line of Sight(Position Of(Event Player), Position Of(Global.brigPlayer), Enemy Barriers Block LOS), 99999);
+		Stop Facing(Event Player);
+		Set Facing(Event Player, Down, To World);
+	}
+}
+
+rule("Brig gets ability")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Count Of(Filtered Array(Global.BRIG_ABILITY_SPAWN, Distance Between(Position Of(Event Player), Current Array Element[1])
+			<= Global.BRIG_ABILITY_RADIUS)) > 0;
+	}
+
+	actions
+	{
+		Global.currentAbilityGranter = Filtered Array(Global.BRIG_ABILITY_SPAWN, Distance Between(Position Of(Event Player),
+			Current Array Element[1]) <= Global.BRIG_ABILITY_RADIUS)[0];
+		Destroy Effect(Global.abilityGranterEffectIds[Global.currentAbilityGranter][0]);
+		Destroy In-World Text(Global.abilityGranterEffectIds[Global.currentAbilityGranter][1]);
+		If(Global.currentAbilityGranter[0] == 0);
+			Set Secondary Fire Enabled(Event Player, True);
+		Else If(Global.currentAbilityGranter[0] == 1);
+			Set Ability 1 Enabled(Event Player, True);
+		End;
+	}
+}
+
+rule("Game setup: Ability Grant Effect")
+{
+	event
+	{
+		Ongoing - Global;
+	}
+
+	actions
+	{
+		Global.abilityGranterEffectIds = Empty Array;
+		For Global Variable(_i_, 0, Count Of(Global.BRIG_ABILITY_SPAWN), 1);
+			Modify Global Variable(abilityGranterEffectIds, Append To Array, 0);
+			Create Effect(All Players(All Teams), Ring, Color(Yellow), Global.BRIG_ABILITY_SPAWN[Global._i_][1], Global.BRIG_ABILITY_RADIUS,
+				Visible To);
+			Create In-World Text(All Players(All Teams), Custom String("{0}", Ability Icon String(Hero(Brigitte),
+				Global.BRIG_ABILITY_SPAWN[Global._i_][2])), Global.BRIG_ABILITY_SPAWN[Global._i_][1] + Up, 10, Clip Against Surfaces,
+				Visible To, Color(Yellow), Default Visibility);
+			Global.abilityGranterEffectIds[Count Of(Global.abilityGranterEffectIds) - 1] = Array(Last Created Entity, Last Text ID);
+		End;
 	}
 }
