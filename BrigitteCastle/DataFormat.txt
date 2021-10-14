@@ -1,0 +1,15 @@
+
+Ability Granter Spawn Data
+0: Ability Id (NOT an index)
+1: Position of Ability Granter
+2: Button of ability
+
+Minion Spawn Data
+0: Minion Type Id
+1: Position of minion
+
+Minion Type Data
+0: Hero
+1: Size (1 = Normal)
+2: Max HP (% of normal HP)
+3: EXP give when killed (int)
