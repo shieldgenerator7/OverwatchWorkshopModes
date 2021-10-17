@@ -417,6 +417,34 @@ rule("ULT: Lucio")
 	}
 }
 
+rule("ULT: McCree")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		McCree;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Ultimate)) == True;
+		Ultimate Charge Percent(Event Player) == 100;
+		Hero Of(Event Player) == Hero(McCree);
+	}
+
+	actions
+	{
+		Big Message(All Players(All Teams), Custom String("{0} IIITS HIIIGH NOOOOOON... {1}", Hero Icon String(Hero(McCree)),
+			Ability Icon String(Hero(McCree), Button(Ultimate))));
+		Set Slow Motion(20);
+		disabled Set Ultimate Ability Enabled(Event Player, False);
+		Wait(Global.GLOBAL_ULT_DURATION * (20 / 100), Ignore Condition);
+		disabled Set Ultimate Ability Enabled(Event Player, True);
+		Set Slow Motion(100);
+	}
+}
+
 rule("ULT: Mercy")
 {
 	event
