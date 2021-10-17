@@ -396,7 +396,7 @@ rule("ULT: D.Va effect")
 	}
 }
 
-rule("ULT: Doomfist")
+rule("ULT: Doomfist (with help from TrueNeutral#11414 and the original author of 2D OVERWATCH)")
 {
 	event
 	{
