@@ -16,6 +16,8 @@ variables
 		12: _i_
 		13: _targetPlayer
 		14: ECHO_ULT_CHARGE_PER_SECOND
+		15: pharahUltTimeLeft
+		16: PHARAH_ULT_JUMP_HEIGHT
 
 	player:
 		0: _targetPlayer
@@ -40,6 +42,7 @@ rule("Game Setup")
 		Global.REAPER_ULT_DAMAGE_PER_SECOND = 100;
 		Global.ZENYATTA_ULT_HEAL_PER_SECOND = 100;
 		Global.ECHO_ULT_CHARGE_PER_SECOND = 10;
+		Global.PHARAH_ULT_JUMP_HEIGHT = 5;
 	}
 }
 
@@ -271,7 +274,7 @@ rule("ULT: Echo")
 		Global.echoUltTimeLeft = Global.GLOBAL_ULT_DURATION;
 		Chase Global Variable Over Time(echoUltTimeLeft, 0, Global.GLOBAL_ULT_DURATION, None);
 		Set Ultimate Ability Enabled(Event Player, False);
-		Wait(Global.ASHE_ULT_DURATION, Ignore Condition);
+		Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
 		Set Ultimate Ability Enabled(Event Player, True);
 	}
 }
@@ -406,6 +409,55 @@ rule("ULT: Mercy effect")
 		Resurrect(Event Player);
 		Big Message(All Players(All Teams), Custom String("{0} {1} RESURRECTED {0}", Ability Icon String(Hero(Mercy), Button(Ability 2)),
 			Hero Of(Event Player)));
+	}
+}
+
+rule("ULT: Pharah")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Pharah;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Ultimate)) == True;
+		Ultimate Charge Percent(Event Player) == 100;
+		Hero Of(Event Player) == Hero(Pharah);
+	}
+
+	actions
+	{
+		Big Message(All Players(All Teams), Custom String("{0} TAKE TO THE SKIES {1}", Hero Icon String(Hero(Pharah)), Ability Icon String(
+			Hero(Echo), Button(Ability 1))));
+		Global.echoUltTimeLeft = Global.GLOBAL_ULT_DURATION;
+		Chase Global Variable Over Time(pharahUltTimeLeft, 0, Global.GLOBAL_ULT_DURATION, None);
+		disabled Set Ultimate Ability Enabled(Event Player, False);
+		disabled Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
+		disabled Set Ultimate Ability Enabled(Event Player, True);
+	}
+}
+
+rule("ULT: Pharah effect")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Global.pharahUltTimeLeft > 0;
+		Is Button Held(Event Player, Button(Jump)) == True;
+	}
+
+	actions
+	{
+		Apply Impulse(Event Player, Up, Global.PHARAH_ULT_JUMP_HEIGHT, To World, Cancel Contrary Motion);
 	}
 }
 
