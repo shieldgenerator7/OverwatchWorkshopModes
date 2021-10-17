@@ -500,6 +500,34 @@ rule("ULT: Genji effect")
 	}
 }
 
+rule("ULT: Hanzo")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Hanzo;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Ultimate)) == True;
+		Ultimate Charge Percent(Event Player) == 100;
+		Hero Of(Event Player) == Hero(Hanzo);
+	}
+
+	actions
+	{
+		Big Message(All Players(All Teams), Custom String("{0} NOW YOU SEE ME, NOW YOU DON'T! {1}", Hero Icon String(Hero(Hanzo)),
+			Ability Icon String(Hero(Hanzo), Button(Ability 1))));
+		Set Invisible(All Players(All Teams), All);
+		disabled Set Ultimate Ability Enabled(Event Player, False);
+		Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
+		disabled Set Ultimate Ability Enabled(Event Player, True);
+		Set Invisible(All Players(All Teams), None);
+	}
+}
+
 rule("ULT: Junkrat")
 {
 	event
