@@ -584,6 +584,34 @@ rule("ULT: McCree")
 	}
 }
 
+rule("ULT: Mei")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Mei;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Ultimate)) == True;
+		Ultimate Charge Percent(Event Player) == 100;
+		Hero Of(Event Player) == Hero(Mei);
+	}
+
+	actions
+	{
+		Big Message(All Players(All Teams), Custom String("{0} FREEZING RAIN {1}", Hero Icon String(Hero(Mei)), Ability Icon String(Hero(
+			Mei), Button(Ultimate))));
+		Set Status(Filtered Array(All Players(All Teams), Hero Of(Current Array Element) != Hero(Mei)), Event Player, Frozen,
+			Global.GLOBAL_ULT_DURATION);
+		Set Ultimate Ability Enabled(Event Player, False);
+		Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
+		Set Ultimate Ability Enabled(Event Player, True);
+	}
+}
+
 rule("ULT: Mercy")
 {
 	event
