@@ -31,7 +31,6 @@ settings
 
 			disabled heroes
 			{
-				Baptiste
 				Brigitte
 				D.Va
 				Doomfist
@@ -279,6 +278,33 @@ rule("ULT: Ashe effect")
 		Wait(0.500, Ignore Condition);
 		Loop If Condition Is True;
 		Big Message(All Players(All Teams), Custom String("{0} OK BACK TO CASUAL", Hero Icon String(Hero(Ashe))));
+	}
+}
+
+rule("ULT: Baptiste")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Baptiste;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Ultimate)) == True;
+		Ultimate Charge Percent(Event Player) == 100;
+		Hero Of(Event Player) == Hero(Baptiste);
+	}
+
+	actions
+	{
+		Big Message(All Players(All Teams), Custom String("{0} NO DYING ON MY WATCH! {1}", Hero Icon String(Hero(Baptiste)),
+			Ability Icon String(Hero(Baptiste), Button(Ability 2))));
+		Set Status(All Players(All Teams), Event Player, Unkillable, Global.GLOBAL_ULT_DURATION);
+		disabled Set Ultimate Ability Enabled(Event Player, False);
+		disabled Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
+		disabled Set Ultimate Ability Enabled(Event Player, True);
 	}
 }
 
