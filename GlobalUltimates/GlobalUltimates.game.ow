@@ -5,21 +5,38 @@ settings
 		Assault
 		{
 			Limit Roles: 2 Of Each Role Per Team
+
+			enabled maps
+			{
+			}
 		}
 
 		Control
 		{
 			Limit Roles: 2 Of Each Role Per Team
+
+			enabled maps
+			{
+			}
 		}
 
 		Escort
 		{
 			Limit Roles: 2 Of Each Role Per Team
+
+			enabled maps
+			{
+			}
 		}
 
 		Hybrid
 		{
 			Limit Roles: 2 Of Each Role Per Team
+
+			enabled maps
+			{
+				Eichenwalde
+			}
 		}
 	}
 
