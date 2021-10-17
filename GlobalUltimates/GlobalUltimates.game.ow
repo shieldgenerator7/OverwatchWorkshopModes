@@ -25,72 +25,25 @@ settings
 
 	heroes
 	{
-		Team 1
-		{
-			enabled heroes
-			{
-				Ana
-				Ashe
-				Bastion
-				D.Va
-				Echo
-				Junkrat
-				Lúcio
-				Mercy
-				Pharah
-				Reaper
-				Reinhardt
-				Roadhog
-				Tracer
-				Widowmaker
-				Winston
-				Zenyatta
-			}
-		}
-
-		Team 2
-		{
-			enabled heroes
-			{
-				Ana
-				Ashe
-				Bastion
-				D.Va
-				Echo
-				Junkrat
-				Lúcio
-				Mercy
-				Pharah
-				Reaper
-				Reinhardt
-				Roadhog
-				Tracer
-				Widowmaker
-				Winston
-				Zenyatta
-			}
-		}
-
 		General
 		{
-			disabled heroes
+			enabled heroes
 			{
-				Baptiste
-				Brigitte
-				Doomfist
-				Genji
-				Hanzo
-				McCree
-				Mei
-				Moira
-				Orisa
-				Sigma
-				Soldier: 76
-				Sombra
-				Symmetra
-				Torbjörn
-				Wrecking Ball
-				Zarya
+				Ana
+				Ashe
+				Bastion
+				Echo
+				Junkrat
+				Lúcio
+				Mercy
+				Pharah
+				Reaper
+				Reinhardt
+				Roadhog
+				Tracer
+				Widowmaker
+				Winston
+				Zenyatta
 			}
 		}
 	}
