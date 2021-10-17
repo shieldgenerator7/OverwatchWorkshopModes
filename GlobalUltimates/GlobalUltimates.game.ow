@@ -31,7 +31,6 @@ settings
 
 			disabled heroes
 			{
-				Brigitte
 				D.Va
 				Doomfist
 				Hanzo
@@ -71,6 +70,8 @@ variables
 		15: pharahUltTimeLeft
 		16: PHARAH_ULT_JUMP_HEIGHT
 		17: genjiUltTimeLeft
+		18: brigitteUltTimeLeft
+		19: BRIGITTE_ULT_ARMOR_PER_SECOND
 
 	player:
 		0: _targetPlayer
@@ -91,6 +92,8 @@ rule("Game Setup")
 	{
 		Global.GLOBAL_ULT_DURATION = Workshop Setting Real(Custom String("All heroes"), Custom String("Ult Duration"), 10, 1, 60, 0);
 		Global.ASHE_ULT_DURATION = Workshop Setting Real(Custom String("Hero Settings"), Custom String("Ashe Ult Duration"), 8, 1, 60, 0);
+		Global.BRIGITTE_ULT_ARMOR_PER_SECOND = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
+			"Brigitte Ult Armor Per Second"), 100, 10, 1000, 0);
 		Global.ECHO_ULT_CHARGE_PER_SECOND = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
 			"Echo Ult Charge Per Second"), 10, 1, 60, 0);
 		Global.PHARAH_ULT_JUMP_HEIGHT = Workshop Setting Real(Custom String("Hero Settings"), Custom String("Pharah Ult Jump Height"), 5,
@@ -333,6 +336,56 @@ rule("ULT: Bastion")
 		Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
 		disabled Set Ultimate Ability Enabled(Event Player, True);
 		Stop Forcing Throttle(All Players(All Teams));
+	}
+}
+
+rule("ULT: Brigitte")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Brigitte;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Ultimate)) == True;
+		Ultimate Charge Percent(Event Player) == 100;
+		Hero Of(Event Player) == Hero(Brigitte);
+	}
+
+	actions
+	{
+		Big Message(All Players(All Teams), Custom String("{0} ALLA TILL MIG! {1}", Hero Icon String(Hero(Brigitte)), Ability Icon String(
+			Hero(Brigitte), Button(Ultimate))));
+		Global.brigitteUltTimeLeft = Global.GLOBAL_ULT_DURATION;
+		Chase Global Variable Over Time(brigitteUltTimeLeft, 0, Global.GLOBAL_ULT_DURATION, None);
+		disabled Set Ultimate Ability Enabled(Event Player, False);
+		disabled Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
+		disabled Set Ultimate Ability Enabled(Event Player, True);
+	}
+}
+
+rule("ULT: Brigitte effect")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Global.brigitteUltTimeLeft > 0;
+	}
+
+	actions
+	{
+		Add Health Pool To Player(Event Player, Armor, Global.BRIGITTE_ULT_ARMOR_PER_SECOND / 10, False, False);
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
 	}
 }
 
