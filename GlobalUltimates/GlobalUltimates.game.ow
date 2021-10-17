@@ -35,7 +35,6 @@ settings
 				Hanzo
 				Mei
 				Moira
-				Orisa
 				Sigma
 				Soldier: 76
 				Sombra
@@ -681,6 +680,34 @@ rule("ULT: Mercy effect")
 		Resurrect(Event Player);
 		Big Message(All Players(All Teams), Custom String("{0} {1} RESURRECTED {0}", Ability Icon String(Hero(Mercy), Button(Ability 2)),
 			Hero Of(Event Player)));
+	}
+}
+
+rule("ULT: Orisa")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Orisa;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Ultimate)) == True;
+		Ultimate Charge Percent(Event Player) == 100;
+		Hero Of(Event Player) == Hero(Orisa);
+	}
+
+	actions
+	{
+		Big Message(All Players(All Teams), Custom String("{0} CEASE YOUR RESISTANCE. {1}", Hero Icon String(Hero(Orisa)),
+			Ability Icon String(Hero(Orisa), Button(Ultimate))));
+		Set Damage Dealt(All Players(All Teams), 200);
+		disabled Set Ultimate Ability Enabled(Event Player, False);
+		Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
+		disabled Set Ultimate Ability Enabled(Event Player, True);
+		Set Damage Dealt(All Players(All Teams), 100);
 	}
 }
 
