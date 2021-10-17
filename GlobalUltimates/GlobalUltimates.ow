@@ -36,13 +36,18 @@ rule("Game Setup")
 
 	actions
 	{
-		Global.GLOBAL_ULT_DURATION = 10;
-		Global.ASHE_ULT_DURATION = 8;
-		Global.TRACER_ULT_BLINK_DISTANCE = 5;
-		Global.REAPER_ULT_DAMAGE_PER_SECOND = 100;
-		Global.ZENYATTA_ULT_HEAL_PER_SECOND = 100;
-		Global.ECHO_ULT_CHARGE_PER_SECOND = 10;
-		Global.PHARAH_ULT_JUMP_HEIGHT = 5;
+		Global.GLOBAL_ULT_DURATION = Workshop Setting Real(Custom String("All heroes"), Custom String("Ult Duration"), 10, 1, 60, 0);
+		Global.ASHE_ULT_DURATION = Workshop Setting Real(Custom String("Hero Settings"), Custom String("Ashe Ult Duration"), 8, 1, 60, 0);
+		Global.ECHO_ULT_CHARGE_PER_SECOND = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
+			"Echo Ult Charge Per Second"), 10, 1, 60, 0);
+		Global.PHARAH_ULT_JUMP_HEIGHT = Workshop Setting Real(Custom String("Hero Settings"), Custom String("Pharah Ult Jump Height"), 5,
+			1, 100, 0);
+		Global.REAPER_ULT_DAMAGE_PER_SECOND = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
+			"Reaper Ut Damage Per Second"), 100, 10, 1000, 0);
+		Global.TRACER_ULT_BLINK_DISTANCE = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
+			"Tracer Ult Blink Distance"), 5, 1, 20, 0);
+		Global.ZENYATTA_ULT_HEAL_PER_SECOND = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
+			"Zenyatta Ult Heal Per Second"), 100, 10, 1000, 0);
 	}
 }
 
