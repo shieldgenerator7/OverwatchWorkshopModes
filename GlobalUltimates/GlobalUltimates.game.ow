@@ -48,7 +48,6 @@ settings
 
 			disabled heroes
 			{
-				Doomfist
 				Moira
 				Soldier: 76
 				Symmetra
@@ -455,6 +454,51 @@ rule("ULT: D.Va effect")
 		Wait(0.100, Ignore Condition);
 		Loop If Condition Is True;
 		Set Gravity(Event Player, 100);
+	}
+}
+
+rule("ULT: Doomfist")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Doomfist;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Ultimate)) == True;
+		Ultimate Charge Percent(Event Player) == 100;
+		Hero Of(Event Player) == Hero(Doomfist);
+	}
+
+	actions
+	{
+		Big Message(All Players(All Teams), Custom String("{0} COMBO BREAKER! {1}", Hero Icon String(Hero(Doomfist)), Ability Icon String(
+			Hero(Doomfist), Button(Ultimate))));
+		Global._targetPlayerList = All Players(All Teams);
+		For Global Variable(_i_, 0, Count Of(Global._targetPlayerList), 1);
+			Global._targetPlayer = Global._targetPlayerList[Global._i_];
+			Stop Facing(Global._targetPlayer);
+			Set Facing(Global._targetPlayer, Vector(X Component Of(Global._targetPlayer), 0.025, 1), To World);
+			Start Facing(Global._targetPlayer, Vector(X Component Of(Global._targetPlayer), 0.025, 1), 10000, To World,
+				Direction and Turn Rate);
+			Start Forcing Throttle(Global._targetPlayer, 0, 1, 0, 1, 0, 0);
+			Start Transforming Throttle(Global._targetPlayer, 1, 1, Vector Towards(Position Of(Global._targetPlayer) + Vector(-1, 0, 0),
+				Position Of(Global._targetPlayer) + Vector(0, 0, 0)));
+			Start Camera(Global._targetPlayer, Global._targetPlayer + Vector(-20, 0, 0), Global._targetPlayer + Vector(7, 5, 0), 100);
+		End;
+		disabled Set Ultimate Ability Enabled(Event Player, False);
+		Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
+		disabled Set Ultimate Ability Enabled(Event Player, True);
+		For Global Variable(_i_, 0, Count Of(Global._targetPlayerList), 1);
+			Global._targetPlayer = Global._targetPlayerList[Global._i_];
+			Stop Facing(Global._targetPlayer);
+			Stop Forcing Throttle(Global._targetPlayer);
+			Stop Transforming Throttle(Global._targetPlayer);
+			Stop Camera(Global._targetPlayer);
+		End;
 	}
 }
 
