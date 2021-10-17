@@ -54,7 +54,6 @@ settings
 				Moira
 				Sigma
 				Soldier: 76
-				Sombra
 				Symmetra
 				Torbjörn
 				Wrecking Ball
@@ -907,6 +906,34 @@ rule("ULT: Roadhog effect")
 	actions
 	{
 		Apply Impulse(Victim, Facing Direction Of(Attacker), Event Damage, To World, Incorporate Contrary Motion);
+	}
+}
+
+rule("ULT: Sombra")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Sombra;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Ultimate)) == True;
+		Ultimate Charge Percent(Event Player) == 100;
+		Hero Of(Event Player) == Hero(Sombra);
+	}
+
+	actions
+	{
+		Big Message(All Players(All Teams), Custom String("{0} Liiights out! {1}", Hero Icon String(Hero(Sombra)), Ability Icon String(
+			Hero(Sombra), Button(Ultimate))));
+		Set Status(Filtered Array(All Players(All Teams), Hero Of(Current Array Element) != Hero(Sombra)), Event Player, Hacked,
+			Global.GLOBAL_ULT_DURATION);
+		Set Ultimate Ability Enabled(Event Player, False);
+		Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
+		Set Ultimate Ability Enabled(Event Player, True);
 	}
 }
 
