@@ -25,7 +25,7 @@ settings
 
 	heroes
 	{
-		General
+		Team 1
 		{
 			enabled heroes
 			{
@@ -33,6 +33,7 @@ settings
 				Ashe
 				Bastion
 				Echo
+				Genji
 				Junkrat
 				Lúcio
 				Mercy
@@ -44,6 +45,52 @@ settings
 				Widowmaker
 				Winston
 				Zenyatta
+			}
+		}
+
+		Team 2
+		{
+			enabled heroes
+			{
+				Ana
+				Ashe
+				Bastion
+				Echo
+				Genji
+				Junkrat
+				Lúcio
+				Mercy
+				Pharah
+				Reaper
+				Reinhardt
+				Roadhog
+				Tracer
+				Widowmaker
+				Winston
+				Zenyatta
+			}
+		}
+
+		General
+		{
+			disabled heroes
+			{
+				Baptiste
+				Brigitte
+				D.Va
+				Doomfist
+				Hanzo
+				McCree
+				Mei
+				Moira
+				Orisa
+				Sigma
+				Soldier: 76
+				Sombra
+				Symmetra
+				Torbjörn
+				Wrecking Ball
+				Zarya
 			}
 		}
 	}
@@ -69,6 +116,7 @@ variables
 		14: ECHO_ULT_CHARGE_PER_SECOND
 		15: pharahUltTimeLeft
 		16: PHARAH_ULT_JUMP_HEIGHT
+		17: genjiUltTimeLeft
 
 	player:
 		0: _targetPlayer
@@ -361,6 +409,56 @@ rule("ULT: Echo effect")
 	}
 }
 
+rule("ULT: Genji")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		Genji;
+	}
+
+	conditions
+	{
+		Is Button Held(Event Player, Button(Ultimate)) == True;
+		Ultimate Charge Percent(Event Player) == 100;
+		Hero Of(Event Player) == Hero(Genji);
+	}
+
+	actions
+	{
+		Big Message(All Players(All Teams), Custom String("{0} 100 JUMPING JACKS! GO! {1}", Hero Icon String(Hero(Genji)),
+			Ability Icon String(Hero(Genji), Button(Jump))));
+		Global.genjiUltTimeLeft = Global.GLOBAL_ULT_DURATION;
+		Chase Global Variable Over Time(genjiUltTimeLeft, 0, Global.GLOBAL_ULT_DURATION, None);
+		disabled Set Ultimate Ability Enabled(Event Player, False);
+		disabled Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
+		disabled Set Ultimate Ability Enabled(Event Player, True);
+	}
+}
+
+rule("ULT: Genji effect")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Global.genjiUltTimeLeft > 0;
+	}
+
+	actions
+	{
+		Press Button(Event Player, Button(Jump));
+		Wait(0.100, Ignore Condition);
+		Loop If Condition Is True;
+	}
+}
+
 rule("ULT: Junkrat")
 {
 	event
@@ -487,8 +585,8 @@ rule("ULT: Pharah")
 	actions
 	{
 		Big Message(All Players(All Teams), Custom String("{0} TAKE TO THE SKIES {1}", Hero Icon String(Hero(Pharah)), Ability Icon String(
-			Hero(Echo), Button(Ability 1))));
-		Global.echoUltTimeLeft = Global.GLOBAL_ULT_DURATION;
+			Hero(Pharah), Button(Ability 1))));
+		Global.pharahUltTimeLeft = Global.GLOBAL_ULT_DURATION;
 		Chase Global Variable Over Time(pharahUltTimeLeft, 0, Global.GLOBAL_ULT_DURATION, None);
 		disabled Set Ultimate Ability Enabled(Event Player, False);
 		disabled Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
