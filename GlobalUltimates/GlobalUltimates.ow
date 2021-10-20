@@ -40,44 +40,43 @@ rule("Game Setup")
 		Global.ULTIMATE_DATA = Array(Array(Hero(Ana), Custom String("NAP TIME... {0}", Ability Icon String(Hero(Ana), Button(Ability 1))),
 			Custom String("EVERYONE PUT TO SLEEP"), False), Array(Hero(Ashe), Custom String("HANDSOME FOR 8 SECONDS {0}",
 			Ability Icon String(Hero(Ashe), Button(Ultimate))), Custom String("EVERYONE FORCED TO EMOTE"), True), Array(Hero(Baptiste),
-			Custom String("{0} NO DYING ON MY WATCH! {1}", Hero Icon String(Hero(Baptiste)), Ability Icon String(Hero(Baptiste), Button(
+			Custom String("NO DYING ON MY WATCH! {1}", Hero Icon String(Hero(Baptiste)), Ability Icon String(Hero(Baptiste), Button(
 			Ability 2))), Custom String("NO ONE CAN DIE"), False), Array(Hero(Bastion), Custom String(
-			"{0} COME OUT COME OUT WHERE EVER YOU ARE {1}", Hero Icon String(Hero(Bastion)), Icon String(Arrow: Up)), Custom String(
-			"EVERYONE FORCED TO WALK FORWARD"), True), Array(Hero(Brigitte), Custom String("{0} ALLA TILL MIG! {1}", Hero Icon String(Hero(
+			"COME OUT COME OUT WHERE EVER YOU ARE {1}", Hero Icon String(Hero(Bastion)), Icon String(Arrow: Up)), Custom String(
+			"EVERYONE FORCED TO WALK FORWARD"), True), Array(Hero(Brigitte), Custom String("ALLA TILL MIG! {1}", Hero Icon String(Hero(
 			Brigitte)), Ability Icon String(Hero(Brigitte), Button(Ultimate))), Custom String("EVERYONE GAINS ARMOR"), True), Array(Hero(
-			D.Va), Custom String("{0} BUNNY HOP! {1}", Hero Icon String(Hero(D.Va)), Ability Icon String(Hero(D.Va), Button(Ability 1))),
-			Custom String("SHOOT TO FLY"), True), Array(Hero(Echo), Custom String("{0} CLASS IS IN SESSION {1}", Hero Icon String(Hero(
-			Echo)), Ability Icon String(Hero(Echo), Button(Ultimate))), Custom String("ULTS CHARGE REALLY FAST"), True), Array(Hero(Genji),
-			Custom String("{0} 100 JUMPING JACKS! GO! {1}", Hero Icon String(Hero(Genji)), Ability Icon String(Hero(Genji), Button(Jump))),
-			Custom String("EVERYONE FORCED TO JUMP"), True), Array(Hero(Hanzo), Custom String("{0} NOW YOU SEE ME, NOW YOU DON'T! {1}",
+			D.Va), Custom String("BUNNY HOP! {1}", Hero Icon String(Hero(D.Va)), Ability Icon String(Hero(D.Va), Button(Ability 1))),
+			Custom String("SHOOT TO FLY"), True), Array(Hero(Echo), Custom String("CLASS IS IN SESSION {1}", Hero Icon String(Hero(Echo)),
+			Ability Icon String(Hero(Echo), Button(Ultimate))), Custom String("ULTS CHARGE REALLY FAST"), True), Array(Hero(Genji),
+			Custom String("100 JUMPING JACKS! GO! {1}", Hero Icon String(Hero(Genji)), Ability Icon String(Hero(Genji), Button(Jump))),
+			Custom String("EVERYONE FORCED TO JUMP"), True), Array(Hero(Hanzo), Custom String("NOW YOU SEE ME, NOW YOU DON'T! {1}",
 			Hero Icon String(Hero(Hanzo)), Ability Icon String(Hero(Hanzo), Button(Ability 1))), Custom String("EVERYONE INVISIBLE"),
-			True), Array(Hero(Junkrat), Custom String("{0} HOLD STILL! {1}", Hero Icon String(Hero(Junkrat)), Ability Icon String(Hero(
+			True), Array(Hero(Junkrat), Custom String("HOLD STILL! {1}", Hero Icon String(Hero(Junkrat)), Ability Icon String(Hero(
 			Junkrat), Button(Ability 2))), Custom String("EVERYONE ROOTED"), True), Array(Hero(Lúcio), Custom String(
-			"{0} CRANK UP THE BEAT! {1}", Hero Icon String(Hero(Lúcio)), Ability Icon String(Hero(Lúcio), Button(Ability 2))),
-			Custom String("EVERYONE MOVES FASTER"), True), Array(Hero(McCree), Custom String("{0} IIITS HIIIGH NOOOOOON... {1}",
-			Hero Icon String(Hero(McCree)), Ability Icon String(Hero(McCree), Button(Ultimate))), Custom String("TIME SLOWED"), True),
-			Array(Hero(Mei), Custom String("{0} FREEZING RAIN {1}", Hero Icon String(Hero(Mei)), Ability Icon String(Hero(Mei), Button(
-			Ultimate))), Custom String("EVERYONE FROZEN"), True), Array(Hero(Mercy), Custom String("{0} HEROES ALWAYS RISE {1}",
-			Hero Icon String(Hero(Mercy)), Ability Icon String(Hero(Mercy), Button(Ability 2))), Custom String("EVERYONE REVIVES"), True),
-			Array(Hero(Orisa), Custom String("{0} CEASE YOUR RESISTANCE. {1}", Hero Icon String(Hero(Orisa)), Ability Icon String(Hero(
-			Orisa), Button(Ultimate))), Custom String("DAMAGE INCREASED"), True), Array(Hero(Pharah), Custom String(
-			"{0} TAKE TO THE SKIES {1}", Hero Icon String(Hero(Pharah)), Ability Icon String(Hero(Pharah), Button(Ability 1))),
-			Custom String("EVERYONE CAN FLY"), True), Array(Hero(Reaper), Custom String("{0} DIE! DIE! DIE! {1}", Hero Icon String(Hero(
-			Reaper)), Ability Icon String(Hero(Reaper), Button(Ultimate))), Custom String("EVERYONE DIES"), True), Array(Hero(Reinhardt),
-			Custom String("{0} EARTHQUAKE!!! {1}", Hero Icon String(Hero(Reinhardt)), Ability Icon String(Hero(Reinhardt), Button(
-			Ultimate))), Custom String("EVERYONE KNOCKED DOWN"), True), Array(Hero(Roadhog), Custom String("{0} GET OUT {1}",
-			Hero Icon String(Hero(Roadhog)), Ability Icon String(Hero(Roadhog), Button(Ultimate))), Custom String(
-			"ALL DAMAGE HAS KNOCKBACK"), True), Array(Hero(Sigma), Custom String("{0} GRAVITY ADAGIO... {1}", Hero Icon String(Hero(
-			Sigma)), Ability Icon String(Hero(Sigma), Button(Ultimate))), Custom String("LOW GRAVITY, THEN STRONG GRAVITY"), True), Array(
-			Hero(Sombra), Custom String("{0} Liiights out! {1}", Hero Icon String(Hero(Sombra)), Ability Icon String(Hero(Sombra), Button(
-			Ultimate))), Custom String("EVERYONE HACKED"), True), Array(Hero(Tracer), Custom String(
-			"{0} TIME TO OPEN THE EYE OF AGAMOTTO {1}", Hero Icon String(Hero(Tracer)), Ability Icon String(Hero(Tracer), Button(
-			Ability 1))), Custom String("EVERYONE BLINKS WITH TRACER"), True), Array(Hero(Widowmaker), Custom String(
-			"{0} I FEEL ALIVE {1}", Hero Icon String(Hero(Widowmaker)), Ability Icon String(Hero(Widowmaker), Button(Secondary Fire))),
-			Custom String("HEADSHOTS ONLY"), True), Array(Hero(Winston), Custom String("{0} OOOH TANKY! {1}", Hero Icon String(Hero(
-			Winston)), Ability Icon String(Hero(Winston), Button(Ultimate))), Custom String("MAX HP INCREASED"), True), Array(Hero(
-			Zenyatta), Custom String("{0} PRAISE THE SUN {1}", Hero Icon String(Hero(Zenyatta)), Ability Icon String(Hero(Zenyatta),
-			Button(Ultimate))), Custom String("EVERYONE GETS LOTS OF HEALS"), True));
+			"CRANK UP THE BEAT! {1}", Hero Icon String(Hero(Lúcio)), Ability Icon String(Hero(Lúcio), Button(Ability 2))), Custom String(
+			"EVERYONE MOVES FASTER"), True), Array(Hero(McCree), Custom String("IIITS HIIIGH NOOOOOON... {1}", Hero Icon String(Hero(
+			McCree)), Ability Icon String(Hero(McCree), Button(Ultimate))), Custom String("TIME SLOWED"), True), Array(Hero(Mei),
+			Custom String("FREEZING RAIN {1}", Hero Icon String(Hero(Mei)), Ability Icon String(Hero(Mei), Button(Ultimate))),
+			Custom String("EVERYONE FROZEN"), True), Array(Hero(Mercy), Custom String("HEROES ALWAYS RISE {1}", Hero Icon String(Hero(
+			Mercy)), Ability Icon String(Hero(Mercy), Button(Ability 2))), Custom String("EVERYONE REVIVES"), True), Array(Hero(Orisa),
+			Custom String("CEASE YOUR RESISTANCE. {1}", Hero Icon String(Hero(Orisa)), Ability Icon String(Hero(Orisa), Button(Ultimate))),
+			Custom String("DAMAGE INCREASED"), True), Array(Hero(Pharah), Custom String("TAKE TO THE SKIES {1}", Hero Icon String(Hero(
+			Pharah)), Ability Icon String(Hero(Pharah), Button(Ability 1))), Custom String("EVERYONE CAN FLY"), True), Array(Hero(Reaper),
+			Custom String("DIE! DIE! DIE! {1}", Hero Icon String(Hero(Reaper)), Ability Icon String(Hero(Reaper), Button(Ultimate))),
+			Custom String("EVERYONE DIES"), True), Array(Hero(Reinhardt), Custom String("EARTHQUAKE!!! {1}", Hero Icon String(Hero(
+			Reinhardt)), Ability Icon String(Hero(Reinhardt), Button(Ultimate))), Custom String("EVERYONE KNOCKED DOWN"), True), Array(
+			Hero(Roadhog), Custom String("GET OUT {1}", Hero Icon String(Hero(Roadhog)), Ability Icon String(Hero(Roadhog), Button(
+			Ultimate))), Custom String("ALL DAMAGE HAS KNOCKBACK"), True), Array(Hero(Sigma), Custom String("GRAVITY ADAGIO... {1}",
+			Hero Icon String(Hero(Sigma)), Ability Icon String(Hero(Sigma), Button(Ultimate))), Custom String(
+			"LOW GRAVITY, THEN STRONG GRAVITY"), True), Array(Hero(Sombra), Custom String("Liiights out! {1}", Hero Icon String(Hero(
+			Sombra)), Ability Icon String(Hero(Sombra), Button(Ultimate))), Custom String("EVERYONE HACKED"), True), Array(Hero(Tracer),
+			Custom String("TIME TO OPEN THE EYE OF AGAMOTTO {1}", Hero Icon String(Hero(Tracer)), Ability Icon String(Hero(Tracer), Button(
+			Ability 1))), Custom String("EVERYONE BLINKS WITH TRACER"), True), Array(Hero(Widowmaker), Custom String("I FEEL ALIVE {1}",
+			Hero Icon String(Hero(Widowmaker)), Ability Icon String(Hero(Widowmaker), Button(Secondary Fire))), Custom String(
+			"HEADSHOTS ONLY"), True), Array(Hero(Winston), Custom String("OOOH TANKY! {1}", Hero Icon String(Hero(Winston)),
+			Ability Icon String(Hero(Winston), Button(Ultimate))), Custom String("MAX HP INCREASED"), True), Array(Hero(Zenyatta),
+			Custom String("PRAISE THE SUN {1}", Hero Icon String(Hero(Zenyatta)), Ability Icon String(Hero(Zenyatta), Button(Ultimate))),
+			Custom String("EVERYONE GETS LOTS OF HEALS"), True));
 		Global.ultimateTimeLeftEntries = Array();
 		Global.ASHE_ULT_DURATION = Workshop Setting Real(Custom String("Hero Settings"), Custom String("Ashe Ult Duration"), 8, 1, 60, 0);
 		Global.BRIGITTE_ULT_ARMOR_PER_SECOND = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
