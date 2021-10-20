@@ -6,34 +6,22 @@ variables
 		2: ultimateTimeLeftEntries
 		4: _targetPlayerList
 		5: TRACER_ULT_BLINK_DISTANCE
-		6: roadhogUltTimeLeft
 		7: REAPER_ULT_DAMAGE_PER_SECOND
-		8: mercyUltTimeLeft
-		9: widowmakerUltTimeLeft
 		10: ZENYATTA_ULT_HEAL_PER_SECOND
-		11: echoUltTimeLeft
 		12: _i_
 		13: _targetPlayer
 		14: ECHO_ULT_CHARGE_PER_SECOND
-		15: pharahUltTimeLeft
 		16: PHARAH_ULT_JUMP_HEIGHT
-		17: genjiUltTimeLeft
-		18: brigitteUltTimeLeft
 		19: BRIGITTE_ULT_ARMOR_PER_SECOND
-		20: dvaUltTimeLeft
 		21: DVA_ULT_FORCE_SPEED
 		22: sigmaUltTimeLeft
 		28: ASHE_ULT_DURATION
-		29: asheUltTimeLeft
 		30: _targetEntry
-		31: tracerUltTimeLeft
 
 	player:
 		0: _targetPlayer
 		1: _targetPlayerList
 		2: _i_
-		3: reaperUltTimeLeft
-		4: zenyattaUltTimeLeft
 		5: ultimateDataEntry
 		6: ultimateTimeLeftEntry
 		7: ultimateTimeLeftIndex
@@ -265,8 +253,8 @@ rule("ULT: Ashe")
 
 	actions
 	{
-		Global.asheUltTimeLeft = Global.ASHE_ULT_DURATION;
-		Chase Global Variable Over Time(asheUltTimeLeft, 0, Global.ASHE_ULT_DURATION, None);
+		Event Player.ultimateTimeLeftEntry[1] = Global.ASHE_ULT_DURATION;
+		Global.ultimateTimeLeftEntries[Event Player.ultimateTimeLeftIndex] = Event Player.ultimateTimeLeftEntry;
 		Set Ultimate Ability Enabled(Event Player, False);
 		Wait(Global.ASHE_ULT_DURATION, Ignore Condition);
 		Set Ultimate Ability Enabled(Event Player, True);
@@ -370,8 +358,6 @@ rule("ULT: Brigitte")
 	{
 		Big Message(All Players(All Teams), Custom String("{0} ALLA TILL MIG! {1}", Hero Icon String(Hero(Brigitte)), Ability Icon String(
 			Hero(Brigitte), Button(Ultimate))));
-		Global.brigitteUltTimeLeft = Global.GLOBAL_ULT_DURATION;
-		Chase Global Variable Over Time(brigitteUltTimeLeft, 0, Global.GLOBAL_ULT_DURATION, None);
 		disabled Set Ultimate Ability Enabled(Event Player, False);
 		disabled Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
 		disabled Set Ultimate Ability Enabled(Event Player, True);
@@ -389,7 +375,7 @@ rule("ULT: Brigitte effect")
 
 	conditions
 	{
-		Global.brigitteUltTimeLeft > 0;
+		Is True For Any(Global.ultimateTimeLeftEntries, Current Array Element[0] == Hero(Brigitte)) == True;
 	}
 
 	actions
@@ -420,8 +406,6 @@ rule("ULT: D.Va")
 	{
 		Big Message(All Players(All Teams), Custom String("{0} BUNNY HOP! {1}", Hero Icon String(Hero(D.Va)), Ability Icon String(Hero(
 			D.Va), Button(Ability 1))));
-		Global.dvaUltTimeLeft = Global.GLOBAL_ULT_DURATION;
-		Chase Global Variable Over Time(dvaUltTimeLeft, 0, Global.GLOBAL_ULT_DURATION, None);
 		disabled Set Ultimate Ability Enabled(Event Player, False);
 		disabled Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
 		disabled Set Ultimate Ability Enabled(Event Player, True);
@@ -439,7 +423,7 @@ rule("ULT: D.Va effect")
 
 	conditions
 	{
-		Global.dvaUltTimeLeft > 0;
+		Is True For Any(Global.ultimateTimeLeftEntries, Current Array Element[0] == Hero(D.Va)) == True;
 		Is Button Held(Event Player, Button(Primary Fire)) == True;
 	}
 
@@ -518,8 +502,6 @@ rule("ULT: Echo")
 	{
 		Big Message(All Players(All Teams), Custom String("{0} CLASS IS IN SESSION {1}", Hero Icon String(Hero(Echo)), Ability Icon String(
 			Hero(Echo), Button(Ultimate))));
-		Global.echoUltTimeLeft = Global.GLOBAL_ULT_DURATION;
-		Chase Global Variable Over Time(echoUltTimeLeft, 0, Global.GLOBAL_ULT_DURATION, None);
 		Set Ultimate Ability Enabled(Event Player, False);
 		Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
 		Set Ultimate Ability Enabled(Event Player, True);
@@ -535,12 +517,11 @@ rule("ULT: Echo effect")
 
 	conditions
 	{
-		Global.echoUltTimeLeft > 0;
+		Is True For Any(Global.ultimateTimeLeftEntries, Current Array Element[0] == Hero(Echo)) == True;
 	}
 
 	actions
 	{
-		disabled Big Message(All Players(All Teams), Custom String("HANDSOME FOR {0} SECONDS", Global.asheUltTimeLeft));
 		Global._targetPlayerList = Filtered Array(All Players(All Teams), Hero Of(Current Array Element) != Hero(Echo));
 		For Global Variable(_i_, 0, Count Of(Global._targetPlayerList), 1);
 			Global._targetPlayer = Global._targetPlayerList[Global._i_];
@@ -548,7 +529,6 @@ rule("ULT: Echo effect")
 		End;
 		Wait(0.100, Ignore Condition);
 		Loop If Condition Is True;
-		disabled Big Message(All Players(All Teams), Custom String("{0} OK BACK TO CASUAL", Hero Icon String(Hero(Ashe))));
 	}
 }
 
@@ -572,8 +552,6 @@ rule("ULT: Genji")
 	{
 		Big Message(All Players(All Teams), Custom String("{0} 100 JUMPING JACKS! GO! {1}", Hero Icon String(Hero(Genji)),
 			Ability Icon String(Hero(Genji), Button(Jump))));
-		Global.genjiUltTimeLeft = Global.GLOBAL_ULT_DURATION;
-		Chase Global Variable Over Time(genjiUltTimeLeft, 0, Global.GLOBAL_ULT_DURATION, None);
 		disabled Set Ultimate Ability Enabled(Event Player, False);
 		disabled Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
 		disabled Set Ultimate Ability Enabled(Event Player, True);
@@ -591,7 +569,7 @@ rule("ULT: Genji effect")
 
 	conditions
 	{
-		Global.genjiUltTimeLeft > 0;
+		Is True For Any(Global.ultimateTimeLeftEntries, Current Array Element[0] == Hero(Genji)) == True;
 	}
 
 	actions
@@ -762,8 +740,6 @@ rule("ULT: Mercy")
 	{
 		Big Message(All Players(All Teams), Custom String("{0} HEROES ALWAYS RISE {1}", Hero Icon String(Hero(Mercy)), Ability Icon String(
 			Hero(Mercy), Button(Ability 2))));
-		Global.mercyUltTimeLeft = Global.GLOBAL_ULT_DURATION;
-		Chase Global Variable Over Time(mercyUltTimeLeft, 0, Global.GLOBAL_ULT_DURATION, None);
 		disabled Set Ultimate Ability Enabled(Event Player, False);
 		disabled Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
 		disabled Set Ultimate Ability Enabled(Event Player, True);
@@ -781,7 +757,7 @@ rule("ULT: Mercy effect")
 
 	conditions
 	{
-		Global.mercyUltTimeLeft > 0;
+		Is True For Any(Global.ultimateTimeLeftEntries, Current Array Element[0] == Hero(Mercy)) == True;
 	}
 
 	actions
@@ -841,8 +817,6 @@ rule("ULT: Pharah")
 	{
 		Big Message(All Players(All Teams), Custom String("{0} TAKE TO THE SKIES {1}", Hero Icon String(Hero(Pharah)), Ability Icon String(
 			Hero(Pharah), Button(Ability 1))));
-		Global.pharahUltTimeLeft = Global.GLOBAL_ULT_DURATION;
-		Chase Global Variable Over Time(pharahUltTimeLeft, 0, Global.GLOBAL_ULT_DURATION, None);
 		disabled Set Ultimate Ability Enabled(Event Player, False);
 		disabled Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
 		disabled Set Ultimate Ability Enabled(Event Player, True);
@@ -860,7 +834,7 @@ rule("ULT: Pharah effect")
 
 	conditions
 	{
-		Global.pharahUltTimeLeft > 0;
+		Is True For Any(Global.ultimateTimeLeftEntries, Current Array Element[0] == Hero(Pharah)) == True;
 		Is Button Held(Event Player, Button(Jump)) == True;
 	}
 
@@ -890,8 +864,6 @@ rule("ULT: Reaper")
 	{
 		Big Message(All Players(All Teams), Custom String("{0} DIE! DIE! DIE! {1}", Hero Icon String(Hero(Reaper)), Ability Icon String(
 			Hero(Reaper), Button(Ultimate))));
-		Event Player.reaperUltTimeLeft = Global.GLOBAL_ULT_DURATION;
-		Chase Player Variable Over Time(Event Player, reaperUltTimeLeft, 0, Global.GLOBAL_ULT_DURATION, None);
 		Event Player._targetPlayerList = Filtered Array(All Players(All Teams), Current Array Element != Event Player);
 		Set Ultimate Ability Enabled(Event Player, False);
 		Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
@@ -910,7 +882,7 @@ rule("ULT: Reaper effect")
 
 	conditions
 	{
-		Event Player.reaperUltTimeLeft > 0;
+		Is True For Any(Global.ultimateTimeLeftEntries, Current Array Element[0] == Hero(Reaper)) == True;
 		Hero Of(Event Player) == Hero(Reaper);
 	}
 
@@ -923,7 +895,6 @@ rule("ULT: Reaper effect")
 		End;
 		Wait(0.100, Ignore Condition);
 		Loop If Condition Is True;
-		disabled Big Message(All Players(All Teams), Custom String("{0} OK BACK TO CASUAL", Hero Icon String(Hero(Ashe))));
 	}
 }
 
@@ -975,8 +946,6 @@ rule("ULT: Roadhog")
 	{
 		Big Message(All Players(All Teams), Custom String("{0} GET OUT {1}", Hero Icon String(Hero(Roadhog)), Ability Icon String(Hero(
 			Roadhog), Button(Ultimate))));
-		Global.roadhogUltTimeLeft = Global.GLOBAL_ULT_DURATION;
-		Chase Global Variable Over Time(roadhogUltTimeLeft, 0, Global.GLOBAL_ULT_DURATION, None);
 		disabled Set Ultimate Ability Enabled(Event Player, False);
 		disabled Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
 		disabled Set Ultimate Ability Enabled(Event Player, True);
@@ -994,7 +963,7 @@ rule("ULT: Roadhog effect")
 
 	conditions
 	{
-		Global.roadhogUltTimeLeft > 0;
+		Is True For Any(Global.ultimateTimeLeftEntries, Current Array Element[0] == Hero(Roadhog)) == True;
 	}
 
 	actions
@@ -1050,6 +1019,7 @@ rule("ULT: Sigma effect")
 	{
 		Global.sigmaUltTimeLeft > 0;
 		Global.sigmaUltTimeLeft <= Global.GLOBAL_ULT_DURATION;
+		Is True For Any(Global.ultimateTimeLeftEntries, Current Array Element[0] == Hero(Sigma)) == True;
 		Is On Ground(Event Player) == True;
 	}
 
@@ -1108,8 +1078,6 @@ rule("ULT: Tracer")
 		Big Message(All Players(All Teams), Custom String("{0} TIME TO OPEN THE EYE OF AGAMOTTO {1}", Hero Icon String(Hero(Tracer)),
 			Ability Icon String(Hero(Tracer), Button(Ability 1))));
 		Event Player._targetPlayerList = Filtered Array(All Players(All Teams), Current Array Element != Event Player);
-		Global.tracerUltTimeLeft = Global.GLOBAL_ULT_DURATION;
-		Chase Global Variable Over Time(tracerUltTimeLeft, 0, Global.GLOBAL_ULT_DURATION, None);
 		disabled Set Ultimate Ability Enabled(Event Player, False);
 		disabled Wait(Global.ASHE_ULT_DURATION, Ignore Condition);
 		disabled Set Ultimate Ability Enabled(Event Player, True);
@@ -1127,7 +1095,7 @@ rule("ULT: Tracer effect")
 
 	conditions
 	{
-		disabled Global.tracerUltTimeLeft > 0;
+		Is True For Any(Global.ultimateTimeLeftEntries, Current Array Element[0] == Hero(Tracer)) == True;
 		Hero Of(Event Player) == Hero(Tracer);
 		Is Button Held(Event Player, Button(Ability 1)) == True;
 	}
@@ -1162,8 +1130,6 @@ rule("ULT: Widowmaker")
 	{
 		Big Message(All Players(All Teams), Custom String("{0} I FEEL ALIVE {1}", Hero Icon String(Hero(Widowmaker)), Ability Icon String(
 			Hero(Widowmaker), Button(Secondary Fire))));
-		Global.widowmakerUltTimeLeft = Global.GLOBAL_ULT_DURATION;
-		Chase Global Variable Over Time(widowmakerUltTimeLeft, 0, Global.GLOBAL_ULT_DURATION, None);
 		disabled Set Ultimate Ability Enabled(Event Player, False);
 		Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
 		disabled Set Ultimate Ability Enabled(Event Player, True);
@@ -1181,7 +1147,7 @@ rule("ULT: Widowmaker effect")
 
 	conditions
 	{
-		Global.widowmakerUltTimeLeft > 0;
+		Is True For Any(Global.ultimateTimeLeftEntries, Current Array Element[0] == Hero(Widowmaker)) == True;
 		Event Was Critical Hit == False;
 	}
 
@@ -1243,9 +1209,7 @@ rule("ULT: Zenyatta")
 	{
 		Big Message(All Players(All Teams), Custom String("{0} PRAISE THE SUN {1}", Hero Icon String(Hero(Zenyatta)), Ability Icon String(
 			Hero(Zenyatta), Button(Ultimate))));
-		Event Player.zenyattaUltTimeLeft = Global.GLOBAL_ULT_DURATION;
 		Event Player._targetPlayerList = All Players(All Teams);
-		Chase Player Variable Over Time(Event Player, zenyattaUltTimeLeft, 0, Global.GLOBAL_ULT_DURATION, None);
 		Set Ultimate Ability Enabled(Event Player, False);
 		Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
 		Set Ultimate Ability Enabled(Event Player, True);
@@ -1263,7 +1227,7 @@ rule("ULT: Zenyatta effect")
 
 	conditions
 	{
-		Event Player.zenyattaUltTimeLeft > 0;
+		Is True For Any(Global.ultimateTimeLeftEntries, Current Array Element[0] == Hero(Zenyatta)) == True;
 		Hero Of(Event Player) == Hero(Zenyatta);
 	}
 
@@ -1276,6 +1240,5 @@ rule("ULT: Zenyatta effect")
 		End;
 		Wait(0.100, Ignore Condition);
 		Loop If Condition Is True;
-		disabled Big Message(All Players(All Teams), Custom String("{0} OK BACK TO CASUAL", Hero Icon String(Hero(Ashe))));
 	}
 }
