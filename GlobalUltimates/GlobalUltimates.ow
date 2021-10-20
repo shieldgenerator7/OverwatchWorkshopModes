@@ -2,8 +2,7 @@ variables
 {
 	global:
 		0: GLOBAL_ULT_DURATION
-		1: ASHE_ULT_DURATION
-		2: asheUltTimeLeft
+		1: ULTIMATE_DATA
 		3: tracerUltTimeLeft
 		4: _targetPlayerList
 		5: TRACER_ULT_BLINK_DISTANCE
@@ -24,6 +23,8 @@ variables
 		20: dvaUltTimeLeft
 		21: DVA_ULT_FORCE_SPEED
 		22: sigmaUltTimeLeft
+		28: ASHE_ULT_DURATION
+		29: asheUltTimeLeft
 
 	player:
 		0: _targetPlayer
@@ -31,6 +32,7 @@ variables
 		2: _i_
 		3: reaperUltTimeLeft
 		4: zenyattaUltTimeLeft
+		5: ultimateDataEntry
 }
 
 rule("Game Setup")
@@ -43,11 +45,15 @@ rule("Game Setup")
 	actions
 	{
 		Global.GLOBAL_ULT_DURATION = Workshop Setting Real(Custom String("All heroes"), Custom String("Ult Duration"), 10, 1, 60, 0);
+		Global.ULTIMATE_DATA = Array(Array(Hero(Ana), Custom String("NAP TIME... {0}", Ability Icon String(Hero(Ana), Button(Ability 1))),
+			Custom String("EVERYONE PUT TO SLEEP"), False), Array(Hero(Ashe), Custom String("HANDSOME FOR 8 SECONDS {0}",
+			Ability Icon String(Hero(Ashe), Button(Ultimate))), Custom String("EVERYONE FORCED TO EMOTE"), True));
 		Global.ASHE_ULT_DURATION = Workshop Setting Real(Custom String("Hero Settings"), Custom String("Ashe Ult Duration"), 8, 1, 60, 0);
 		Global.BRIGITTE_ULT_ARMOR_PER_SECOND = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
 			"Brigitte Ult Armor Per Second"), 100, 10, 1000, 0);
 		Global.DVA_ULT_FORCE_SPEED = Workshop Setting Real(Custom String("Hero Settings"), Custom String("D.Va Ult Force Speed"), 30, 10,
 			100, 0);
+			"Doomfist Ult Max Camera Distance"), 20, 1, 50, 0);
 		Global.ECHO_ULT_CHARGE_PER_SECOND = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
 			"Echo Ult Charge Per Second"), 10, 1, 60, 0);
 		Global.PHARAH_ULT_JUMP_HEIGHT = Workshop Setting Real(Custom String("Hero Settings"), Custom String("Pharah Ult Jump Height"), 5,
@@ -119,7 +125,7 @@ rule("==TEST== Teleport to objective ==")
 	}
 }
 
-rule("Player Setup - Disable ultimate")
+rule("Player Setup - Disable normal ultimate")
 {
 	event
 	{
@@ -157,6 +163,14 @@ rule("Player presses ultimate button")
 	actions
 	{
 		Set Ultimate Charge(Event Player, 0);
+		Event Player.ultimateDataEntry = Filtered Array(Global.ULTIMATE_DATA, Hero Of(Event Player) == Current Array Element[0])[0];
+		Big Message(All Players(All Teams), Custom String("{0} {1}", Hero Icon String(Event Player.ultimateDataEntry[0]),
+			Event Player.ultimateDataEntry[1]));
+		If(Event Player.ultimateDataEntry[3] == True);
+			Set Ultimate Ability Enabled(Event Player, False);
+			Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
+			Set Ultimate Ability Enabled(Event Player, True);
+		End;
 	}
 }
 
@@ -178,13 +192,8 @@ rule("ULT: Ana")
 
 	actions
 	{
-		Big Message(All Players(All Teams), Custom String("{0} NAP TIME... {1}", Hero Icon String(Hero(Ana)), Ability Icon String(Hero(
-			Ana), Button(Ability 1))));
 		Set Status(Filtered Array(All Players(All Teams), Hero Of(Current Array Element) != Hero(Ana)), Event Player, Asleep,
 			Global.GLOBAL_ULT_DURATION);
-		disabled Set Ultimate Ability Enabled(Event Player, False);
-		disabled Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
-		disabled Set Ultimate Ability Enabled(Event Player, True);
 	}
 }
 
@@ -206,8 +215,6 @@ rule("ULT: Ashe")
 
 	actions
 	{
-		Big Message(All Players(All Teams), Custom String("{0} HANDSOME FOR 8 SECONDS {1}", Hero Icon String(Hero(Ashe)),
-			Ability Icon String(Hero(Ashe), Button(Ultimate))));
 		Global.asheUltTimeLeft = Global.ASHE_ULT_DURATION;
 		Chase Global Variable Over Time(asheUltTimeLeft, 0, Global.ASHE_ULT_DURATION, None);
 		Set Ultimate Ability Enabled(Event Player, False);

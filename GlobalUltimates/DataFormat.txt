@@ -1,0 +1,5 @@
+//Ultimate Data
+0: Hero
+1: Ultimate Tagline
+2: Ultimate Description
+3: T/F: Should ult generation be DISABLED during ult?
