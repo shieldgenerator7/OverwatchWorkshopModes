@@ -4,24 +4,24 @@ variables
 		0: GLOBAL_ULT_DURATION
 		1: ULTIMATE_DATA
 		2: ultimateTimeLeftEntries
-		4: _targetPlayerList
-		5: TRACER_ULT_BLINK_DISTANCE
-		7: REAPER_ULT_DAMAGE_PER_SECOND
+		3: _i_
+		4: _targetPlayer
+		5: _targetPlayerList
+		6: _targetEntry
+		7: TRACER_ULT_BLINK_DISTANCE
+		8: REAPER_ULT_DAMAGE_PER_SECOND
 		10: ZENYATTA_ULT_HEAL_PER_SECOND
-		12: _i_
-		13: _targetPlayer
 		14: ECHO_ULT_CHARGE_PER_SECOND
 		16: PHARAH_ULT_JUMP_HEIGHT
 		19: BRIGITTE_ULT_ARMOR_PER_SECOND
 		21: DVA_ULT_FORCE_SPEED
-		22: sigmaUltTimeLeft
 		28: ASHE_ULT_DURATION
-		30: _targetEntry
+		29: sigmaUltTimeLeft
 
 	player:
-		0: _targetPlayer
-		1: _targetPlayerList
-		2: _i_
+		0: _i_
+		1: _targetPlayer
+		2: _targetPlayerList
 		5: ultimateDataEntry
 		6: ultimateTimeLeftEntry
 		7: ultimateTimeLeftIndex
