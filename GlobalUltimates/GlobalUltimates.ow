@@ -192,7 +192,6 @@ rule("Player presses ultimate button")
 
 	actions
 	{
-		Set Ultimate Charge(Event Player, 0);
 		Event Player.ultimateDataEntry = Filtered Array(Global.ULTIMATE_DATA, Hero Of(Event Player) == Current Array Element[0])[0];
 		Big Message(All Players(All Teams), Custom String("{0} {1}", Hero Icon String(Event Player.ultimateDataEntry[0]),
 			Event Player.ultimateDataEntry[1]));
@@ -205,6 +204,8 @@ rule("Player presses ultimate button")
 			Event Player);
 		Modify Global Variable(ultimateTimeLeftEntries, Append To Array, 0);
 		Global.ultimateTimeLeftEntries[Event Player.ultimateTimeLeftIndex] = Event Player.ultimateTimeLeftEntry;
+		Wait(0.100, Ignore Condition);
+		Set Ultimate Charge(Event Player, 0);
 		If(Event Player.ultimateDataEntry[3] == True);
 			Set Ultimate Ability Enabled(Event Player, False);
 			Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
