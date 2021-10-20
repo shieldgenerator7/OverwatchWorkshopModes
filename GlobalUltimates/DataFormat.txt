@@ -4,7 +4,11 @@
 2: Ultimate Description
 3: T/F: Should ult generation be DISABLED during ult?
 
-//Ultimate Time Left
+//Ultimate Time Left Entries
 0: Hero
-1: Time left (real)
+1: 0
 2: HUD test id
+3: Player
+
+//Ultimate Time Left
+: Time left (real)
