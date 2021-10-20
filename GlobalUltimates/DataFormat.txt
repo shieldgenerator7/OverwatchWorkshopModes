@@ -6,9 +6,6 @@
 
 //Ultimate Time Left Entries
 0: Hero
-1: 0
+1: Time left (real)
 2: HUD test id
 3: Player
-
-//Ultimate Time Left
-: Time left (real)

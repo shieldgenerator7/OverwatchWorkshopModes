@@ -4,7 +4,6 @@ variables
 		0: GLOBAL_ULT_DURATION
 		1: ULTIMATE_DATA
 		2: ultimateTimeLeftEntries
-		3: ultimateTimeLeft
 		4: _targetPlayerList
 		5: TRACER_ULT_BLINK_DISTANCE
 		6: roadhogUltTimeLeft
@@ -38,7 +37,6 @@ variables
 		5: ultimateDataEntry
 		6: ultimateTimeLeftEntry
 		7: ultimateTimeLeftIndex
-		8: ultimateTimeLeft
 }
 
 rule("Game Setup")
@@ -55,7 +53,6 @@ rule("Game Setup")
 			Custom String("EVERYONE PUT TO SLEEP"), False), Array(Hero(Ashe), Custom String("HANDSOME FOR 8 SECONDS {0}",
 			Ability Icon String(Hero(Ashe), Button(Ultimate))), Custom String("EVERYONE FORCED TO EMOTE"), True));
 		Global.ultimateTimeLeftEntries = Array();
-		Global.ultimateTimeLeft = Array();
 		Global.ASHE_ULT_DURATION = Workshop Setting Real(Custom String("Hero Settings"), Custom String("Ashe Ult Duration"), 8, 1, 60, 0);
 		Global.BRIGITTE_ULT_ARMOR_PER_SECOND = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
 			"Brigitte Ult Armor Per Second"), 100, 10, 1000, 0);
@@ -175,10 +172,11 @@ rule("Player presses ultimate button")
 		Big Message(All Players(All Teams), Custom String("{0} {1}", Hero Icon String(Event Player.ultimateDataEntry[0]),
 			Event Player.ultimateDataEntry[1]));
 		Event Player.ultimateTimeLeftIndex = Count Of(Global.ultimateTimeLeftEntries);
-		Modify Global Variable(ultimateTimeLeft, Append To Array, Global.GLOBAL_ULT_DURATION);
-		Create HUD Text(All Players(All Teams), Custom String("ASHE ULT: {0}", Event Player.ultimateTimeLeft), Null, Null, Left,
-			Event Player.ultimateTimeLeft, Color(White), Color(White), Color(White), Visible To and String, Default Visibility);
-		Event Player.ultimateTimeLeftEntry = Array(Event Player.ultimateDataEntry[0], 0, Last Text ID, Event Player);
+		Create HUD Text(All Players(All Teams), Custom String("ASHE ULT: {0}",
+			Global.ultimateTimeLeftEntries[Event Player.ultimateTimeLeftIndex][1]), Null, Null, Left, 0, Color(White), Color(White), Color(
+			White), Visible To and String, Default Visibility);
+		Event Player.ultimateTimeLeftEntry = Array(Event Player.ultimateDataEntry[0], Global.GLOBAL_ULT_DURATION, Last Text ID,
+			Event Player);
 		Modify Global Variable(ultimateTimeLeftEntries, Append To Array, 0);
 		Global.ultimateTimeLeftEntries[Event Player.ultimateTimeLeftIndex] = Event Player.ultimateTimeLeftEntry;
 		If(Event Player.ultimateDataEntry[3] == True);
@@ -209,9 +207,8 @@ rule("Decrement ultimate time left")
 			Global._targetPlayer = Global._targetEntry[3];
 			Global._targetPlayer.ultimateTimeLeftIndex = Global._i_;
 			"Modify the time left in the entry"
-			Global.ultimateTimeLeft[Global._i_] -= 0.100;
-			Global._targetPlayer.ultimateTimeLeft = Global.ultimateTimeLeft[Global._i_];
-			If(Global.ultimateTimeLeft[Global._i_] > 0);
+			Global._targetEntry[1] -= 0.100;
+			If(Global._targetEntry[1] > 0);
 				"Put modified entry back into the array"
 				Global.ultimateTimeLeftEntries[Global._i_] = Global._targetEntry;
 			Else;
@@ -219,7 +216,6 @@ rule("Decrement ultimate time left")
 				Destroy HUD Text(Global._targetEntry[2]);
 				"Remove entry from array"
 				Modify Global Variable(ultimateTimeLeftEntries, Remove From Array By Index, Global._i_);
-				Modify Global Variable(ultimateTimeLeft, Remove From Array By Index, Global._i_);
 			End;
 		End;
 		Wait(0.100, Ignore Condition);
