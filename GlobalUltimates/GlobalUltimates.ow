@@ -53,7 +53,7 @@ rule("Game Setup")
 		Global.PHARAH_ULT_JUMP_HEIGHT = Workshop Setting Real(Custom String("Hero Settings"), Custom String("Pharah Ult Jump Height"), 5,
 			1, 100, 0);
 		Global.REAPER_ULT_DAMAGE_PER_SECOND = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
-			"Reaper Ut Damage Per Second"), 100, 10, 1000, 0);
+			"Reaper Ult Damage Per Second"), 100, 10, 1000, 0);
 		Global.TRACER_ULT_BLINK_DISTANCE = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
 			"Tracer Ult Blink Distance"), 5, 1, 20, 0);
 		Global.ZENYATTA_ULT_HEAL_PER_SECOND = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
@@ -115,6 +115,7 @@ rule("==TEST== Teleport to objective ==")
 	actions
 	{
 		Teleport(All Players(All Teams), Objective Position(0));
+		Set Ultimate Charge(All Players(All Teams), 100);
 	}
 }
 
