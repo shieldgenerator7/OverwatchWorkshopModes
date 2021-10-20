@@ -39,7 +39,40 @@ rule("Game Setup")
 		Global.GLOBAL_ULT_DURATION = Workshop Setting Real(Custom String("All heroes"), Custom String("Ult Duration"), 10, 1, 60, 0);
 		Global.ULTIMATE_DATA = Array(Array(Hero(Ana), Custom String("NAP TIME... {0}", Ability Icon String(Hero(Ana), Button(Ability 1))),
 			Custom String("EVERYONE PUT TO SLEEP"), False), Array(Hero(Ashe), Custom String("HANDSOME FOR 8 SECONDS {0}",
-			Ability Icon String(Hero(Ashe), Button(Ultimate))), Custom String("EVERYONE FORCED TO EMOTE"), True));
+			Ability Icon String(Hero(Ashe), Button(Ultimate))), Custom String("EVERYONE FORCED TO EMOTE"), True), Array(Hero(Baptiste),
+			Custom String("HANDSOME FOR 8 SECONDS {0}", Ability Icon String(Hero(Ashe), Button(Ultimate))), Custom String(
+			"EVERYONE FORCED TO EMOTE"), True), Array(Hero(Bastion), Custom String("HANDSOME FOR 8 SECONDS {0}", Ability Icon String(Hero(
+			Ashe), Button(Ultimate))), Custom String("EVERYONE FORCED TO EMOTE"), True), Array(Hero(Brigitte), Custom String(
+			"HANDSOME FOR 8 SECONDS {0}", Ability Icon String(Hero(Ashe), Button(Ultimate))), Custom String("EVERYONE FORCED TO EMOTE"),
+			True), Array(Hero(D.Va), Custom String("HANDSOME FOR 8 SECONDS {0}", Ability Icon String(Hero(Ashe), Button(Ultimate))),
+			Custom String("EVERYONE FORCED TO EMOTE"), True), Array(Hero(Echo), Custom String("HANDSOME FOR 8 SECONDS {0}",
+			Ability Icon String(Hero(Ashe), Button(Ultimate))), Custom String("EVERYONE FORCED TO EMOTE"), True), Array(Hero(Genji),
+			Custom String("HANDSOME FOR 8 SECONDS {0}", Ability Icon String(Hero(Ashe), Button(Ultimate))), Custom String(
+			"EVERYONE FORCED TO EMOTE"), True), Array(Hero(Hanzo), Custom String("HANDSOME FOR 8 SECONDS {0}", Ability Icon String(Hero(
+			Ashe), Button(Ultimate))), Custom String("EVERYONE FORCED TO EMOTE"), True), Array(Hero(Junkrat), Custom String(
+			"HANDSOME FOR 8 SECONDS {0}", Ability Icon String(Hero(Ashe), Button(Ultimate))), Custom String("EVERYONE FORCED TO EMOTE"),
+			True), Array(Hero(Lúcio), Custom String("HANDSOME FOR 8 SECONDS {0}", Ability Icon String(Hero(Ashe), Button(Ultimate))),
+			Custom String("EVERYONE FORCED TO EMOTE"), True), Array(Hero(McCree), Custom String("HANDSOME FOR 8 SECONDS {0}",
+			Ability Icon String(Hero(Ashe), Button(Ultimate))), Custom String("EVERYONE FORCED TO EMOTE"), True), Array(Hero(Mei),
+			Custom String("HANDSOME FOR 8 SECONDS {0}", Ability Icon String(Hero(Ashe), Button(Ultimate))), Custom String(
+			"EVERYONE FORCED TO EMOTE"), True), Array(Hero(Mercy), Custom String("HANDSOME FOR 8 SECONDS {0}", Ability Icon String(Hero(
+			Ashe), Button(Ultimate))), Custom String("EVERYONE FORCED TO EMOTE"), True), Array(Hero(Orisa), Custom String(
+			"HANDSOME FOR 8 SECONDS {0}", Ability Icon String(Hero(Ashe), Button(Ultimate))), Custom String("EVERYONE FORCED TO EMOTE"),
+			True), Array(Hero(Pharah), Custom String("HANDSOME FOR 8 SECONDS {0}", Ability Icon String(Hero(Ashe), Button(Ultimate))),
+			Custom String("EVERYONE FORCED TO EMOTE"), True), Array(Hero(Reaper), Custom String("HANDSOME FOR 8 SECONDS {0}",
+			Ability Icon String(Hero(Ashe), Button(Ultimate))), Custom String("EVERYONE FORCED TO EMOTE"), True), Array(Hero(Reinhardt),
+			Custom String("HANDSOME FOR 8 SECONDS {0}", Ability Icon String(Hero(Ashe), Button(Ultimate))), Custom String(
+			"EVERYONE FORCED TO EMOTE"), True), Array(Hero(Roadhog), Custom String("HANDSOME FOR 8 SECONDS {0}", Ability Icon String(Hero(
+			Ashe), Button(Ultimate))), Custom String("EVERYONE FORCED TO EMOTE"), True), Array(Hero(Sigma), Custom String(
+			"HANDSOME FOR 8 SECONDS {0}", Ability Icon String(Hero(Ashe), Button(Ultimate))), Custom String("EVERYONE FORCED TO EMOTE"),
+			True), Array(Hero(Sombra), Custom String("HANDSOME FOR 8 SECONDS {0}", Ability Icon String(Hero(Ashe), Button(Ultimate))),
+			Custom String("EVERYONE FORCED TO EMOTE"), True), Array(Hero(Tracer), Custom String("HANDSOME FOR 8 SECONDS {0}",
+			Ability Icon String(Hero(Ashe), Button(Ultimate))), Custom String("EVERYONE FORCED TO EMOTE"), True), Array(Hero(Widowmaker),
+			Custom String("HANDSOME FOR 8 SECONDS {0}", Ability Icon String(Hero(Ashe), Button(Ultimate))), Custom String(
+			"EVERYONE FORCED TO EMOTE"), True), Array(Hero(Winston), Custom String("HANDSOME FOR 8 SECONDS {0}", Ability Icon String(Hero(
+			Ashe), Button(Ultimate))), Custom String("EVERYONE FORCED TO EMOTE"), True), Array(Hero(Zenyatta), Custom String(
+			"HANDSOME FOR 8 SECONDS {0}", Ability Icon String(Hero(Ashe), Button(Ultimate))), Custom String("EVERYONE FORCED TO EMOTE"),
+			True));
 		Global.ultimateTimeLeftEntries = Array();
 		Global.ASHE_ULT_DURATION = Workshop Setting Real(Custom String("Hero Settings"), Custom String("Ashe Ult Duration"), 8, 1, 60, 0);
 		Global.BRIGITTE_ULT_ARMOR_PER_SECOND = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
