@@ -7,3 +7,4 @@
 //Ultimate Time Left
 0: Hero
 1: Time left (real)
+2: HUD test id
