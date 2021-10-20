@@ -1,5 +1,11 @@
 settings
 {
+	main
+	{
+		Description: "Press Q and change how the game works for 10 seconds! From increasing move speed to forcing everyone to jump, every hero has a new unique that globally changes the game."
+		Mode Name: "Global Ultimates"
+	}
+
 	modes
 	{
 		Assault
