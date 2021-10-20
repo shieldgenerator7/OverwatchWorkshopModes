@@ -173,7 +173,7 @@ rule("Player presses ultimate button")
 			Event Player.ultimateDataEntry[1]));
 		Event Player.ultimateTimeLeftIndex = Count Of(Global.ultimateTimeLeftEntries);
 		Create HUD Text(All Players(All Teams), Custom String("{0}: {1}", Hero Icon String(Event Player.ultimateDataEntry[0]),
-			Global.ultimateTimeLeftEntries[Event Player.ultimateTimeLeftIndex][1]), Custom String("{0}",
+			Round To Integer(Global.ultimateTimeLeftEntries[Event Player.ultimateTimeLeftIndex][1], To Nearest)), Custom String("{0}",
 			Event Player.ultimateDataEntry[1]), Custom String("{0}", Event Player.ultimateDataEntry[2]), Left, 0, Color(White), Color(
 			White), Color(White), Visible To and String, Default Visibility);
 		Event Player.ultimateTimeLeftEntry = Array(Event Player.ultimateDataEntry[0], Global.GLOBAL_ULT_DURATION, Last Text ID,
