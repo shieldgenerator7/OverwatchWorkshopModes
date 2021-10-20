@@ -201,15 +201,16 @@ rule("Decrement ultimate time left")
 			Global._targetEntry = Global.ultimateTimeLeft[Global._i_];
 			"Modify the time left in the entry"
 			Global._targetEntry[1] -= 0.100;
+			disabled Small Message(All Players(All Teams), Custom String("last text id: {0}", Global._targetEntry[2]));
 			"Remove old HUD"
 			Destroy HUD Text(Global._targetEntry[2]);
 			If(Global._targetEntry[1] > 0);
-				"Put modified entry back into the array"
-				Global.ultimateTimeLeft[Global._i_] = Global._targetEntry;
 				"Display new HUD"
 				Create HUD Text(All Players(All Teams), Custom String("ASHE ULT: {0}", Global._targetEntry[1]), Null, Null, Left,
 					Global._targetEntry[1], Color(White), Color(White), Color(White), Visible To, Default Visibility);
 				Global._targetEntry[2] = Last Text ID;
+				"Put modified entry back into the array"
+				Global.ultimateTimeLeft[Global._i_] = Global._targetEntry;
 			Else;
 				Modify Global Variable(ultimateTimeLeft, Remove From Array By Index, Global._i_);
 			End;
