@@ -62,8 +62,6 @@ settings
 	{
 		General
 		{
-			Spawn With Ultimate Ready: On
-
 			disabled heroes
 			{
 				Doomfist
