@@ -10,36 +10,51 @@ settings
 	{
 		Assault
 		{
-			enabled maps
-			{
-			}
+			Limit Roles: 2 Of Each Role Per Team
+		}
+
+		Capture the Flag
+		{
+			Respawn Speed Buff Duration: 10.0
 		}
 
 		Control
 		{
-			enabled maps
-			{
-			}
+			Limit Roles: 2 Of Each Role Per Team
 		}
 
 		Escort
 		{
-			enabled maps
-			{
-			}
+			Limit Roles: 2 Of Each Role Per Team
 		}
 
 		Hybrid
 		{
-			enabled maps
-			{
-				Eichenwalde
-			}
+			Limit Roles: 2 Of Each Role Per Team
 		}
 
-		General
+		Team Deathmatch
 		{
-			Limit Roles: 2 Of Each Role Per Team
+			enabled maps
+			{
+				Black Forest
+				Black Forest Winter
+				Castillo
+				Château Guillard
+				Château Guillard Halloween
+				Ecopoint: Antarctica
+				Ecopoint: Antarctica Winter
+				Eichenwalde
+				Eichenwalde Halloween
+				Kanezaka
+				King's Row
+				King's Row Winter
+				Malevento
+				Necropolis
+				Petra
+				Workshop Island
+				Workshop Island Night
+			}
 		}
 	}
 
