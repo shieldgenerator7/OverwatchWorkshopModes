@@ -12,6 +12,7 @@ variables
 		8: REAPER_ULT_DAMAGE_PER_SECOND
 		9: MOIRA_ULT_PERCENT_LIFESTEAL
 		10: ZENYATTA_ULT_HEAL_PER_SECOND
+		11: MCCREE_ULT_TIME_SLOW_PERCENT
 		14: ECHO_ULT_CHARGE_PER_SECOND
 		16: PHARAH_ULT_JUMP_HEIGHT
 		19: BRIGITTE_ULT_ARMOR_PER_SECOND
@@ -97,8 +98,10 @@ rule("Game Setup")
 			"Doomfist Ult Max Camera Distance"), 20, 1, 50, 0);
 		Global.ECHO_ULT_CHARGE_PER_SECOND = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
 			"Echo Ult Charge Per Second"), 10, 1, 60, 0);
-		Global.MOIRA_ULT_PERCENT_LIFESTEAL = Workshop Setting Real(Custom String("HERO SETTINGS"), Custom String(
-			"MOIRA ULT PERCENT LIFESTEAL"), 100, 0, 100, 0);
+		Global.MCCREE_ULT_TIME_SLOW_PERCENT = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
+			"McCree Ult Time Slow Percent"), 20, 0, 100, 0);
+		Global.MOIRA_ULT_PERCENT_LIFESTEAL = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
+			"Moira Ult Percent Lifesteal"), 100, 0, 100, 0);
 		Global.PHARAH_ULT_JUMP_HEIGHT = Workshop Setting Real(Custom String("Hero Settings"), Custom String("Pharah Ult Jump Height"), 5,
 			1, 100, 0);
 		Global.REAPER_ULT_DAMAGE_PER_SECOND = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
@@ -716,9 +719,15 @@ rule("ULT: McCree")
 
 	actions
 	{
-		Set Slow Motion(20);
-		Wait(Global.GLOBAL_ULT_DURATION * (20 / 100), Ignore Condition);
+		Set Slow Motion(Global.MCCREE_ULT_TIME_SLOW_PERCENT);
+		Set Aim Speed(Filtered Array(All Players(All Teams), Hero Of(Current Array Element) == Hero(McCree)), 100 / (
+			Global.MCCREE_ULT_TIME_SLOW_PERCENT / 100));
+		Set Move Speed(Filtered Array(All Players(All Teams), Hero Of(Current Array Element) == Hero(McCree)), 100 / (
+			Global.MCCREE_ULT_TIME_SLOW_PERCENT / 100));
+		Wait(Global.GLOBAL_ULT_DURATION * (Global.MCCREE_ULT_TIME_SLOW_PERCENT / 100), Ignore Condition);
 		Set Slow Motion(100);
+		Set Aim Speed(All Players(All Teams), 100);
+		Set Move Speed(All Players(All Teams), 100);
 	}
 }
 
