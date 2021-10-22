@@ -385,14 +385,14 @@ rule("Player presses ultimate button")
 			Event Player.ultimateDataEntry[1]), Custom String("{0}", Event Player.ultimateDataEntry[2]), Left, 0, Color(White), Color(
 			White), Color(White), Visible To and String, Default Visibility);
 		Event Player.ultimateTimeLeftEntry = Array(Event Player.ultimateDataEntry[0],
-			Global.GLOBAL_ULT_DURATION * Event Player.ultimateDataEntry[4], Last Text ID, Event Player);
+			Event Player.ultimateDataEntry[4] * Global.GLOBAL_ULT_DURATION / 100, Last Text ID, Event Player);
 		Modify Global Variable(ultimateTimeLeftEntries, Append To Array, 0);
 		Global.ultimateTimeLeftEntries[Event Player.ultimateTimeLeftIndex] = Event Player.ultimateTimeLeftEntry;
 		Wait(0.100, Ignore Condition);
 		Set Ultimate Charge(Event Player, 0);
 		If(Event Player.ultimateDataEntry[3] == True);
 			Set Ultimate Ability Enabled(Event Player, False);
-			Wait(Global.GLOBAL_ULT_DURATION * Event Player.ultimateDataEntry[4], Ignore Condition);
+			Wait(Event Player.ultimateDataEntry[4] * Global.GLOBAL_ULT_DURATION / 100, Ignore Condition);
 			Set Ultimate Ability Enabled(Event Player, True);
 		End;
 	}
