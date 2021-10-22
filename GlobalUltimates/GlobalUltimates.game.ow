@@ -552,7 +552,7 @@ rule("ULT: Ana")
 	actions
 	{
 		Set Status(Filtered Array(All Players(All Teams), Hero Of(Current Array Element) != Hero(Ana)), Event Player, Asleep,
-			Global.GLOBAL_ULT_DURATION);
+			Global.ANA_ULT_DURATION * Global.GLOBAL_ULT_DURATION / 100);
 	}
 }
 
@@ -622,7 +622,7 @@ rule("ULT: Baptiste")
 
 	actions
 	{
-		Set Status(All Players(All Teams), Event Player, Unkillable, Global.GLOBAL_ULT_DURATION);
+		Set Status(All Players(All Teams), Event Player, Unkillable, Global.BAPTISTE_ULT_DURATION * Global.GLOBAL_ULT_DURATION / 100);
 	}
 }
 
@@ -645,7 +645,7 @@ rule("ULT: Bastion")
 	actions
 	{
 		Start Forcing Throttle(All Players(All Teams), 1, 1, 0, 1, 0, 1);
-		Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
+		Wait(Global.BASTION_ULT_DURATION * Global.GLOBAL_ULT_DURATION / 100, Ignore Condition);
 		Stop Forcing Throttle(All Players(All Teams));
 	}
 }
@@ -731,7 +731,7 @@ rule("ULT: D.Va effect")
 	}
 }
 
-rule("ULT: Doomfist (with help from TrueNeutral#11414 and the original author of 2D OVERWATCH)")
+disabled rule("ULT: Doomfist (with help from TrueNeutral#11414 and the original author of 2D OVERWATCH)")
 {
 	event
 	{
@@ -763,6 +763,7 @@ rule("ULT: Doomfist (with help from TrueNeutral#11414 and the original author of
 				Position Of(Global._targetPlayer) + Vector(0, 0, 0)));
 			Start Camera(Global._targetPlayer, Global._targetPlayer + Vector(-20, 0, 0), Global._targetPlayer + Vector(7, 5, 0), 100);
 		End;
+		"Wait(Global.DOOMFIST_ULT_DURATION * Global.GLOBAL_ULT_DURATION/100, Ignore Condition);"
 		Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
 		For Global Variable(_i_, 0, Count Of(Global._targetPlayerList), 1);
 			Global._targetPlayer = Global._targetPlayerList[Global._i_];
@@ -873,7 +874,7 @@ rule("ULT: Hanzo")
 	actions
 	{
 		Set Invisible(All Players(All Teams), All);
-		Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
+		Wait(Global.HANZO_ULT_DURATION * Global.GLOBAL_ULT_DURATION / 100, Ignore Condition);
 		Set Invisible(All Players(All Teams), None);
 	}
 }
@@ -897,7 +898,7 @@ rule("ULT: Junkrat")
 	actions
 	{
 		Set Status(Filtered Array(All Players(All Teams), Is On Ground(Current Array Element) == True && Hero Of(Current Array Element)
-			!= Hero(Junkrat)), Event Player, Rooted, Global.GLOBAL_ULT_DURATION);
+			!= Hero(Junkrat)), Event Player, Rooted, Global.JUNKRAT_ULT_DURATION * Global.GLOBAL_ULT_DURATION / 100);
 	}
 }
 
@@ -920,7 +921,7 @@ rule("ULT: Lucio")
 	actions
 	{
 		Set Move Speed(All Players(All Teams), 200);
-		Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
+		Wait(Global.LUCIO_ULT_DURATION * Global.GLOBAL_ULT_DURATION / 100, Ignore Condition);
 		Set Move Speed(All Players(All Teams), 100);
 	}
 }
@@ -948,7 +949,8 @@ rule("ULT: McCree")
 			Global.MCCREE_ULT_TIME_SLOW_PERCENT / 100));
 		Set Move Speed(Filtered Array(All Players(All Teams), Hero Of(Current Array Element) == Hero(McCree)), 100 / (
 			Global.MCCREE_ULT_TIME_SLOW_PERCENT / 100));
-		Wait(Global.GLOBAL_ULT_DURATION * (Global.MCCREE_ULT_TIME_SLOW_PERCENT / 100), Ignore Condition);
+		Wait(Global.MCCREE_ULT_DURATION * Global.GLOBAL_ULT_DURATION / 100 * (Global.MCCREE_ULT_TIME_SLOW_PERCENT / 100),
+			Ignore Condition);
 		Set Slow Motion(100);
 		Set Aim Speed(All Players(All Teams), 100);
 		Set Move Speed(All Players(All Teams), 100);
@@ -974,7 +976,7 @@ rule("ULT: Mei")
 	actions
 	{
 		Set Status(Filtered Array(All Players(All Teams), Hero Of(Current Array Element) != Hero(Mei)), Event Player, Frozen,
-			Global.GLOBAL_ULT_DURATION);
+			Global.MEI_ULT_DURATION * Global.GLOBAL_ULT_DURATION / 100);
 	}
 }
 
@@ -1057,7 +1059,7 @@ rule("ULT: Orisa")
 	actions
 	{
 		Set Damage Dealt(All Players(All Teams), 200);
-		Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
+		Wait(Global.ORISA_ULT_DURATION * Global.GLOBAL_ULT_DURATION / 100, Ignore Condition);
 		Set Damage Dealt(All Players(All Teams), 100);
 	}
 }
@@ -1168,7 +1170,7 @@ rule("ULT: Reinhardt")
 	actions
 	{
 		Set Status(Filtered Array(All Players(All Teams), Is On Ground(Current Array Element) == True && Hero Of(Current Array Element)
-			!= Hero(Reinhardt)), Event Player, Knocked Down, Global.GLOBAL_ULT_DURATION);
+			!= Hero(Reinhardt)), Event Player, Knocked Down, Global.REINHARDT_ULT_DURATION * Global.GLOBAL_ULT_DURATION / 100);
 	}
 }
 
@@ -1212,14 +1214,14 @@ rule("ULT: Sigma")
 	{
 		Big Message(All Players(All Teams), Custom String("{0} GRAVITY ADAGIO... {1}", Hero Icon String(Hero(Sigma)), Ability Icon String(
 			Hero(Sigma), Button(Ultimate))));
-		Global.sigmaUltTimeLeft = Global.GLOBAL_ULT_DURATION * 2;
-		Chase Global Variable Over Time(sigmaUltTimeLeft, 0, Global.GLOBAL_ULT_DURATION, None);
+		Global.sigmaUltTimeLeft = Global.SIGMA_ULT_DURATION * Global.GLOBAL_ULT_DURATION / 100;
+		Chase Global Variable Over Time(sigmaUltTimeLeft, 0, Global.SIGMA_ULT_DURATION * Global.GLOBAL_ULT_DURATION / 100, None);
 		Set Gravity(All Players(All Teams), 20);
-		Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
+		Wait(Global.SIGMA_ULT_DURATION * Global.GLOBAL_ULT_DURATION / 100 / 2, Ignore Condition);
 		Big Message(All Players(All Teams), Custom String("{0} GRAVITY ALLEGRO! {1}", Hero Icon String(Hero(Sigma)), Ability Icon String(
 			Hero(Sigma), Button(Ultimate))));
 		Set Gravity(All Players(All Teams), 200);
-		Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
+		Wait(Global.SIGMA_ULT_DURATION * Global.GLOBAL_ULT_DURATION / 100 / 2, Ignore Condition);
 		Set Gravity(All Players(All Teams), 100);
 	}
 }
@@ -1236,7 +1238,7 @@ rule("ULT: Sigma effect")
 	conditions
 	{
 		Global.sigmaUltTimeLeft > 0;
-		Global.sigmaUltTimeLeft <= Global.GLOBAL_ULT_DURATION;
+		Global.sigmaUltTimeLeft <= Global.SIGMA_ULT_DURATION * Global.GLOBAL_ULT_DURATION / 100 / 2;
 		Is True For Any(Global.ultimateTimeLeftEntries, Current Array Element[0] == Hero(Sigma)) == True;
 		Is On Ground(Event Player) == True;
 	}
@@ -1291,7 +1293,7 @@ rule("ULT: Sombra")
 	actions
 	{
 		Set Status(Filtered Array(All Players(All Teams), Hero Of(Current Array Element) != Hero(Sombra)), Event Player, Hacked,
-			Global.GLOBAL_ULT_DURATION);
+			Global.SOMBRA_ULT_DURATION * Global.GLOBAL_ULT_DURATION / 100);
 	}
 }
 
@@ -1404,7 +1406,7 @@ rule("ULT: Winston")
 	{
 		Set Max Health(All Players(All Teams), 200);
 		Heal(All Players(All Teams), Event Player, 1000);
-		Wait(Global.GLOBAL_ULT_DURATION, Ignore Condition);
+		Wait(Global.WINSTON_ULT_DURATION * Global.GLOBAL_ULT_DURATION / 100, Ignore Condition);
 		Set Max Health(Event Player, 100);
 	}
 }
