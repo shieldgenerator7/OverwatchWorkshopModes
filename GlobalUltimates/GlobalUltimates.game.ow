@@ -66,6 +66,7 @@ settings
 
 			disabled heroes
 			{
+				Doomfist
 				Symmetra
 				Torbjörn
 				Wrecking Ball
@@ -104,6 +105,7 @@ variables
 		5: _targetPlayerList
 		6: _targetEntry
 		7: BRIGITTE_ULT_ARMOR_PER_SECOND
+		8: DOOMFIST_MAX_CAM_DISTANCE
 		9: DVA_ULT_FORCE_SPEED
 		10: ECHO_ULT_CHARGE_PER_SECOND
 		11: MCCREE_ULT_TIME_SLOW_PERCENT
@@ -171,6 +173,8 @@ rule("Game Setup")
 			"Brigitte Ult Armor Per Second"), 100, 10, 1000, 0);
 		Global.DVA_ULT_FORCE_SPEED = Workshop Setting Real(Custom String("Hero Ult Settings"), Custom String("D.Va Ult Force Speed"), 30,
 			10, 100, 0);
+		disabled Global.DOOMFIST_MAX_CAM_DISTANCE = Workshop Setting Real(Custom String("Hero Ult Settings"), Custom String(
+			"Doomfist Ult Max Camera Distance"), 20, 1, 50, 0);
 		Global.ECHO_ULT_CHARGE_PER_SECOND = Workshop Setting Real(Custom String("Hero Ult Settings"), Custom String(
 			"Echo Ult Charge Per Second"), 10, 1, 60, 0);
 		Global.MCCREE_ULT_TIME_SLOW_PERCENT = Workshop Setting Real(Custom String("Hero Ult Settings"), Custom String(
@@ -333,7 +337,7 @@ rule("Game Setup: Ult Data")
 	}
 }
 
-rule("Skip setup")
+disabled rule("Skip setup")
 {
 	event
 	{
@@ -351,7 +355,7 @@ rule("Skip setup")
 	}
 }
 
-rule("Skip assembly")
+disabled rule("Skip assembly")
 {
 	event
 	{
@@ -369,7 +373,7 @@ rule("Skip assembly")
 	}
 }
 
-rule("==TEST== Teleport to objective ==")
+disabled rule("==TEST== Teleport to objective ==")
 {
 	event
 	{
