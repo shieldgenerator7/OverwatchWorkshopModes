@@ -3,6 +3,7 @@
 1: Ultimate Tagline
 2: Ultimate Description
 3: T/F: Should ult generation be DISABLED during ult?
+4: Ult Duration (real)
 
 //Ultimate Time Left Entries
 0: Hero
