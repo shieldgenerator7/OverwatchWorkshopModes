@@ -78,15 +78,16 @@ rule("Game Setup")
 			"GET OUT {1}", Hero Icon String(Hero(Roadhog)), Ability Icon String(Hero(Roadhog), Button(Ultimate))), Custom String(
 			"ALL DAMAGE HAS KNOCKBACK"), True), Array(Hero(Sigma), Custom String("GRAVITY ADAGIO... {1}", Hero Icon String(Hero(Sigma)),
 			Ability Icon String(Hero(Sigma), Button(Ultimate))), Custom String("LOW GRAVITY, THEN STRONG GRAVITY"), True), Array(Hero(
-			Sombra), Custom String("Liiights out! {1}", Hero Icon String(Hero(Sombra)), Ability Icon String(Hero(Sombra), Button(
-			Ultimate))), Custom String("EVERYONE HACKED"), True), Array(Hero(Tracer), Custom String("TIME TO OPEN THE EYE OF AGAMOTTO {1}",
-			Hero Icon String(Hero(Tracer)), Ability Icon String(Hero(Tracer), Button(Ability 1))), Custom String(
-			"EVERYONE BLINKS WITH TRACER"), True), Array(Hero(Widowmaker), Custom String("I FEEL ALIVE {1}", Hero Icon String(Hero(
-			Widowmaker)), Ability Icon String(Hero(Widowmaker), Button(Secondary Fire))), Custom String("HEADSHOTS ONLY"), True), Array(
-			Hero(Winston), Custom String("OOOH TANKY! {1}", Hero Icon String(Hero(Winston)), Ability Icon String(Hero(Winston), Button(
-			Ultimate))), Custom String("MAX HP INCREASED"), True), Array(Hero(Zenyatta), Custom String("PRAISE THE SUN {1}",
-			Hero Icon String(Hero(Zenyatta)), Ability Icon String(Hero(Zenyatta), Button(Ultimate))), Custom String(
-			"EVERYONE GETS LOTS OF HEALS"), True));
+			Soldier: 76), Custom String("MAKE EVERY BULLET COUNT! {1}", Hero Icon String(Hero(Soldier: 76)), Ability Icon String(Hero(
+			Soldier: 76), Button(Ultimate))), Custom String("EVERYONE HAS AIM HACKS"), True), Array(Hero(Sombra), Custom String(
+			"Liiights out! {1}", Hero Icon String(Hero(Sombra)), Ability Icon String(Hero(Sombra), Button(Ultimate))), Custom String(
+			"EVERYONE HACKED"), True), Array(Hero(Tracer), Custom String("TIME TO OPEN THE EYE OF AGAMOTTO {1}", Hero Icon String(Hero(
+			Tracer)), Ability Icon String(Hero(Tracer), Button(Ability 1))), Custom String("EVERYONE BLINKS WITH TRACER"), True), Array(
+			Hero(Widowmaker), Custom String("I FEEL ALIVE {1}", Hero Icon String(Hero(Widowmaker)), Ability Icon String(Hero(Widowmaker),
+			Button(Secondary Fire))), Custom String("HEADSHOTS ONLY"), True), Array(Hero(Winston), Custom String("OOOH TANKY! {1}",
+			Hero Icon String(Hero(Winston)), Ability Icon String(Hero(Winston), Button(Ultimate))), Custom String("MAX HP INCREASED"),
+			True), Array(Hero(Zenyatta), Custom String("PRAISE THE SUN {1}", Hero Icon String(Hero(Zenyatta)), Ability Icon String(Hero(
+			Zenyatta), Button(Ultimate))), Custom String("EVERYONE GETS LOTS OF HEALS"), True));
 		Global.ultimateTimeLeftEntries = Array();
 		Global.ASHE_ULT_DURATION = Workshop Setting Real(Custom String("Hero Settings"), Custom String("Ashe Ult Duration"), 8, 1, 60, 0);
 		Global.BRIGITTE_ULT_ARMOR_PER_SECOND = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
@@ -938,23 +939,6 @@ rule("ULT: Reinhardt")
 	}
 }
 
-rule("ULT: Roadhog")
-{
-	event
-	{
-		Ongoing - Each Player;
-		All;
-		Roadhog;
-	}
-
-	conditions
-	{
-		Is Button Held(Event Player, Button(Ultimate)) == True;
-		Ultimate Charge Percent(Event Player) == 100;
-		Hero Of(Event Player) == Hero(Roadhog);
-	}
-}
-
 rule("ULT: Roadhog effect")
 {
 	event
@@ -1027,6 +1011,31 @@ rule("ULT: Sigma effect")
 	actions
 	{
 		Damage(Event Player, Filtered Array(All Players(All Teams), Hero Of(Current Array Element) == Hero(Sigma)), 100);
+	}
+}
+
+rule("ULT: Soldier: 76 effect")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is True For Any(Global.ultimateTimeLeftEntries, Current Array Element[0] == Hero(Soldier: 76)) == True;
+		(Is Button Held(Event Player, Button(Primary Fire)) || Is Button Held(Event Player, Button(Secondary Fire))) == True;
+	}
+
+	actions
+	{
+		Event Player._targetPlayer = Player Closest To Reticle(Event Player, Opposite Team Of(Team Of(Event Player)));
+		Start Facing(Event Player, Position Of(Event Player._targetPlayer) - Position Of(Event Player), 360, To World,
+			Direction and Turn Rate);
+		Wait Until(!(Is Button Held(Event Player, Button(Primary Fire)) || Is Button Held(Event Player, Button(Secondary Fire))), 10);
+		Stop Facing(Event Player);
 	}
 }
 
