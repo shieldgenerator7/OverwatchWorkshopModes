@@ -115,23 +115,23 @@ rule("Game Setup")
 			Hero Icon String(Hero(Winston)), Ability Icon String(Hero(Winston), Button(Ultimate))), Custom String("MAX HP INCREASED"),
 			True), Array(Hero(Zenyatta), Custom String("PRAISE THE SUN {1}", Hero Icon String(Hero(Zenyatta)), Ability Icon String(Hero(
 			Zenyatta), Button(Ultimate))), Custom String("EVERYONE GETS LOTS OF HEALS"), True));
-		Global.BRIGITTE_ULT_ARMOR_PER_SECOND = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
+		Global.BRIGITTE_ULT_ARMOR_PER_SECOND = Workshop Setting Real(Custom String("Hero Ult Settings"), Custom String(
 			"Brigitte Ult Armor Per Second"), 100, 10, 1000, 0);
-		Global.DVA_ULT_FORCE_SPEED = Workshop Setting Real(Custom String("Hero Settings"), Custom String("D.Va Ult Force Speed"), 30, 10,
+		Global.DVA_ULT_FORCE_SPEED = Workshop Setting Real(Custom String("Hero Ult Settings"), Custom String("D.Va Ult Force Speed"), 30, 10,
 			100, 0);
-		Global.ECHO_ULT_CHARGE_PER_SECOND = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
+		Global.ECHO_ULT_CHARGE_PER_SECOND = Workshop Setting Real(Custom String("Hero Ult Settings"), Custom String(
 			"Echo Ult Charge Per Second"), 10, 1, 60, 0);
-		Global.MCCREE_ULT_TIME_SLOW_PERCENT = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
+		Global.MCCREE_ULT_TIME_SLOW_PERCENT = Workshop Setting Real(Custom String("Hero Ult Settings"), Custom String(
 			"McCree Ult Time Slow Percent"), 20, 0, 100, 0);
-		Global.MOIRA_ULT_PERCENT_LIFESTEAL = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
+		Global.MOIRA_ULT_PERCENT_LIFESTEAL = Workshop Setting Real(Custom String("Hero Ult Settings"), Custom String(
 			"Moira Ult Percent Lifesteal"), 100, 0, 100, 0);
-		Global.PHARAH_ULT_JUMP_HEIGHT = Workshop Setting Real(Custom String("Hero Settings"), Custom String("Pharah Ult Jump Height"), 5,
+		Global.PHARAH_ULT_JUMP_HEIGHT = Workshop Setting Real(Custom String("Hero Ult Settings"), Custom String("Pharah Ult Jump Height"), 5,
 			1, 100, 0);
-		Global.REAPER_ULT_DAMAGE_PER_SECOND = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
+		Global.REAPER_ULT_DAMAGE_PER_SECOND = Workshop Setting Real(Custom String("Hero Ult Settings"), Custom String(
 			"Reaper Ult Damage Per Second"), 100, 10, 1000, 0);
-		Global.TRACER_ULT_BLINK_DISTANCE = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
+		Global.TRACER_ULT_BLINK_DISTANCE = Workshop Setting Real(Custom String("Hero Ult Settings"), Custom String(
 			"Tracer Ult Blink Distance"), 5, 1, 20, 0);
-		Global.ZENYATTA_ULT_HEAL_PER_SECOND = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
+		Global.ZENYATTA_ULT_HEAL_PER_SECOND = Workshop Setting Real(Custom String("Hero Ult Settings"), Custom String(
 			"Zenyatta Ult Heal Per Second"), 100, 10, 1000, 0);
 		Global.GLOBAL_ULT_DURATION = Workshop Setting Real(Custom String("All heroes"), Custom String("Ult Duration"), 10, 1, 60, 0);
 		Global.ANA_ULT_DURATION = Workshop Setting Real(Custom String("Hero Ult Durations"), Custom String("ANA Ult Duration"), 10, 1, 300,
