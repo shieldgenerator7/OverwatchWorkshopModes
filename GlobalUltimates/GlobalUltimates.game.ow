@@ -44,7 +44,6 @@ settings
 	}
 
 	heroes
-	workshop
 	{
 		General
 		{
@@ -58,6 +57,10 @@ settings
 				Zarya
 			}
 		}
+	}
+
+	workshop
+	{
 		ASHE Ult Duration: 8.000
 		BASTION Ult Duration: 20.000
 		DVA Ult Duration: 60.000
