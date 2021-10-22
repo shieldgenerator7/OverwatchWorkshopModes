@@ -44,6 +44,7 @@ settings
 	}
 
 	heroes
+	workshop
 	{
 		General
 		{
@@ -57,6 +58,19 @@ settings
 				Zarya
 			}
 		}
+		ASHE Ult Duration: 8.000
+		BASTION Ult Duration: 20.000
+		DVA Ult Duration: 60.000
+		GENJI Ult Duration: 20.000
+		LUCIO Ult Duration: 20.000
+		MCCREE Ult Duration: 20.000
+		MOIRA Ult Duration: 20.000
+		ORISA Ult Duration: 20.000
+		PHARAH Ult Duration: 60.000
+		ROADHOG Ult Duration: 60.000
+		SIGMA Ult Duration: 20.000
+		SOLDIER76 Ult Duration: 20.000
+		WINSTON Ult Duration: 60.000
 	}
 }
 
@@ -70,17 +84,43 @@ variables
 		4: _targetPlayer
 		5: _targetPlayerList
 		6: _targetEntry
-		7: TRACER_ULT_BLINK_DISTANCE
-		8: REAPER_ULT_DAMAGE_PER_SECOND
-		9: MOIRA_ULT_PERCENT_LIFESTEAL
-		10: ZENYATTA_ULT_HEAL_PER_SECOND
-		11: MCCREE_ULT_TIME_SLOW_PERCENT
-		14: ECHO_ULT_CHARGE_PER_SECOND
-		16: PHARAH_ULT_JUMP_HEIGHT
-		19: BRIGITTE_ULT_ARMOR_PER_SECOND
-		21: DVA_ULT_FORCE_SPEED
-		28: ASHE_ULT_DURATION
-		29: sigmaUltTimeLeft
+		7: ANA_ULT_DURATION
+		8: ASHE_ULT_DURATION
+		9: BAPTISTE_ULT_DURATION
+		10: BASTION_ULT_DURATION
+		11: BRIGITTE_ULT_DURATION
+		12: DVA_ULT_DURATION
+		13: ECHO_ULT_DURATION
+		14: GENJI_ULT_DURATION
+		15: HANZO_ULT_DURATION
+		16: JUNKRAT_ULT_DURATION
+		17: LUCIO_ULT_DURATION
+		18: MCCREE_ULT_DURATION
+		19: MEI_ULT_DURATION
+		20: MERCY_ULT_DURATION
+		21: MOIRA_ULT_DURATION
+		22: ORISA_ULT_DURATION
+		23: PHARAH_ULT_DURATION
+		24: REAPER_ULT_DURATION
+		25: REINHARDT_ULT_DURATION
+		26: ROADHOG_ULT_DURATION
+		27: SIGMA_ULT_DURATION
+		28: SOLDIER76_ULT_DURATION
+		29: SOMBRA_ULT_DURATION
+		30: TRACER_ULT_DURATION
+		31: WIDOWMAKER_ULT_DURATION
+		32: WINSTON_ULT_DURATION
+		33: ZENYATTA_ULT_DURATION
+		34: BRIGITTE_ULT_ARMOR_PER_SECOND
+		36: DVA_ULT_FORCE_SPEED
+		37: ECHO_ULT_CHARGE_PER_SECOND
+		38: MCCREE_ULT_TIME_SLOW_PERCENT
+		39: MOIRA_ULT_PERCENT_LIFESTEAL
+		40: PHARAH_ULT_JUMP_HEIGHT
+		41: REAPER_ULT_DAMAGE_PER_SECOND
+		42: sigmaUltTimeLeft
+		43: TRACER_ULT_BLINK_DISTANCE
+		44: ZENYATTA_ULT_HEAL_PER_SECOND
 
 	player:
 		0: _i_
@@ -152,7 +192,60 @@ rule("Game Setup")
 			True), Array(Hero(Zenyatta), Custom String("PRAISE THE SUN {1}", Hero Icon String(Hero(Zenyatta)), Ability Icon String(Hero(
 			Zenyatta), Button(Ultimate))), Custom String("EVERYONE GETS LOTS OF HEALS"), True));
 		Global.ultimateTimeLeftEntries = Array();
-		Global.ASHE_ULT_DURATION = Workshop Setting Real(Custom String("Hero Settings"), Custom String("Ashe Ult Duration"), 8, 1, 60, 0);
+		Global.ANA_ULT_DURATION = Workshop Setting Real(Custom String("Hero Ult Durations"), Custom String("ANA Ult Duration"), 10, 1, 300,
+			0);
+		Global.ASHE_ULT_DURATION = Workshop Setting Real(Custom String("Hero Ult Durations"), Custom String("ASHE Ult Duration"), 10, 1,
+			300, 0);
+		Global.BAPTISTE_ULT_DURATION = Workshop Setting Real(Custom String("Hero Ult Durations"), Custom String("BAPTISTE Ult Duration"),
+			10, 1, 300, 0);
+		Global.BASTION_ULT_DURATION = Workshop Setting Real(Custom String("Hero Ult Durations"), Custom String("BASTION Ult Duration"), 10,
+			1, 300, 0);
+		Global.BRIGITTE_ULT_DURATION = Workshop Setting Real(Custom String("Hero Ult Durations"), Custom String("BRIGITTE Ult Duration"),
+			10, 1, 300, 0);
+		Global.DVA_ULT_DURATION = Workshop Setting Real(Custom String("Hero Ult Durations"), Custom String("DVA Ult Duration"), 10, 1, 300,
+			0);
+		Global.ECHO_ULT_DURATION = Workshop Setting Real(Custom String("Hero Ult Durations"), Custom String("ECHO Ult Duration"), 10, 1,
+			300, 0);
+		Global.GENJI_ULT_DURATION = Workshop Setting Real(Custom String("Hero Ult Durations"), Custom String("GENJI Ult Duration"), 10, 1,
+			300, 0);
+		Global.HANZO_ULT_DURATION = Workshop Setting Real(Custom String("Hero Ult Durations"), Custom String("HANZO Ult Duration"), 10, 1,
+			300, 0);
+		Global.JUNKRAT_ULT_DURATION = Workshop Setting Real(Custom String("Hero Ult Durations"), Custom String("JUNKRAT Ult Duration"), 10,
+			1, 300, 0);
+		Global.LUCIO_ULT_DURATION = Workshop Setting Real(Custom String("Hero Ult Durations"), Custom String("LUCIO Ult Duration"), 10, 1,
+			300, 0);
+		Global.MCCREE_ULT_DURATION = Workshop Setting Real(Custom String("Hero Ult Durations"), Custom String("MCCREE Ult Duration"), 10,
+			1, 300, 0);
+		Global.MEI_ULT_DURATION = Workshop Setting Real(Custom String("Hero Ult Durations"), Custom String("MEI Ult Duration"), 10, 1, 300,
+			0);
+		Global.MERCY_ULT_DURATION = Workshop Setting Real(Custom String("Hero Ult Durations"), Custom String("MERCY Ult Duration"), 10, 1,
+			300, 0);
+		Global.MOIRA_ULT_DURATION = Workshop Setting Real(Custom String("Hero Ult Durations"), Custom String("MOIRA Ult Duration"), 10, 1,
+			300, 0);
+		Global.ORISA_ULT_DURATION = Workshop Setting Real(Custom String("Hero Ult Durations"), Custom String("ORISA Ult Duration"), 10, 1,
+			300, 0);
+		Global.PHARAH_ULT_DURATION = Workshop Setting Real(Custom String("Hero Ult Durations"), Custom String("PHARAH Ult Duration"), 10,
+			1, 300, 0);
+		Global.REAPER_ULT_DURATION = Workshop Setting Real(Custom String("Hero Ult Durations"), Custom String("REAPER Ult Duration"), 10,
+			1, 300, 0);
+		Global.REINHARDT_ULT_DURATION = Workshop Setting Real(Custom String("Hero Ult Durations"), Custom String("REINHARDT Ult Duration"),
+			10, 1, 300, 0);
+		Global.ROADHOG_ULT_DURATION = Workshop Setting Real(Custom String("Hero Ult Durations"), Custom String("ROADHOG Ult Duration"), 10,
+			1, 300, 0);
+		Global.SIGMA_ULT_DURATION = Workshop Setting Real(Custom String("Hero Ult Durations"), Custom String("SIGMA Ult Duration"), 10, 1,
+			300, 0);
+		Global.SOLDIER76_ULT_DURATION = Workshop Setting Real(Custom String("Hero Ult Durations"), Custom String("SOLDIER76 Ult Duration"),
+			10, 1, 300, 0);
+		Global.SOMBRA_ULT_DURATION = Workshop Setting Real(Custom String("Hero Ult Durations"), Custom String("SOMBRA Ult Duration"), 10,
+			1, 300, 0);
+		Global.TRACER_ULT_DURATION = Workshop Setting Real(Custom String("Hero Ult Durations"), Custom String("TRACER Ult Duration"), 10,
+			1, 300, 0);
+		Global.WIDOWMAKER_ULT_DURATION = Workshop Setting Real(Custom String("Hero Ult Durations"), Custom String(
+			"WIDOWMAKER Ult Duration"), 10, 1, 300, 0);
+		Global.WINSTON_ULT_DURATION = Workshop Setting Real(Custom String("Hero Ult Durations"), Custom String("WINSTON Ult Duration"), 10,
+			1, 300, 0);
+		Global.ZENYATTA_ULT_DURATION = Workshop Setting Real(Custom String("Hero Ult Durations"), Custom String("ZENYATTA Ult Duration"),
+			10, 1, 300, 0);
 		Global.BRIGITTE_ULT_ARMOR_PER_SECOND = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
 			"Brigitte Ult Armor Per Second"), 100, 10, 1000, 0);
 		Global.DVA_ULT_FORCE_SPEED = Workshop Setting Real(Custom String("Hero Settings"), Custom String("D.Va Ult Force Speed"), 30, 10,
