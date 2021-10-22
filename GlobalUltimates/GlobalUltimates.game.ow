@@ -87,9 +87,15 @@ variables
 		1: _targetPlayer
 		2: _targetPlayerList
 		3: hudTextId
+		4: hero
 		5: ultimateDataEntry
 		6: ultimateTimeLeftEntry
 		7: ultimateTimeLeftIndex
+}
+
+subroutines
+{
+	0: updateHeroInfo
 }
 
 rule("Game Setup")
@@ -219,7 +225,7 @@ rule("==TEST== Teleport to objective ==")
 	}
 }
 
-rule("Player Setup - Disable normal ultimate")
+rule("Player Setup")
 {
 	event
 	{
@@ -237,6 +243,41 @@ rule("Player Setup - Disable normal ultimate")
 	actions
 	{
 		Disallow Button(Event Player, Button(Ultimate));
+		Call Subroutine(updateHeroInfo);
+	}
+}
+
+rule("Player switched hero")
+{
+	event
+	{
+		Ongoing - Each Player;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Hero Of(Event Player) != Event Player.hero;
+	}
+
+	actions
+	{
+		Call Subroutine(updateHeroInfo);
+	}
+}
+
+rule("updateHeroInfo()")
+{
+	event
+	{
+		Subroutine;
+		updateHeroInfo;
+	}
+
+	actions
+	{
+		Event Player.hero = Hero Of(Event Player);
 		Event Player.ultimateDataEntry = Filtered Array(Global.ULTIMATE_DATA, Hero Of(Event Player) == Current Array Element[0])[0];
 		Destroy HUD Text(Event Player.hudTextId);
 		Create HUD Text(Event Player, Custom String("{0} {1}", Hero Icon String(Event Player.ultimateDataEntry[0]),
