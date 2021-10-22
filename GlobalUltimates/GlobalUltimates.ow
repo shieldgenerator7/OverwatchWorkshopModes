@@ -10,6 +10,7 @@ variables
 		6: _targetEntry
 		7: TRACER_ULT_BLINK_DISTANCE
 		8: REAPER_ULT_DAMAGE_PER_SECOND
+		9: MOIRA_ULT_PERCENT_LIFESTEAL
 		10: ZENYATTA_ULT_HEAL_PER_SECOND
 		14: ECHO_ULT_CHARGE_PER_SECOND
 		16: PHARAH_ULT_JUMP_HEIGHT
@@ -65,25 +66,27 @@ rule("Game Setup")
 			McCree)), Ability Icon String(Hero(McCree), Button(Ultimate))), Custom String("TIME SLOWED"), True), Array(Hero(Mei),
 			Custom String("FREEZING RAIN {1}", Hero Icon String(Hero(Mei)), Ability Icon String(Hero(Mei), Button(Ultimate))),
 			Custom String("EVERYONE FROZEN"), True), Array(Hero(Mercy), Custom String("HEROES ALWAYS RISE {1}", Hero Icon String(Hero(
-			Mercy)), Ability Icon String(Hero(Mercy), Button(Ability 2))), Custom String("EVERYONE REVIVES"), True), Array(Hero(Orisa),
-			Custom String("CEASE YOUR RESISTANCE. {1}", Hero Icon String(Hero(Orisa)), Ability Icon String(Hero(Orisa), Button(Ultimate))),
-			Custom String("DAMAGE INCREASED"), True), Array(Hero(Pharah), Custom String("TAKE TO THE SKIES {1}", Hero Icon String(Hero(
-			Pharah)), Ability Icon String(Hero(Pharah), Button(Ability 1))), Custom String("EVERYONE CAN FLY"), True), Array(Hero(Reaper),
-			Custom String("DIE! DIE! DIE! {1}", Hero Icon String(Hero(Reaper)), Ability Icon String(Hero(Reaper), Button(Ultimate))),
-			Custom String("EVERYONE DIES"), True), Array(Hero(Reinhardt), Custom String("EARTHQUAKE!!! {1}", Hero Icon String(Hero(
-			Reinhardt)), Ability Icon String(Hero(Reinhardt), Button(Ultimate))), Custom String("EVERYONE KNOCKED DOWN"), True), Array(
-			Hero(Roadhog), Custom String("GET OUT {1}", Hero Icon String(Hero(Roadhog)), Ability Icon String(Hero(Roadhog), Button(
-			Ultimate))), Custom String("ALL DAMAGE HAS KNOCKBACK"), True), Array(Hero(Sigma), Custom String("GRAVITY ADAGIO... {1}",
-			Hero Icon String(Hero(Sigma)), Ability Icon String(Hero(Sigma), Button(Ultimate))), Custom String(
-			"LOW GRAVITY, THEN STRONG GRAVITY"), True), Array(Hero(Sombra), Custom String("Liiights out! {1}", Hero Icon String(Hero(
-			Sombra)), Ability Icon String(Hero(Sombra), Button(Ultimate))), Custom String("EVERYONE HACKED"), True), Array(Hero(Tracer),
-			Custom String("TIME TO OPEN THE EYE OF AGAMOTTO {1}", Hero Icon String(Hero(Tracer)), Ability Icon String(Hero(Tracer), Button(
-			Ability 1))), Custom String("EVERYONE BLINKS WITH TRACER"), True), Array(Hero(Widowmaker), Custom String("I FEEL ALIVE {1}",
-			Hero Icon String(Hero(Widowmaker)), Ability Icon String(Hero(Widowmaker), Button(Secondary Fire))), Custom String(
-			"HEADSHOTS ONLY"), True), Array(Hero(Winston), Custom String("OOOH TANKY! {1}", Hero Icon String(Hero(Winston)),
-			Ability Icon String(Hero(Winston), Button(Ultimate))), Custom String("MAX HP INCREASED"), True), Array(Hero(Zenyatta),
-			Custom String("PRAISE THE SUN {1}", Hero Icon String(Hero(Zenyatta)), Ability Icon String(Hero(Zenyatta), Button(Ultimate))),
-			Custom String("EVERYONE GETS LOTS OF HEALS"), True));
+			Mercy)), Ability Icon String(Hero(Mercy), Button(Ability 2))), Custom String("EVERYONE REVIVES"), True), Array(Hero(Moira),
+			Custom String("FEAST MY SUBJECTS! {1}", Hero Icon String(Hero(Moira)), Ability Icon String(Hero(Moira), Button(Ultimate))),
+			Custom String("ALL DAMAGE HAS LIFESTEAL"), True), Array(Hero(Orisa), Custom String("CEASE YOUR RESISTANCE. {1}",
+			Hero Icon String(Hero(Orisa)), Ability Icon String(Hero(Orisa), Button(Ultimate))), Custom String("DAMAGE INCREASED"), True),
+			Array(Hero(Pharah), Custom String("TAKE TO THE SKIES {1}", Hero Icon String(Hero(Pharah)), Ability Icon String(Hero(Pharah),
+			Button(Ability 1))), Custom String("EVERYONE CAN FLY"), True), Array(Hero(Reaper), Custom String("DIE! DIE! DIE! {1}",
+			Hero Icon String(Hero(Reaper)), Ability Icon String(Hero(Reaper), Button(Ultimate))), Custom String("EVERYONE DIES"), True),
+			Array(Hero(Reinhardt), Custom String("EARTHQUAKE!!! {1}", Hero Icon String(Hero(Reinhardt)), Ability Icon String(Hero(
+			Reinhardt), Button(Ultimate))), Custom String("EVERYONE KNOCKED DOWN"), True), Array(Hero(Roadhog), Custom String(
+			"GET OUT {1}", Hero Icon String(Hero(Roadhog)), Ability Icon String(Hero(Roadhog), Button(Ultimate))), Custom String(
+			"ALL DAMAGE HAS KNOCKBACK"), True), Array(Hero(Sigma), Custom String("GRAVITY ADAGIO... {1}", Hero Icon String(Hero(Sigma)),
+			Ability Icon String(Hero(Sigma), Button(Ultimate))), Custom String("LOW GRAVITY, THEN STRONG GRAVITY"), True), Array(Hero(
+			Sombra), Custom String("Liiights out! {1}", Hero Icon String(Hero(Sombra)), Ability Icon String(Hero(Sombra), Button(
+			Ultimate))), Custom String("EVERYONE HACKED"), True), Array(Hero(Tracer), Custom String("TIME TO OPEN THE EYE OF AGAMOTTO {1}",
+			Hero Icon String(Hero(Tracer)), Ability Icon String(Hero(Tracer), Button(Ability 1))), Custom String(
+			"EVERYONE BLINKS WITH TRACER"), True), Array(Hero(Widowmaker), Custom String("I FEEL ALIVE {1}", Hero Icon String(Hero(
+			Widowmaker)), Ability Icon String(Hero(Widowmaker), Button(Secondary Fire))), Custom String("HEADSHOTS ONLY"), True), Array(
+			Hero(Winston), Custom String("OOOH TANKY! {1}", Hero Icon String(Hero(Winston)), Ability Icon String(Hero(Winston), Button(
+			Ultimate))), Custom String("MAX HP INCREASED"), True), Array(Hero(Zenyatta), Custom String("PRAISE THE SUN {1}",
+			Hero Icon String(Hero(Zenyatta)), Ability Icon String(Hero(Zenyatta), Button(Ultimate))), Custom String(
+			"EVERYONE GETS LOTS OF HEALS"), True));
 		Global.ultimateTimeLeftEntries = Array();
 		Global.ASHE_ULT_DURATION = Workshop Setting Real(Custom String("Hero Settings"), Custom String("Ashe Ult Duration"), 8, 1, 60, 0);
 		Global.BRIGITTE_ULT_ARMOR_PER_SECOND = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
@@ -93,6 +96,8 @@ rule("Game Setup")
 			"Doomfist Ult Max Camera Distance"), 20, 1, 50, 0);
 		Global.ECHO_ULT_CHARGE_PER_SECOND = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
 			"Echo Ult Charge Per Second"), 10, 1, 60, 0);
+		Global.MOIRA_ULT_PERCENT_LIFESTEAL = Workshop Setting Real(Custom String("HERO SETTINGS"), Custom String(
+			"MOIRA ULT PERCENT LIFESTEAL"), 100, 0, 100, 0);
 		Global.PHARAH_ULT_JUMP_HEIGHT = Workshop Setting Real(Custom String("Hero Settings"), Custom String("Pharah Ult Jump Height"), 5,
 			1, 100, 0);
 		Global.REAPER_ULT_DAMAGE_PER_SECOND = Workshop Setting Real(Custom String("Hero Settings"), Custom String(
@@ -776,6 +781,26 @@ rule("ULT: Mercy effect")
 		Resurrect(Event Player);
 		Big Message(All Players(All Teams), Custom String("{0} {1} RESURRECTED {0}", Ability Icon String(Hero(Mercy), Button(Ability 2)),
 			Hero Of(Event Player)));
+	}
+}
+
+rule("ULT: Moira effect")
+{
+	event
+	{
+		Player Dealt Damage;
+		All;
+		All;
+	}
+
+	conditions
+	{
+		Is True For Any(Global.ultimateTimeLeftEntries, Current Array Element[0] == Hero(Moira)) == True;
+	}
+
+	actions
+	{
+		Heal(Event Player, Event Player, Event Damage * Global.MOIRA_ULT_PERCENT_LIFESTEAL / 100);
 	}
 }
 
