@@ -22,6 +22,7 @@ variables
 		0: _i_
 		1: _targetPlayer
 		2: _targetPlayerList
+		3: hudTextId
 		5: ultimateDataEntry
 		6: ultimateTimeLeftEntry
 		7: ultimateTimeLeftIndex
@@ -167,11 +168,19 @@ rule("Player Setup - Disable normal ultimate")
 	conditions
 	{
 		Is Alive(Event Player) == True;
+		Has Spawned(Event Player) == True;
 	}
 
 	actions
 	{
 		Disallow Button(Event Player, Button(Ultimate));
+		Event Player.ultimateDataEntry = Filtered Array(Global.ULTIMATE_DATA, Hero Of(Event Player) == Current Array Element[0])[0];
+		Destroy HUD Text(Event Player.hudTextId);
+		Create HUD Text(Event Player, Custom String("{0} {1}", Hero Icon String(Event Player.ultimateDataEntry[0]),
+			Event Player.ultimateDataEntry[0]), Custom String("{0}", Event Player.ultimateDataEntry[1]), Custom String("{0}",
+			Event Player.ultimateDataEntry[2]), Right, 0, Color(White), Color(White), Color(White), Visible To and String,
+			Default Visibility);
+		Event Player.hudTextId = Last Text ID;
 	}
 }
 
